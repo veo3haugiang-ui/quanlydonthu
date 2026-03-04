@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>HỆ THỐNG QUẢN LÝ ĐƠN THƯ</title>
+
+<style>
+
+/* ===== BACKGROUND ===== */
+
+body{
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:#f4f6f9;
+}
+
+#loginPage{
+height:100vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+background:
+linear-gradient(rgba(120,0,0,0.85),rgba(120,0,0,0.85)),
+url("https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=1600&auto=format&fit=crop") center/cover no-repeat;
+}
+
+/* ===== WRAPPER ===== */
+
+.login-wrapper{
+text-align:center;
+color:white;
+width:100%;
+}
+
+/* ===== HEADER TITLE ===== */
+
+.system-title{
+font-size:30px;
+font-weight:700;
+letter-spacing:1px;
+margin-bottom:6px;
+}
+
+.system-subtitle{
+font-size:14px;
+opacity:0.9;
+margin-bottom:35px;
+}
+
+/* ===== LOGIN CARD ===== */
+
+.login-box{
+background:white;
+width:380px;
+margin:auto;
+padding:40px 35px;
+border-radius:18px;
+box-shadow:0 30px 70px rgba(0,0,0,0.45);
+text-align:left;
+animation:fadeIn 0.4s ease;
+}
+
+.login-box h3{
+margin:0 0 25px 0;
+color:#b02a37;
+font-weight:600;
+text-align:center;
+}
+
+/* ===== INPUT ===== */
+
+.login-box input{
+width:100%;
+padding:14px;
+margin-bottom:18px;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:14px;
+transition:0.2s;
+background:#f7f9fc;
+}
+
+.login-box input:focus{
+border-color:#b02a37;
+background:white;
+outline:none;
+box-shadow:0 0 0 3px rgba(176,42,55,0.15);
+}
+
+/* ===== BUTTON ===== */
+
+.login-box button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+background:linear-gradient(135deg,#b02a37,#8b1e2d);
+color:white;
+font-weight:600;
+cursor:pointer;
+transition:0.3s;
+font-size:15px;
+}
+
+.login-box button:hover{
+transform:translateY(-2px);
+box-shadow:0 10px 25px rgba(176,42,55,0.4);
+}
+
+/* ===== ANIMATION ===== */
+
+@keyframes fadeIn{
+from{transform:translateY(-25px);opacity:0}
+to{transform:translateY(0);opacity:1}
+}
+
+#dateTimeBox{
+font-size:13px;
+opacity:0.9;
+margin-top:3px;
+}
+
+header{
+background:#b02a37;
+color:white;
+padding:15px 20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+position:sticky;
+top:0;
+z-index:1000;
+}
+
+header h2{
+margin:0;
+font-size:22px;
+font-weight:700;
+letter-spacing:0.5px;
+}
+
+#welcomeBox{
+margin-top:4px;
+font-size:13px;
+opacity:0.9;
+}
+
+.container{width:98%;margin:15px auto;}
+.card{background:white;padding:15px;border-radius:8px;margin-bottom:15px;}
+input,select,textarea{width:100%;padding:6px;margin-bottom:8px;}
+button{padding:6px 10px;border:none;border-radius:5px;cursor:pointer;margin-right:4px;}
+.btn-save{background:#198754;color:white;}
+.btn-delete{background:#dc3545;color:white;}
+.btn-view{background:#0d6efd;color:white;}
+.btn-edit{background:#ffc107;}
+.btn-logout{background:#6c757d;color:white;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{border:1px solid #ccc;padding:6px;}
+th{background:#f8d7da;}
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.55);
+backdrop-filter:blur(6px);
+z-index:1000;
+}
+
+.modal-content{
+background:#ffffff;
+width:80%;
+max-width:1000px;
+margin:3% auto;
+padding:30px;
+border-radius:16px;
+position:relative;
+max-height:90%;
+overflow:auto;
+box-shadow:0 25px 60px rgba(0,0,0,0.35);
+animation:fadeIn .25s ease;
+}
+
+@keyframes fadeIn{
+from{transform:translateY(-15px);opacity:0}
+to{transform:translateY(0);opacity:1}
+}
+
+.view-title{
+font-size:22px;
+font-weight:700;
+margin-bottom:20px;
+color:#b02a37;
+border-bottom:2px solid #f1f1f1;
+padding-bottom:10px;
+}
+
+.view-section{
+margin-bottom:20px;
+}
+
+.section-title{
+font-weight:600;
+margin-bottom:10px;
+color:#333;
+font-size:14px;
+text-transform:uppercase;
+letter-spacing:0.5px;
+}
+
+.view-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px 20px;
+}
+
+.view-item{
+background:#f8f9fb;
+padding:12px 14px;
+border-radius:10px;
+border:1px solid #e8e8e8;
+}
+
+.view-label{
+font-size:12px;
+color:#777;
+margin-bottom:5px;
+}
+
+.view-value{
+font-size:14px;
+font-weight:500;
+color:#222;
+}
+
+.view-full{
+grid-column:1 / -1;
+}
+
+.status-badge{
+display:inline-block;
+padding:4px 10px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+}
+
+.status-processing{
+background:#fff3cd;
+color:#856404;
+}
+
+.status-done{
+background:#d4edda;
+color:#155724;
+}
+
+.status-transfer{
+background:#d1ecf1;
+color:#0c5460;
+}
+
+.filter-row button{
+padding:7px 14px;
+border-radius:6px;
+font-weight:600;
+}
+
+.filter-row button:first-of-type{
+background:#0d6efd;
+color:white;
+}
+
+.filter-row button:last-of-type{
+background:#dc3545;
+color:white;
+}
+
+.filter-row button:hover{
+opacity:0.85;
+}
+
+.popup-actions{
+text-align:center;
+margin-top:25px;
+}
+
+.close-btn{position:absolute;top:10px;right:10px;background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:5px;}
+.login-box{max-width:400px;margin:100px auto;background:white;padding:20px;border-radius:8px;}
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.stats{background:#fff3cd;padding:10px;border-radius:6px;margin-bottom:10px;}
+
+.view-container{padding:10px;}
+.view-title{font-size:20px;font-weight:bold;margin-bottom:15px;color:#b02a37;}
+.view-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;}
+.view-item{background:#f8f9fa;padding:10px;border-radius:8px;}
+.view-label{font-size:13px;font-weight:bold;color:#666;}
+.view-value{margin-top:4px;font-size:14px;}
+.view-full{grid-column:1 / -1;}
+.view-history{margin-top:15px;background:#fff3cd;padding:10px;border-radius:8px;font-size:13px;}
+.popup-actions{text-align:center;margin-top:20px;}
+.print-btn{background:#0d6efd;color:white;}
+.pdf-btn{background:#198754;color:white;}
+
+header{
+background:#b02a37;
+color:white;
+padding:12px 25px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+position:sticky;
+top:0;
+z-index:1000;
+}
+
+.header-left{
+display:flex;
+flex-direction:column;
+}
+
+.header-right{
+display:flex;
+align-items:center;
+gap:15px;
+font-size:14px;
+}
+
+#welcomeBox{
+font-weight:500;
+}
+
+#dateTimeBox{
+font-size:13px;
+opacity:0.9;
+margin-top:4px;
+}
+</style>
+
+
+<script>
+
+
+
+window.addEventListener("error", function(e){
+console.error("Lỗi JS:", e.message);
+});
+
+const users={
+lbphuc:{pass:"123",role:"Phó Giám đốc",fullname:"Lục Bích Phúc"},
+ntnhi:{pass:"123",role:"Phó Chánh Văn phòng",fullname:"Nguyễn Thị Nhi"},
+ntlong:{pass:"123",role:"Cán bộ xử lý",fullname:"Nguyễn Thế Long"},
+lttrinh:{pass:"123",role:"Cán bộ xử lý",fullname:"Lâm Tố Trinh"},
+ntbphuong:{pass:"123",role:"Cán bộ xử lý",fullname:"Nguyễn Thị Bích Phượng"}
+};
+
+let currentUser=null;
+let currentRole=null;
+let cases=[];
+let editIndex=-1;
+
+const API_URL="https://script.google.com/macros/s/AKfycbx2_I0zlJBZQftCylsYAf1tB_NpNTud-SIOaw5z1uJvx2qOAoEW7PhzHCBjxckZdYvG/exec";
+function loadData(){
+fetch(API_URL)
+.then(res=>{
+if(!res.ok){
+throw new Error("Lỗi kết nối API");
+}
+return res.json();
+})
+.then(data=>{
+if(!Array.isArray(data)){
+console.error("Dữ liệu không hợp lệ:", data);
+cases=[];
+}else{
+cases=data;
+}
+displayData();
+filteredCases=[...cases];
+updateStats(cases);
+})
+.catch(err=>{
+console.error("Lỗi tải dữ liệu:", err);
+cases=[];
+displayData();
+filteredCases=[...cases];
+updateStats(cases);
+});
+}
+
+function login(){
+let u=username.value;
+let p=password.value;
+
+if(users[u] && users[u].pass===p){
+currentUser=u;
+currentRole=users[u].role;
+loginPage.style.display="none";
+mainPage.style.display="block";
+welcomeBox.innerHTML="👤 <b>"+users[u].fullname+"</b> | Vai trò: "+users[u].role;
+loadData();
+}else{
+alert("Sai tài khoản hoặc mật khẩu");
+}
+}
+
+function logout(){
+mainPage.style.display="none";
+loginPage.style.display="block";
+}
+
+function generateCode(type){
+let year=new Date().getFullYear();
+let prefix={ "Khiếu nại":"KN","Tố cáo":"TC","Phản ánh":"PA","Hòa giải":"HG"}[type];
+let count=cases.filter(c=>c.loaidon===type).length+1;
+return prefix+String(count).padStart(2,'0')+"-"+year;
+}
+
+function addCase(){
+
+let loaidon=loaidonField.value;
+let mahoso=(editIndex===-1)?generateCode(loaidon):cases[editIndex].mahoso;
+
+let newData={
+action:(editIndex===-1)?"add":"update",
+mahoso,
+ngayden:ngayden.value,
+nguondon:nguondon.value,
+linhvuc:linhvuc.value,
+soluong:soluong.value,
+hoten:hoten.value,
+diachi:diachi.value,
+dienthoai:dienthoai.value,
+noidung:noidung.value,
+coquan:coquan.value,
+ketqua:ketqua.value,
+sokyhieu:sokyhieu.value,
+kyduyet:kyduyet.value,
+soanthao:soanthao.value,
+ghichu:ghichu.value,
+tinhtrang:tinhtrang.value,
+loaidon,
+owner:(editIndex===-1)?currentUser:cases[editIndex].owner,
+history:[]
+};
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify(newData)
+}).then(()=>loadData());
+
+form.reset();
+editIndex=-1;
+}
+
+function deleteCase(i){
+if(currentRole==="Phó Giám đốc"){alert("Lãnh đạo không được xóa");return;}
+if(cases[i].owner!==currentUser){alert("Không có quyền xóa");return;}
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({action:"delete",mahoso:cases[i].mahoso})
+}).then(()=>loadData());
+}
+
+function editCase(i){
+if(currentRole!=="Phó Giám đốc" && cases[i].owner!==currentUser){
+alert("Không có quyền sửa");
+return;
+}
+let c=cases[i];
+Object.keys(c).forEach(k=>{
+if(document.getElementById(k)){
+
+if(k === "ngayden" && c[k]){
+let d = new Date(c[k]);
+let iso = d.toISOString().split("T")[0];
+document.getElementById(k).value = iso;
+}else{
+document.getElementById(k).value = c[k];
+}
+
+}
+});
+editIndex=i;
+}
+
+function displayData(){
+tbody.innerHTML="";
+cases.forEach((c,i)=>{
+let buttons=`<button class="btn-view" onclick="viewCase(${i})">Xem</button>`;
+if(c.tinhtrang!=="Đã giải quyết"){
+if(currentRole==="Phó Giám đốc" || c.owner===currentUser){
+buttons+=`<button class="btn-edit" onclick="editCase(${i})">Sửa</button>`;
+}
+if(c.owner===currentUser){
+buttons+=`<button class="btn-delete" onclick="deleteCase(${i})">Xóa</button>`;
+}
+}
+tbody.innerHTML+=`
+<tr>
+<td>${i+1}</td>
+<td>${c.mahoso}</td>
+<td>${formatDate(c.ngayden)}</td>
+<td>${c.hoten}</td>
+<td>${c.loaidon}</td>
+<td>${users[c.owner] ? users[c.owner].fullname : c.owner}</td>
+<td>${buttons}</td>
+</tr>`;
+});
+}
+
+function formatDate(dateStr){
+if(!dateStr) return "";
+let d = new Date(dateStr);
+return d.toLocaleDateString("vi-VN");
+}
+
+function viewCase(i){
+let c = cases[i];
+
+let statusClass = "status-processing";
+if(c.tinhtrang==="Đã giải quyết") statusClass="status-done";
+if(c.tinhtrang==="Chuyển cơ quan khác") statusClass="status-transfer";
+
+modalBody.innerHTML = `
+<div class="view-container">
+
+<div class="view-title">
+📄 Hồ sơ: ${c.mahoso}
+</div>
+
+<div class="view-section">
+<div class="section-title">Thông tin cơ bản</div>
+<div class="view-grid">
+
+<div class="view-item">
+<div class="view-label">Ngày đến</div>
+<div class="view-value">${formatDate(c.ngayden)}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Loại đơn</div>
+<div class="view-value">${c.loaidon||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Nguồn đơn</div>
+<div class="view-value">${c.nguondon||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Lĩnh vực</div>
+<div class="view-value">${c.linhvuc||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Số người</div>
+<div class="view-value">${c.soluong||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Họ tên</div>
+<div class="view-value">${c.hoten||""}</div>
+</div>
+
+<div class="view-item view-full">
+<div class="view-label">Địa chỉ</div>
+<div class="view-value">${c.diachi||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Điện thoại</div>
+<div class="view-value">${c.dienthoai||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Tình trạng</div>
+<div class="view-value">
+<span class="status-badge ${statusClass}">
+${c.tinhtrang||""}
+</span>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="view-section">
+<div class="section-title">Nội dung & xử lý</div>
+<div class="view-grid">
+
+<div class="view-item view-full">
+<div class="view-label">Nội dung</div>
+<div class="view-value">${c.noidung||""}</div>
+</div>
+
+<div class="view-item view-full">
+<div class="view-label">Cơ quan xử lý</div>
+<div class="view-value">${c.coquan||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Kết quả</div>
+<div class="view-value">${c.ketqua||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Số ký hiệu</div>
+<div class="view-value">${c.sokyhieu||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Ký duyệt</div>
+<div class="view-value">${c.kyduyet||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Soạn thảo</div>
+<div class="view-value">${c.soanthao||""}</div>
+</div>
+
+<div class="view-item view-full">
+<div class="view-label">Ghi chú</div>
+<div class="view-value">${c.ghichu||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Người nhập</div>
+<div class="view-value">
+${users[c.owner] ? users[c.owner].fullname : c.owner}
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="popup-actions">
+<button class="print-btn" onclick="window.print()">🖨 In</button>
+<button class="pdf-btn" onclick="window.print()">📑 Xuất PDF</button>
+</div>
+
+</div>
+`;
+
+modal.style.display="block";
+}
+
+function closeModal(){modal.style.display="none";}
+window.onclick=function(e){if(e.target==modal){modal.style.display="none";}};
+
+let filteredCases = [];
+
+function updateStats(list = cases){
+let total = list.length;
+let kn = list.filter(c=>c.loaidon==="Khiếu nại").length;
+let tc = list.filter(c=>c.loaidon==="Tố cáo").length;
+let pa = list.filter(c=>c.loaidon==="Phản ánh").length;
+let hg = list.filter(c=>c.loaidon==="Hòa giải").length;
+
+statsBox.innerHTML = `
+<b>📊 TỔNG SỐ HỒ SƠ: ${total}</b><br>
+Khiếu nại: ${kn} |
+Tố cáo: ${tc} |
+Phản ánh: ${pa} |
+Hòa giải: ${hg}
+`;
+}
+
+function applyFilter(){
+let m = monthFilter.value;
+let t = typeFilter.value;
+let k = searchInput.value.toLowerCase();
+
+filteredCases = cases.filter(c=>{
+let okMonth = !m || (new Date(c.ngayden).getMonth()+1 == m);
+let okType = !t || c.loaidon === t;
+let okKey = (c.mahoso||"").toLowerCase().includes(k) ||
+            (c.hoten||"").toLowerCase().includes(k);
+return okMonth && okType && okKey;
+});
+
+displayFiltered(filteredCases);
+updateStats(filteredCases);
+}
+
+function resetFilter(){
+monthFilter.value="";
+typeFilter.value="";
+searchInput.value="";
+filteredCases = [...cases];
+displayFiltered(filteredCases);
+updateStats(cases);
+}
+
+function displayFiltered(list){
+tbody.innerHTML="";
+list.forEach((c,i)=>{
+let buttons=`<button class="btn-view" onclick="viewCase(${i})">Xem</button>`;
+tbody.innerHTML+=`
+<tr>
+<td>${i+1}</td>
+<td>${c.mahoso}</td>
+<td>${formatDate(c.ngayden)}</td>
+<td>${c.hoten}</td>
+<td>${c.loaidon}</td>
+<td>${users[c.owner] ? users[c.owner].fullname : c.owner}</td>
+<td>${buttons}</td>
+</tr>`;
+});
+}
+
+function updateDateTime(){
+const now = new Date();
+
+const weekdays = [
+"Chủ nhật","Thứ Hai","Thứ Ba","Thứ Tư",
+"Thứ Năm","Thứ Sáu","Thứ Bảy"
+];
+
+const dayName = weekdays[now.getDay()];
+const date = now.toLocaleDateString("vi-VN");
+const time = now.toLocaleTimeString("vi-VN");
+
+document.getElementById("dateTimeBox").innerHTML =
+"📅 " + dayName + ", " + date + " – 🕒 " + time;
+}
+
+setInterval(updateDateTime,1000);
+updateDateTime();
+
+</script>
+</head>
+<body>
+
+<div id="loginPage" class="login-wrapper">
+
+<div class="system-title">
+HỆ THỐNG QUẢN LÝ ĐƠN THƯ
+</div>
+
+<div class="system-subtitle">
+SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
+</div>
+
+<div class="login-box">
+
+<input id="username" placeholder="Tài khoản">
+<input id="password" type="password" placeholder="Mật khẩu">
+
+<button onclick="login()">Đăng nhập</button>
+</div>
+
+</div>
+
+<div id="mainPage" style="display:none;">
+
+<header>
+<div class="header-left">
+<h2>HỆ THỐNG QUẢN LÝ ĐƠN THƯ</h2>
+<div id="dateTimeBox"></div>
+</div>
+
+<div class="header-right">
+<div id="welcomeBox"></div>
+<button class="btn-logout" onclick="logout()">Đăng xuất</button>
+</div>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h3>Nhập hồ sơ</h3>
+<form id="form" onsubmit="event.preventDefault(); addCase();">
+
+<input type="date" id="ngayden" required>
+<input id="nguondon" placeholder="Nguồn đơn">
+<select id="loaidonField">
+<option>Khiếu nại</option>
+<option>Tố cáo</option>
+<option>Phản ánh</option>
+<option>Hòa giải</option>
+</select>
+<input id="linhvuc" placeholder="Lĩnh vực">
+<input id="soluong" type="number" placeholder="Số người">
+<input id="hoten" placeholder="Họ tên" required>
+<input id="diachi" placeholder="Địa chỉ">
+<input id="dienthoai" placeholder="Điện thoại">
+<textarea id="noidung" placeholder="Nội dung"></textarea>
+<input id="coquan" placeholder="Cơ quan xử lý">
+<input id="ketqua" placeholder="Kết quả">
+<input id="sokyhieu" placeholder="Số ký hiệu">
+<input id="kyduyet" placeholder="Ký duyệt">
+<input id="soanthao" placeholder="Soạn thảo">
+<input id="ghichu" placeholder="Ghi chú">
+<select id="tinhtrang">
+<option>Đang xử lý</option>
+<option>Đã giải quyết</option>
+<option>Chuyển cơ quan khác</option>
+</select>
+
+<button type="submit" class="btn-save">Lưu hồ sơ</button>
+</form>
+</div>
+
+<div class="card">
+<div class="stats" id="statsBox"></div>
+
+<div class="filter-row">
+<select id="monthFilter">
+<option value="">-- Tháng --</option>
+<option value="1">Tháng 1</option>
+<option value="2">Tháng 2</option>
+<option value="3">Tháng 3</option>
+<option value="4">Tháng 4</option>
+<option value="5">Tháng 5</option>
+<option value="6">Tháng 6</option>
+<option value="7">Tháng 7</option>
+<option value="8">Tháng 8</option>
+<option value="9">Tháng 9</option>
+<option value="10">Tháng 10</option>
+<option value="11">Tháng 11</option>
+<option value="12">Tháng 12</option>
+</select>
+
+<select id="typeFilter">
+<option value="">-- Loại đơn --</option>
+<option>Khiếu nại</option>
+<option>Tố cáo</option>
+<option>Phản ánh</option>
+<option>Hòa giải</option>
+</select>
+
+<input id="searchInput" placeholder="Tìm mã HS, họ tên...">
+
+<button onclick="applyFilter()">Lọc</button>
+<button onclick="resetFilter()">Xóa lọc</button>
+</div>
+<h3>Danh sách hồ sơ</h3>
+
+<table>
+<thead>
+<tr>
+<th>STT</th>
+<th>Mã HS</th>
+<th>Ngày</th>
+<th>Họ tên</th>
+<th>Loại</th>
+<th>Người nhập</th>
+<th>Thao tác</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+</div>
+
+</div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<button class="close-btn" onclick="closeModal()">Đóng</button>
+<div id="modalBody"></div>
+</div>
+</div>
+
+</body>
+</html>
