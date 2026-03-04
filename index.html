@@ -203,6 +203,19 @@ padding-bottom:10px;
 margin-bottom:20px;
 }
 
+.btn-save{
+background:#2e7d32;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:5px;
+font-weight:600;
+cursor:pointer;
+}
+
+.btn-save:hover{
+background:#1b5e20;
+}
 .section-title{
 font-weight:600;
 margin-bottom:10px;
@@ -212,6 +225,56 @@ text-transform:uppercase;
 letter-spacing:0.5px;
 }
 
+.form-container{
+max-width:900px;
+margin:auto;
+}
+
+.card-section{
+background:white;
+padding:16px;
+border-radius:6px;
+margin-bottom:18px;
+box-shadow:0 2px 4px rgba(0,0,0,0.08);
+}
+
+.section-title{
+font-weight:700;
+color:#b02a37;
+margin-bottom:12px;
+font-size:15px;
+border-bottom:2px solid #eee;
+padding-bottom:6px;
+}
+
+.form-group{
+margin-bottom:12px;
+}
+
+.form-group label{
+font-weight:600;
+font-size:13px;
+display:block;
+margin-bottom:4px;
+}
+
+input,select,textarea{
+width:100%;
+padding:8px 10px;
+border:1px solid #ccc;
+border-radius:4px;
+font-size:13px;
+}
+
+textarea{
+min-height:80px;
+}
+
+input:focus,select:focus,textarea:focus{
+border-color:#b02a37;
+outline:none;
+box-shadow:0 0 3px rgba(176,42,55,0.2);
+}
 .view-grid{
 display:grid;
 grid-template-columns:1fr 1fr;
@@ -287,6 +350,76 @@ opacity:0.85;
 .popup-actions{
 text-align:center;
 margin-top:25px;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
+.form-group{
+display:flex;
+flex-direction:column;
+}
+
+.btn-add{
+background:#b02a37;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:5px;
+font-weight:600;
+cursor:pointer;
+margin-bottom:10px;
+}
+
+.btn-add:hover{
+background:#8c1f2b;
+}
+
+.form-group label{
+font-weight:600;
+font-size:13px;
+margin-bottom:4px;
+color:#444;
+}
+
+input,select,textarea{
+padding:8px 10px;
+border:1px solid #ccc;
+border-radius:4px;
+font-size:13px;
+width:100%;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+border-color:#b02a37;
+outline:none;
+box-shadow:0 0 4px rgba(176,42,55,0.2);
+}
+
+textarea{
+min-height:70px;
+}
+
+.card-section{
+background:white;
+padding:15px;
+border-radius:6px;
+box-shadow:0 2px 4px rgba(0,0,0,0.08);
+margin-bottom:16px;
+}
+
+.section-title{
+font-weight:700;
+color:#b02a37;
+font-size:14px;
+margin-bottom:12px;
+border-bottom:2px solid #eee;
+padding-bottom:6px;
 }
 
 .close-btn{position:absolute;top:10px;right:10px;background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:5px;}
@@ -448,9 +581,21 @@ mainPage.style.display="none";
 loginPage.style.display="block";
 }
 
+function newCase(){
+document.getElementById("form").reset();
+editIndex=-1;
+document.getElementById("formModal").style.display="block";
+}
+
 function generateCode(type){
 let year=new Date().getFullYear();
-let prefix={ "Khiếu nại":"KN","Tố cáo":"TC","Phản ánh":"PA","Hòa giải":"HG"}[type];
+let prefix={
+"Khiếu nại":"KN",
+"Tố cáo":"TC",
+"Phản ánh":"PA",
+"Hòa giải":"HG",
+"Khác":"K"
+}[type] || "HS";
 let count=cases.filter(c=>c.loaidon===type).length+1;
 return prefix+String(count).padStart(2,'0')+"-"+year;
 }
@@ -483,45 +628,77 @@ owner:(editIndex===-1)?currentUser:cases[editIndex].owner,
 history:[]
 };
 
+
+
 fetch(API_URL,{
 method:"POST",
 body:JSON.stringify(newData)
-}).then(()=>loadData());
-
-form.reset();
-editIndex=-1;
+})
+.then(()=>{
+alert("✅ Đã lưu hồ sơ thành công");
+closeForm();
+loadData();
+});
 }
 
 function deleteCase(i){
-if(currentRole==="Phó Giám đốc"){alert("Lãnh đạo không được xóa");return;}
-if(cases[i].owner!==currentUser){alert("Không có quyền xóa");return;}
+
+if(currentRole==="Phó Giám đốc"){
+alert("Lãnh đạo không được xóa");
+return;
+}
+
+if(cases[i].owner!==currentUser){
+alert("Không có quyền xóa");
+return;
+}
+
+if(!confirm("⚠️ Bạn có chắc chắn muốn xóa hồ sơ này không?")){
+return;
+}
 
 fetch(API_URL,{
 method:"POST",
-body:JSON.stringify({action:"delete",mahoso:cases[i].mahoso})
-}).then(()=>loadData());
+body:JSON.stringify({
+action:"delete",
+mahoso:cases[i].mahoso
+})
+})
+.then(()=>{
+alert("🗑 Hồ sơ đã được xóa");
+loadData();
+});
+
 }
 
 function editCase(i){
+
 if(currentRole!=="Phó Giám đốc" && cases[i].owner!==currentUser){
 alert("Không có quyền sửa");
 return;
 }
-let c=cases[i];
+
+let c = cases[i];
+
 Object.keys(c).forEach(k=>{
 if(document.getElementById(k)){
 
-if(k === "ngayden" && c[k]){
-let d = new Date(c[k]);
-let iso = d.toISOString().split("T")[0];
-document.getElementById(k).value = iso;
+if(k==="ngayden" && c[k]){
+let d=new Date(c[k]);
+let iso=d.toISOString().split("T")[0];
+document.getElementById(k).value=iso;
 }else{
-document.getElementById(k).value = c[k];
+document.getElementById(k).value=c[k];
 }
 
 }
 });
+
 editIndex=i;
+
+/* MỞ POPUP */
+document.getElementById("formModal").style.display="block";
+
 }
 
 function displayData(){
@@ -696,13 +873,16 @@ let kn = list.filter(c=>c.loaidon==="Khiếu nại").length;
 let tc = list.filter(c=>c.loaidon==="Tố cáo").length;
 let pa = list.filter(c=>c.loaidon==="Phản ánh").length;
 let hg = list.filter(c=>c.loaidon==="Hòa giải").length;
+let k = list.filter(c=>c.loaidon==="Khác").length;
+
 
 statsBox.innerHTML = `
 <b>📊 TỔNG SỐ HỒ SƠ: ${total}</b><br>
 Khiếu nại: ${kn} |
 Tố cáo: ${tc} |
 Phản ánh: ${pa} |
-Hòa giải: ${hg}
+Hòa giải: ${hg} |
+Khác: ${k}
 `;
 }
 
@@ -768,9 +948,43 @@ document.getElementById("dateTimeBox").innerHTML =
 setInterval(updateDateTime,1000);
 updateDateTime();
 
+function toggleForm(){
+
+let form=document.getElementById("formNhapHoSo");
+
+if(form.style.display==="none"){
+form.style.display="block";
+window.scrollTo(0,0);
+}else{
+form.style.display="none";
+}
+
+}
+
+function openForm(){
+
+document.getElementById("formModal").style.display="block";
+
+document.getElementById("form").reset();
+
+editIndex=-1;
+
+}
+
+function closeForm(){
+
+document.getElementById("formModal").style.display="none";
+
+}
+
+
+
+
 </script>
 </head>
 <body>
+
+
 
 <div id="loginPage" class="login-wrapper">
 
@@ -809,131 +1023,15 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <div class="container">
 
 <div class="card">
-<h3>Nhập hồ sơ</h3>
+<button class="btn-add" onclick="newCase()">
+➕ Nhập hồ sơ mới
+</button>
 
-<form id="form" onsubmit="event.preventDefault(); addCase();">
 
-<!-- THÔNG TIN HỒ SƠ -->
-
-<div class="section">
-
-<div class="section-title">📁 Thông tin hồ sơ</div>
-
-<div class="form-grid">
-
-<input type="date" id="ngayden" required>
-
-<select id="loaidonField">
-<option>Khiếu nại</option>
-<option>Tố cáo</option>
-<option>Phản ánh</option>
-<option>Hòa giải</option>
-</select>
-
-<input id="nguondon" placeholder="Nguồn đơn">
-
-<input id="linhvuc" placeholder="Lĩnh vực">
-
-<input id="soluong" type="number" placeholder="Số người">
 
 </div>
-
 </div>
 
-
-<!-- THÔNG TIN NGƯỜI GỬI -->
-
-<div class="section">
-
-<div class="section-title">👤 Thông tin người gửi</div>
-
-<div class="form-grid">
-
-<input id="hoten" placeholder="Họ tên" required>
-
-<input id="dienthoai" placeholder="Điện thoại">
-
-<input id="diachi" placeholder="Địa chỉ" class="form-full">
-
-</div>
-
-</div>
-
-
-<!-- NỘI DUNG ĐƠN -->
-
-<div class="section">
-
-<div class="section-title">📝 Nội dung đơn</div>
-
-<textarea id="noidung" placeholder="Nội dung đơn"></textarea>
-
-</div>
-
-
-<!-- XỬ LÝ HỒ SƠ -->
-
-<div class="section">
-
-<div class="section-title">⚙ Xử lý hồ sơ</div>
-
-<div class="form-grid">
-
-<input id="coquan" placeholder="Cơ quan xử lý">
-
-<select id="tinhtrang">
-<option>Đang xử lý</option>
-<option>Đã giải quyết</option>
-<option>Chuyển cơ quan khác</option>
-</select>
-
-<input id="ketqua" placeholder="Kết quả">
-
-<input id="sokyhieu" placeholder="Số ký hiệu">
-
-<input id="kyduyet" placeholder="Ký duyệt">
-
-<input id="soanthao" placeholder="Soạn thảo">
-
-<textarea id="ghichu" placeholder="Ghi chú" class="form-full"></textarea>
-
-</div>
-
-</div>
-
-<button type="submit" class="btn-save">Lưu hồ sơ</button>
-
-</form>
-
-<input type="date" id="ngayden" required>
-<input id="nguondon" placeholder="Nguồn đơn">
-<select id="loaidonField">
-<option>Khiếu nại</option>
-<option>Tố cáo</option>
-<option>Phản ánh</option>
-<option>Hòa giải</option>
-</select>
-<input id="linhvuc" placeholder="Lĩnh vực">
-<input id="soluong" type="number" placeholder="Số người">
-<input id="hoten" placeholder="Họ tên" required>
-<input id="diachi" placeholder="Địa chỉ">
-<input id="dienthoai" placeholder="Điện thoại">
-<textarea id="noidung" placeholder="Nội dung"></textarea>
-<input id="coquan" placeholder="Cơ quan xử lý">
-<input id="ketqua" placeholder="Kết quả">
-<input id="sokyhieu" placeholder="Số ký hiệu">
-<input id="kyduyet" placeholder="Ký duyệt">
-<input id="soanthao" placeholder="Soạn thảo">
-<input id="ghichu" placeholder="Ghi chú">
-<select id="tinhtrang">
-<option>Đang xử lý</option>
-<option>Đã giải quyết</option>
-<option>Chuyển cơ quan khác</option>
-</select>
-
-<button type="submit" class="btn-save">Lưu hồ sơ</button>
-</form>
-</div>
 
 <div class="card">
 <div class="stats" id="statsBox"></div>
@@ -961,6 +1059,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option>Tố cáo</option>
 <option>Phản ánh</option>
 <option>Hòa giải</option>
+<option>Khác</option>
 </select>
 
 <input id="searchInput" placeholder="Tìm mã HS, họ tên...">
@@ -997,5 +1096,121 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </div>
 </div>
 
+
+<div class="popup-box">
+
+<div class="popup-header">
+
+<span class="close-btn" onclick="closePopup()">✖</span>
+</div>
+
+<div class="popup-body">
+
+<!-- DÁN TOÀN BỘ FORM NHẬP HỒ SƠ CỦA ANH VÀO ĐÂY -->
+
+</div>
+
+</div>
+
+</div>
+
+<div class="modal" id="formModal">
+<div class="modal-content">
+
+<button class="close-btn" onclick="closeForm()">Đóng</button>
+
+<h3 style="color:#b02a37">Nhập / Sửa hồ sơ</h3>
+
+<form id="form" onsubmit="event.preventDefault(); addCase();">
+
+<div class="section">
+<div class="section-title">Thông tin hồ sơ</div>
+
+<label>Ngày</label>
+<input type="date" id="ngayden">
+
+<label>Loại đơn</label>
+<select id="loaidonField">
+<option>Khiếu nại</option>
+<option>Tố cáo</option>
+<option>Phản ánh</option>
+<option>Hòa giải</option>
+<option>Khác</option>
+</select>
+
+<label>Nguồn đơn</label>
+<input id="nguondon">
+
+<label>Lĩnh vực</label>
+<input id="linhvuc">
+
+<label>Số người</label>
+<input id="soluong">
+
+</div>
+
+
+<div class="section">
+<div class="section-title">Thông tin người gửi</div>
+
+<label>Họ tên</label>
+<input id="hoten">
+
+<label>Điện thoại</label>
+<input id="dienthoai">
+
+<label>Địa chỉ</label>
+<input id="diachi">
+
+</div>
+
+
+<div class="section">
+<div class="section-title">Nội dung đơn</div>
+
+<textarea id="noidung"></textarea>
+
+</div>
+
+
+<div class="section">
+<div class="section-title">Xử lý hồ sơ</div>
+
+<label>Cơ quan xử lý</label>
+<input id="coquan">
+
+<label>Trạng thái</label>
+<select id="tinhtrang">
+<option>Đang xử lý</option>
+<option>Đã giải quyết</option>
+</select>
+
+<label>Kết quả</label>
+<input id="ketqua">
+
+<label>Số ký hiệu</label>
+<input id="sokyhieu">
+
+<label>Ký duyệt</label>
+<input id="kyduyet">
+
+<label>Soạn thảo</label>
+<input id="soanthao">
+
+<label>Ghi chú</label>
+<textarea id="ghichu"></textarea>
+
+</div>
+
+<button class="btn-save">💾 Lưu hồ sơ</button>
+
+</form>
+
+</div>
+</div>
+
+
+
 </body>
 </html>
+
