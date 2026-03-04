@@ -339,6 +339,41 @@ font-size:13px;
 opacity:0.9;
 margin-top:4px;
 }
+
+/* FORM PROFESSIONAL */
+
+.section{
+background:#f8f9fa;
+padding:15px;
+border-radius:8px;
+margin-bottom:15px;
+border:1px solid #e3e3e3;
+}
+
+.section-title{
+font-weight:700;
+margin-bottom:10px;
+color:#b02a37;
+font-size:15px;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.form-full{
+grid-column:1 / -1;
+}
+
+.section input,
+.section select,
+.section textarea{
+width:100%;
+padding:7px;
+margin:0;
+}
 </style>
 
 
@@ -775,7 +810,100 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <div class="card">
 <h3>Nhập hồ sơ</h3>
+
 <form id="form" onsubmit="event.preventDefault(); addCase();">
+
+<!-- THÔNG TIN HỒ SƠ -->
+
+<div class="section">
+
+<div class="section-title">📁 Thông tin hồ sơ</div>
+
+<div class="form-grid">
+
+<input type="date" id="ngayden" required>
+
+<select id="loaidonField">
+<option>Khiếu nại</option>
+<option>Tố cáo</option>
+<option>Phản ánh</option>
+<option>Hòa giải</option>
+</select>
+
+<input id="nguondon" placeholder="Nguồn đơn">
+
+<input id="linhvuc" placeholder="Lĩnh vực">
+
+<input id="soluong" type="number" placeholder="Số người">
+
+</div>
+
+</div>
+
+
+<!-- THÔNG TIN NGƯỜI GỬI -->
+
+<div class="section">
+
+<div class="section-title">👤 Thông tin người gửi</div>
+
+<div class="form-grid">
+
+<input id="hoten" placeholder="Họ tên" required>
+
+<input id="dienthoai" placeholder="Điện thoại">
+
+<input id="diachi" placeholder="Địa chỉ" class="form-full">
+
+</div>
+
+</div>
+
+
+<!-- NỘI DUNG ĐƠN -->
+
+<div class="section">
+
+<div class="section-title">📝 Nội dung đơn</div>
+
+<textarea id="noidung" placeholder="Nội dung đơn"></textarea>
+
+</div>
+
+
+<!-- XỬ LÝ HỒ SƠ -->
+
+<div class="section">
+
+<div class="section-title">⚙ Xử lý hồ sơ</div>
+
+<div class="form-grid">
+
+<input id="coquan" placeholder="Cơ quan xử lý">
+
+<select id="tinhtrang">
+<option>Đang xử lý</option>
+<option>Đã giải quyết</option>
+<option>Chuyển cơ quan khác</option>
+</select>
+
+<input id="ketqua" placeholder="Kết quả">
+
+<input id="sokyhieu" placeholder="Số ký hiệu">
+
+<input id="kyduyet" placeholder="Ký duyệt">
+
+<input id="soanthao" placeholder="Soạn thảo">
+
+<textarea id="ghichu" placeholder="Ghi chú" class="form-full"></textarea>
+
+</div>
+
+</div>
+
+<button type="submit" class="btn-save">Lưu hồ sơ</button>
+
+</form>
 
 <input type="date" id="ngayden" required>
 <input id="nguondon" placeholder="Nguồn đơn">
