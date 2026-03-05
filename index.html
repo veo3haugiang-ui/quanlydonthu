@@ -6,6 +6,50 @@
 
 <style>
 
+/* ===== SIDEBAR ===== */
+
+.layout{
+display:flex;
+}
+
+.sidebar{
+width:220px;
+background:#2c3e50;
+color:white;
+min-height:calc(100vh - 60px);
+padding-top:10px;
+}
+
+.sidebar-title{
+font-size:14px;
+padding:10px 15px;
+opacity:0.8;
+}
+
+.sidebar a{
+display:block;
+padding:12px 15px;
+color:white;
+text-decoration:none;
+font-size:14px;
+border-left:4px solid transparent;
+}
+
+.sidebar a:hover{
+background:#34495e;
+border-left:4px solid #ffc107;
+}
+
+.sidebar a.active{
+background:#1a252f;
+border-left:4px solid #ffc107;
+}
+
+.main-content{
+flex:1;
+padding:10px;
+}
+
 /* ===== BACKGROUND ===== */
 
 body{
@@ -512,7 +556,26 @@ margin:0;
 
 <script>
 
+function showPage(page){
 
+document.getElementById("pageDonThu").style.display="none";
+document.getElementById("pageTiepDan").style.display="none";
+document.getElementById("pageVanBan").style.display="none";
+
+if(page==="donthu"){
+document.getElementById("pageDonThu").style.display="block";
+}
+
+if(page==="tiepdancu"){
+document.getElementById("pageTiepDan").style.display="block";
+loadTiepDan();
+}
+
+if(page==="vanban"){
+document.getElementById("pageVanBan").style.display="block";
+}
+
+}
 
 window.addEventListener("error", function(e){
 console.error("Lỗi JS:", e.message);
@@ -531,7 +594,7 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbx2_I0zlJBZQftCylsYAf1tB_NpNTud-SIOaw5z1uJvx2qOAoEW7PhzHCBjxckZdYvG/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbx_F_2hrF2BOQHUEuoxalSvzA8n7h7a9aV2MWi373wbPBaUmT-DLbOTe6PPhgY-OGil/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -561,19 +624,29 @@ updateStats(cases);
 }
 
 function login(){
-let u=username.value;
-let p=password.value;
+
+let u = document.getElementById("username").value.trim();
+let p = document.getElementById("password").value.trim();
 
 if(users[u] && users[u].pass===p){
+
 currentUser=u;
 currentRole=users[u].role;
-loginPage.style.display="none";
-mainPage.style.display="block";
-welcomeBox.innerHTML="👤 <b>"+users[u].fullname+"</b> | Vai trò: "+users[u].role;
+
+document.getElementById("loginPage").style.display="none";
+document.getElementById("mainPage").style.display="block";
+
+document.getElementById("welcomeBox").innerHTML =
+"👤 <b>"+users[u].fullname+"</b> | Vai trò: "+users[u].role;
+
 loadData();
+
 }else{
+
 alert("Sai tài khoản hoặc mật khẩu");
+
 }
+
 }
 
 function logout(){
@@ -866,6 +939,17 @@ function closeModal(){modal.style.display="none";}
 window.onclick=function(e){if(e.target==modal){modal.style.display="none";}};
 
 let filteredCases = [];
+let tbody;
+
+window.onload = function(){
+
+tbody = document.getElementById("tbody");
+
+/* load dữ liệu */
+loadData();
+loadTiepDan();
+
+}
 
 function updateStats(list = cases){
 let total = list.length;
@@ -876,7 +960,7 @@ let hg = list.filter(c=>c.loaidon==="Hòa giải").length;
 let k = list.filter(c=>c.loaidon==="Khác").length;
 
 
-statsBox.innerHTML = `
+document.getElementById("statsBox").innerHTML = `
 <b>📊 TỔNG SỐ HỒ SƠ: ${total}</b><br>
 Khiếu nại: ${kn} |
 Tố cáo: ${tc} |
@@ -976,8 +1060,113 @@ function closeForm(){
 document.getElementById("formModal").style.display="none";
 
 }
+let tiepDanList = [];
+function saveTiepDan(){
+
+let data={
+
+action:"addTiepDan",
+
+ngay:td_ngay.value,
+thang:td_thang.value,
+congchuc:td_congchuc.value,
+phong:td_phong.value,
+congdan:td_congdan.value,
+cccd:td_cccd.value,
+noidung:td_noidung.value,
+phanloai:td_phanloai.value,
+songuoi:td_songuoi.value,
+coquan:td_coquan.value,
+thuly:td_thuly.value,
+tralai:td_tralai.value,
+chuyendon:td_chuyendon.value,
+theodoi:td_theodoi.value,
+vanban:td_vanban.value,
+ghichu:td_ghichu.value
+
+};
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify(data)
+})
+.then(res=>res.text())
+.then(res=>{
+
+alert("✅ Đã lưu sổ tiếp công dân");
+
+tiepDanList.push(data);   // thêm vào bảng ngay
+
+loadTiepDan();
+
+});
+
+}
 
 
+function displayTiepDan(){
+
+let tbody = document.getElementById("tbodyTiepDan");
+
+tbody.innerHTML="";
+
+tiepDanList.forEach((c,i)=>{
+
+tbody.innerHTML += `
+<tr>
+
+<td>${i+1}</td>
+<td>${formatDate(c.ngay)}</td>
+<td>${c.congchuc || ""}</td>
+<td>${c.congdan || ""}</td>
+<td>${c.cccd || ""}</td>
+<td>${c.phanloai || ""}</td>
+<td>${c.noidung || ""}</td>
+<td>${c.theodoi || ""}</td>
+
+<td></td>
+
+</tr>
+`;
+
+});
+
+}
+
+
+
+
+
+function newTiepDan(){
+
+document.getElementById("tiepDanModal").style.display="block";
+
+}
+
+function closeTiepDan(){
+
+document.getElementById("tiepDanModal").style.display="none";
+
+}
+
+function loadTiepDan(){
+
+fetch(API_URL+"?type=tiepdan")
+.then(res=>res.json())
+.then(data=>{
+
+console.log("DATA TIEP DAN:",data);   // để kiểm tra
+
+tiepDanList = data || [];
+
+displayTiepDan();
+
+})
+.catch(err=>{
+console.log("Lỗi tải tiếp dân:",err);
+});
+
+}
 
 
 </script>
@@ -1007,6 +1196,32 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </div>
 
 <div id="mainPage" style="display:none;">
+<div class="layout">
+
+<!-- MENU BÊN TRÁI -->
+<div class="sidebar">
+
+<div class="sidebar-title">MENU HỆ THỐNG</div>
+
+<a href="#" class="active" onclick="showPage('donthu')">
+📂 Quản lý đơn thư
+</a>
+
+<a href="#" onclick="showPage('tiepdancu')">
+📖 Sổ tiếp công dân
+</a>
+
+<a href="#" onclick="showPage('vanban')">
+📚 Thư viện văn bản
+</a>
+
+</div>
+
+<div class="main-content">
+
+<!-- ================= QUẢN LÝ ĐƠN THƯ ================= -->
+
+<div id="pageDonThu">
 
 <header>
 <div class="header-left">
@@ -1026,18 +1241,15 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <button class="btn-add" onclick="newCase()">
 ➕ Nhập hồ sơ mới
 </button>
-
-
-
 </div>
-</div>
-
 
 <div class="card">
+
 <div class="stats" id="statsBox"></div>
 
 <div class="filter-row">
-<select id="monthFilter">
+
+<select id="monthFilter" onchange="applyFilter()">
 <option value="">-- Tháng --</option>
 <option value="1">Tháng 1</option>
 <option value="2">Tháng 2</option>
@@ -1053,7 +1265,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option value="12">Tháng 12</option>
 </select>
 
-<select id="typeFilter">
+<select id="typeFilter" onchange="applyFilter()">
 <option value="">-- Loại đơn --</option>
 <option>Khiếu nại</option>
 <option>Tố cáo</option>
@@ -1062,11 +1274,13 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option>Khác</option>
 </select>
 
-<input id="searchInput" placeholder="Tìm mã HS, họ tên...">
+<input id="searchInput" placeholder="Tìm mã HS, họ tên..." oninput="applyFilter()">
 
-<button onclick="applyFilter()">Lọc</button>
+
 <button onclick="resetFilter()">Xóa lọc</button>
+
 </div>
+
 <h3>Danh sách hồ sơ</h3>
 
 <table>
@@ -1081,14 +1295,129 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <th>Thao tác</th>
 </tr>
 </thead>
+
 <tbody id="tbody"></tbody>
+
+</table>
+
+</div>
+</div>
+
+</div>
+
+
+<!-- ================= SỔ TIẾP CÔNG DÂN ================= -->
+
+<div id="pageTiepDan" style="display:none">
+<button class="btn-add" onclick="newTiepDan()">
+➕ Nhập mới tiếp công dân
+</button>
+<div class="modal" id="tiepDanModal">
+<div class="modal-content">
+
+<button class="close-btn" onclick="closeTiepDan()">Đóng</button>
+
+<h3>Sổ tiếp công dân</h3>
+
+<form onsubmit="event.preventDefault(); saveTiepDan();">
+
+<label>Ngày tiếp công dân</label>
+<input type="date" id="td_ngay">
+
+<label>Tháng</label>
+<input id="td_thang">
+
+<label>Công chức tiếp công dân</label>
+<input id="td_congchuc">
+
+<label>Công chức phòng chuyên môn</label>
+<input id="td_phong">
+
+<label>Họ tên – địa chỉ – điện thoại công dân</label>
+<textarea id="td_congdan"></textarea>
+
+<label>CCCD / Hộ chiếu</label>
+<input id="td_cccd">
+
+<label>Nội dung vụ việc</label>
+<textarea id="td_noidung"></textarea>
+
+<label>Phân loại đơn</label>
+<select id="td_phanloai">
+<option>Khiếu nại</option>
+<option>Tố cáo</option>
+<option>Phản ánh</option>
+<option>Kiến nghị</option>
+<option>Khác</option>
+</select>
+
+<label>Số người</label>
+<input id="td_songuoi">
+
+<label>Cơ quan đã giải quyết</label>
+<input id="td_coquan">
+
+<label>Thụ lý để giải quyết</label>
+<input id="td_thuly">
+
+<label>Trả lại đơn và hướng dẫn</label>
+<input id="td_tralai">
+
+<label>Chuyển đơn đến cơ quan có thẩm quyền</label>
+<input id="td_chuyendon">
+
+<label>Theo dõi kết quả giải quyết</label>
+<textarea id="td_theodoi"></textarea>
+
+<label>Đã có văn bản giải quyết</label>
+<input id="td_vanban">
+
+<label>Ghi chú</label>
+<textarea id="td_ghichu"></textarea>
+
+<button class="btn-save">Lưu</button>
+
+</form>
+
+</div>
+</div>
+
+<table>
+
+<thead>
+<tr>
+
+<th>STT</th>
+<th>Ngày tiếp</th>
+<th>Công chức tiếp</th>
+<th>Công dân</th>
+<th>CCCD</th>
+<th>Phân loại</th>
+<th>Nội dung</th>
+<th>Theo dõi</th>
+<th>Thao tác</th>
+
+</tr>
+</thead>
+
+<tbody id="tbodyTiepDan"></tbody>
+
 </table>
 
 </div>
 
-</div>
+
+<!-- ================= THƯ VIỆN VĂN BẢN ================= -->
+
+<div id="pageVanBan" style="display:none">
+
+<h2>Thư viện văn bản</h2>
+
+<div class="card">
+Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 </div>
 
+</div>
 <div class="modal" id="modal">
 <div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Đóng</button>
@@ -1097,14 +1426,9 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </div>
 
 
-<div class="popup-box">
 
-<div class="popup-header">
 
-<span class="close-btn" onclick="closePopup()">✖</span>
-</div>
 
-<div class="popup-body">
 
 <!-- DÁN TOÀN BỘ FORM NHẬP HỒ SƠ CỦA ANH VÀO ĐÂY -->
 
