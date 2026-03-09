@@ -1111,9 +1111,26 @@ let tbody=document.getElementById("tbodyTiepDan");
 
 tbody.innerHTML="";
 
+/* nếu không có dữ liệu */
+
+if(!Array.isArray(tiepDanList) || tiepDanList.length===0){
+
+tbody.innerHTML = `
+<tr>
+<td colspan="9" style="text-align:center;color:#888">
+Không có dữ liệu
+</td>
+</tr>
+`;
+
+return;
+
+}
+
 tiepDanList.forEach((c,i)=>{
 
 let ngay = "";
+
 if(c.ngay){
 try{
 ngay = new Date(c.ngay).toLocaleDateString("vi-VN");
@@ -1163,6 +1180,8 @@ fetch(API_URL+"?action=getTiepDan&t="+Date.now())
 
 .then(data=>{
 
+console.log("DATA TIEP DAN:",data);
+
 tiepDanList = data;
 
 displayTiepDan();
@@ -1174,7 +1193,6 @@ console.log(err);
 });
 
 }
-
 </script>
 </head>
 <body>
