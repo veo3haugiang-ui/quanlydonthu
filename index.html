@@ -594,7 +594,7 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbx_F_2hrF2BOQHUEuoxalSvzA8n7h7a9aV2MWi373wbPBaUmT-DLbOTe6PPhgY-OGil/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbxQXpLerDeoj_576DLlvTRTRzNhtALLixL6R_kQjP14BDyCuCMwvPfWJhAzauuN9W1n/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -947,7 +947,8 @@ tbody = document.getElementById("tbody");
 
 /* load dữ liệu */
 loadData();
-loadTiepDan();
+
+/* KHÔNG load tiếp dân ở đây */
 
 }
 
@@ -1112,11 +1113,22 @@ tbody.innerHTML="";
 
 tiepDanList.forEach((c,i)=>{
 
+let ngay = "";
+
+if(c.ngay){
+let d = new Date(c.ngay);
+if(!isNaN(d)){
+ngay = d.toLocaleDateString("vi-VN");
+}else{
+ngay = c.ngay;
+}
+}
+
 tbody.innerHTML += `
 <tr>
 
 <td>${i+1}</td>
-<td>${formatDate(c.ngay)}</td>
+<td>${ngay}</td>
 <td>${c.congchuc || ""}</td>
 <td>${c.congdan || ""}</td>
 <td>${c.cccd || ""}</td>
@@ -1132,7 +1144,6 @@ tbody.innerHTML += `
 });
 
 }
-
 
 
 
