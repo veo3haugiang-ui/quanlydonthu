@@ -1161,8 +1161,10 @@ document.getElementById("tiepDanModal").style.display="none";
 
 function loadTiepDan(){
 
-fetch(API_URL+"?action=getTiepDan")
+fetch(API_URL+"?action=getTiepDan&t="+Date.now())
+
 .then(res=>res.json())
+
 .then(data=>{
 
 tiepDanList = data;
@@ -1170,6 +1172,7 @@ tiepDanList = data;
 displayTiepDan();
 
 })
+
 .catch(err=>{
 console.log(err);
 });
