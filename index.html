@@ -1109,35 +1109,23 @@ function displayTiepDan(){
 
 let tbody = document.getElementById("tbodyTiepDan");
 
+if(!tbody) return;
+
 tbody.innerHTML="";
 
 tiepDanList.forEach((c,i)=>{
 
-let ngay = "";
-
-if(c.ngay){
-let d = new Date(c.ngay);
-if(!isNaN(d)){
-ngay = d.toLocaleDateString("vi-VN");
-}else{
-ngay = c.ngay;
-}
-}
-
-tbody.innerHTML += `
+tbody.innerHTML+=`
 <tr>
-
 <td>${i+1}</td>
-<td>${ngay}</td>
+<td>${c.ngay || ""}</td>
 <td>${c.congchuc || ""}</td>
 <td>${c.congdan || ""}</td>
 <td>${c.cccd || ""}</td>
 <td>${c.phanloai || ""}</td>
 <td>${c.noidung || ""}</td>
 <td>${c.theodoi || ""}</td>
-
 <td></td>
-
 </tr>
 `;
 
@@ -1166,9 +1154,13 @@ fetch(API_URL+"?type=tiepdan")
 .then(res=>res.json())
 .then(data=>{
 
-console.log("DATA TIEP DAN:",data);   // để kiểm tra
+console.log("DATA TIEP DAN:",data);
 
-tiepDanList = data || [];
+if(!Array.isArray(data)){
+tiepDanList=[];
+}else{
+tiepDanList=data;
+}
 
 displayTiepDan();
 
