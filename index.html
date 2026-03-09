@@ -598,7 +598,7 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbxQXpLerDeoj_576DLlvTRTRzNhtALLixL6R_kQjP14BDyCuCMwvPfWJhAzauuN9W1n/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbw1_wQxkXeHWsjpIp7qduPw_s3VldcRaI7pss9f0yIhmVkDevlseqxH7N4Z-D1s2Ow/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -1161,36 +1161,20 @@ document.getElementById("tiepDanModal").style.display="none";
 
 function loadTiepDan(){
 
-fetch(API_URL+"?type=tiepdan")
-.then(res=>{
-
-if(!res.ok){
-throw new Error("Lỗi kết nối API");
-}
-
-return res.json();
-
-})
+fetch(API_URL+"?action=getTiepDan")
+.then(res=>res.json())
 .then(data=>{
 
-if(!Array.isArray(data)){
-console.error("Dữ liệu không hợp lệ:",data);
-tiepDanList=[];
-}else{
-tiepDanList=data;
-}
+tiepDanList = data;
 
 displayTiepDan();
 
 })
 .catch(err=>{
-console.error("Lỗi tải tiếp dân:",err);
-tiepDanList=[];
-displayTiepDan();
+console.log(err);
 });
 
 }
-
 
 </script>
 </head>
