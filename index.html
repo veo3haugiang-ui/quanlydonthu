@@ -1111,24 +1111,31 @@ loadTiepDan();
 
 function displayTiepDan(){
 
-let tbody = document.getElementById("tbodyTiepDan");
-
-if(!tbody) return;
+let tbody=document.getElementById("tbodyTiepDan");
 
 tbody.innerHTML="";
 
 tiepDanList.forEach((c,i)=>{
 
+let ngay = "";
+if(c.ngay){
+try{
+ngay = new Date(c.ngay).toLocaleDateString("vi-VN");
+}catch(e){
+ngay = c.ngay;
+}
+}
+
 tbody.innerHTML+=`
 <tr>
 <td>${i+1}</td>
-<td>${c.ngay || ""}</td>
-<td>${c.congchuc || ""}</td>
-<td>${c.congdan || ""}</td>
-<td>${c.cccd || ""}</td>
-<td>${c.phanloai || ""}</td>
-<td>${c.noidung || ""}</td>
-<td>${c.theodoi || ""}</td>
+<td>${ngay}</td>
+<td>${c.congchuc||""}</td>
+<td>${c.congdan||""}</td>
+<td>${c.cccd||""}</td>
+<td>${c.phanloai||""}</td>
+<td>${c.noidung||""}</td>
+<td>${c.theodoi||""}</td>
 <td></td>
 </tr>
 `;
@@ -1155,12 +1162,19 @@ document.getElementById("tiepDanModal").style.display="none";
 function loadTiepDan(){
 
 fetch(API_URL+"?type=tiepdan")
-.then(res=>res.json())
+.then(res=>{
+
+if(!res.ok){
+throw new Error("Lỗi kết nối API");
+}
+
+return res.json();
+
+})
 .then(data=>{
 
-console.log("DATA TIEP DAN:",data);
-
 if(!Array.isArray(data)){
+console.error("Dữ liệu không hợp lệ:",data);
 tiepDanList=[];
 }else{
 tiepDanList=data;
@@ -1170,7 +1184,9 @@ displayTiepDan();
 
 })
 .catch(err=>{
-console.log("Lỗi tải tiếp dân:",err);
+console.error("Lỗi tải tiếp dân:",err);
+tiepDanList=[];
+displayTiepDan();
 });
 
 }
