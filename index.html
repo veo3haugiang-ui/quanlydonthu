@@ -1014,9 +1014,27 @@ updateStats(cases);
 }
 
 function displayFiltered(list){
+
 tbody.innerHTML="";
+
 list.forEach((c,i)=>{
-let buttons=`<button class="btn-view" onclick="viewCase(${i})">Xem</button>`;
+
+let realIndex = cases.findIndex(x=>x.mahoso===c.mahoso);
+
+let buttons=`<button class="btn-view" onclick="viewCase(${realIndex})">Xem</button>`;
+
+if(c.tinhtrang!=="Đã giải quyết"){
+
+if(currentRole==="Phó Giám đốc" || c.owner===currentUser){
+buttons+=`<button class="btn-edit" onclick="editCase(${realIndex})">Sửa</button>`;
+}
+
+if(c.owner===currentUser){
+buttons+=`<button class="btn-delete" onclick="deleteCase(${realIndex})">Xóa</button>`;
+}
+
+}
+
 tbody.innerHTML+=`
 <tr>
 <td>${i+1}</td>
@@ -1027,7 +1045,9 @@ tbody.innerHTML+=`
 <td>${users[c.owner] ? users[c.owner].fullname : c.owner}</td>
 <td>${buttons}</td>
 </tr>`;
+
 });
+
 }
 
 function updateDateTime(){
