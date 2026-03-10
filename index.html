@@ -1190,7 +1190,10 @@ tbody.innerHTML+=`
 <td>${c.phanloai||""}</td>
 <td>${c.noidung||""}</td>
 <td>${c.theodoi||""}</td>
-<td></td>
+<td>
+<button class="btn-edit">Sửa</button>
+<button class="btn-delete">Xóa</button>
+</td>
 </tr>
 `;
 
@@ -1223,7 +1226,7 @@ fetch(API_URL + "?action=getTiepDan&t=" + Date.now())
 
 console.log("DATA TIEP DAN:",data);
 
-tiepDanList = data.filter(r => r.ngay);
+tiepDanList = data || [];
 
 displayTiepDan();
 
