@@ -555,45 +555,35 @@ margin:0;
 
 
 <script>
+let tiepDanList = [];
 
 function showPage(page){
 
-/* Ẩn tất cả trang */
 document.getElementById("pageDonThu").style.display="none";
 document.getElementById("pageTiepDan").style.display="none";
 document.getElementById("pageVanBan").style.display="none";
 
-/* Bỏ active của tất cả menu */
 document.querySelectorAll(".sidebar a").forEach(a=>{
 a.classList.remove("active");
 });
 
-/* Hiện trang + active menu */
-
 if(page==="donthu"){
 document.getElementById("pageDonThu").style.display="block";
-document.querySelector(".sidebar a:nth-child(2)").classList.add("active");
+document.querySelectorAll(".sidebar a")[0].classList.add("active");
 }
 
 if(page==="tiepdancu"){
-
 document.getElementById("pageTiepDan").style.display="block";
-
-document.querySelector(".sidebar a:nth-child(3)").classList.add("active");
-
-/* LOAD DỮ LIỆU SAU KHI DOM HIỆN */
+document.querySelectorAll(".sidebar a")[1].classList.add("active");
 
 setTimeout(function(){
-
 loadTiepDan();
-
 },100);
-
 }
 
 if(page==="vanban"){
 document.getElementById("pageVanBan").style.display="block";
-document.querySelector(".sidebar a:nth-child(4)").classList.add("active");
+document.querySelectorAll(".sidebar a")[2].classList.add("active");
 }
 
 }
@@ -1071,8 +1061,16 @@ document.getElementById("dateTimeBox").innerHTML =
 "📅 " + dayName + ", " + date + " – 🕒 " + time;
 }
 
+window.onload = function(){
+
+tbody = document.getElementById("tbody");
+
+loadData();
+
 setInterval(updateDateTime,1000);
 updateDateTime();
+
+}
 
 function toggleForm(){
 
@@ -1102,7 +1100,7 @@ function closeForm(){
 document.getElementById("formModal").style.display="none";
 
 }
-let tiepDanList = [];
+
 function saveTiepDan(){
 
 let data={
@@ -1152,32 +1150,12 @@ let tbody=document.getElementById("tbodyTiepDan");
 
 tbody.innerHTML="";
 
-/* nếu không có dữ liệu */
-
-if(!Array.isArray(tiepDanList) || tiepDanList.length===0){
-
-tbody.innerHTML = `
-<tr>
-<td colspan="9" style="text-align:center;color:#888">
-Không có dữ liệu
-</td>
-</tr>
-`;
-
-return;
-
-}
-
 tiepDanList.forEach((c,i)=>{
 
 let ngay = "";
 
 if(c.ngay){
-try{
-ngay = new Date(c.ngay).toLocaleDateString("vi-VN");
-}catch(e){
-ngay = c.ngay;
-}
+    ngay = c.ngay.toString().substring(0,10);
 }
 
 tbody.innerHTML+=`
@@ -1190,10 +1168,7 @@ tbody.innerHTML+=`
 <td>${c.phanloai||""}</td>
 <td>${c.noidung||""}</td>
 <td>${c.theodoi||""}</td>
-<td>
-<button class="btn-edit">Sửa</button>
-<button class="btn-delete">Xóa</button>
-</td>
+<td></td>
 </tr>
 `;
 
