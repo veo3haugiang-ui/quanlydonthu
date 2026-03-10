@@ -5,6 +5,97 @@
 <title>HỆ THỐNG QUẢN LÝ ĐƠN THƯ</title>
 
 <style>
+/* ===== BẢNG SỔ TIẾP DÂN ĐẸP HƠN ===== */
+
+#pageTiepDan table{
+table-layout:fixed;
+width:100%;
+}
+
+#pageTiepDan tbody tr:hover{
+background:#f1f6ff;
+}
+/* CỘT THAO TÁC */
+
+.action-buttons{
+display:flex;
+justify-content:center;
+gap:6px;
+}
+
+.action-buttons button{
+padding:4px 8px;
+font-size:12px;
+border-radius:5px;
+}
+
+#pageTiepDan th,
+#pageTiepDan td{
+padding:8px;
+vertical-align:middle;
+}
+
+/* STT */
+#pageTiepDan th:nth-child(1),
+#pageTiepDan td:nth-child(1){
+width:40px;
+text-align:center;
+}
+
+/* Ngày tiếp */
+#pageTiepDan th:nth-child(2),
+#pageTiepDan td:nth-child(2){
+width:100px;
+text-align:center;
+}
+
+/* Công chức */
+#pageTiepDan th:nth-child(3),
+#pageTiepDan td:nth-child(3){
+width:140px;
+}
+
+/* Công dân */
+#pageTiepDan th:nth-child(4),
+#pageTiepDan td:nth-child(4){
+width:260px;
+}
+
+/* CCCD */
+#pageTiepDan th:nth-child(5),
+#pageTiepDan td:nth-child(5){
+width:120px;
+text-align:center;
+}
+
+/* Phân loại */
+#pageTiepDan th:nth-child(6),
+#pageTiepDan td:nth-child(6){
+width:90px;
+text-align:center;
+}
+
+/* Nội dung */
+#pageTiepDan th:nth-child(7),
+#pageTiepDan td:nth-child(7){
+width:260px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+/* Theo dõi */
+#pageTiepDan th:nth-child(8),
+#pageTiepDan td:nth-child(8){
+width:130px;
+}
+
+/* Thao tác */
+#pageTiepDan th:nth-child(9),
+#pageTiepDan td:nth-child(9){
+width:130px;
+text-align:center;
+}
 
 /* ===== SIDEBAR ===== */
 
@@ -48,6 +139,13 @@ border-left:4px solid #ffc107;
 .main-content{
 flex:1;
 padding:10px;
+}
+
+td:nth-child(7){
+max-width:300px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
 }
 
 /* ===== BACKGROUND ===== */
@@ -324,6 +422,16 @@ display:grid;
 grid-template-columns:1fr 1fr;
 gap:14px 20px;
 }
+.section-title{
+font-weight:700;
+color:#b02a37;
+margin-top:20px;
+margin-bottom:10px;
+font-size:14px;
+border-bottom:2px solid #eee;
+padding-bottom:6px;
+text-transform:uppercase;
+}
 
 .view-item{
 background:#f8f9fb;
@@ -551,6 +659,25 @@ width:100%;
 padding:7px;
 margin:0;
 }
+
+.print-area{
+background:white;
+padding:20px;
+}
+
+.print-header{
+text-align:center;
+font-weight:700;
+font-size:18px;
+margin-bottom:20px;
+}
+
+.print-sub{
+text-align:center;
+font-size:13px;
+margin-bottom:20px;
+color:#666;
+}
 </style>
 
 
@@ -605,7 +732,7 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbxB3XPInTk-w5vACimyEqzZ-BEztmqoteoRv9k9DhpJ-mqV-MBwtnWW3W6_tlJN9fM/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbxdEX56jnqM9duEwXlP0faB3ro2OsVcFzZZDRg6kPjYRBVHJltQiQSlYPBgrEK3VTxE/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -805,7 +932,11 @@ tbody.innerHTML+=`
 <td>${c.hoten}</td>
 <td>${c.loaidon}</td>
 <td>${users[c.owner] ? users[c.owner].fullname : c.owner}</td>
-<td>${buttons}</td>
+<td>
+<div class="action-buttons">
+${buttons}
+</div>
+</td>
 </tr>`;
 });
 }
@@ -952,16 +1083,7 @@ window.onclick=function(e){if(e.target==modal){modal.style.display="none";}};
 let filteredCases = [];
 let tbody;
 
-window.onload = function(){
 
-tbody = document.getElementById("tbody");
-
-/* load dữ liệu */
-loadData();
-
-/* KHÔNG load tiếp dân ở đây */
-
-}
 
 function updateStats(list = cases){
 let total = list.length;
@@ -1103,12 +1225,16 @@ document.getElementById("formModal").style.display="none";
 
 function saveTiepDan(){
 
+let action = (editIndex === -1) ? "addTiepDan" : "updateTiepDan";
+
 let data={
 
-action:"addTiepDan",
+action:action,
+
+index:editIndex,
 
 ngay:td_ngay.value,
-thang:td_thang.value,
+
 congchuc:td_congchuc.value,
 phong:td_phong.value,
 congdan:td_congdan.value,
@@ -1135,7 +1261,7 @@ body:JSON.stringify(data)
 
 alert("✅ Đã lưu sổ tiếp công dân");
 
-tiepDanList.push(data);   // thêm vào bảng ngay
+closeTiepDan();
 
 loadTiepDan();
 
@@ -1145,20 +1271,24 @@ loadTiepDan();
 
 
 function displayTiepDan(){
-
 let tbody=document.getElementById("tbodyTiepDan");
-
 tbody.innerHTML="";
 
 tiepDanList.forEach((c,i)=>{
 
-let ngay = "";
+let buttons = `<button class="btn-view" onclick="viewTiepDan(${i})">Xem</button>`;
 
-if(c.ngay){
-    ngay = c.ngay.toString().substring(0,10);
+if(currentRole==="Phó Giám đốc" || c.congchuc===users[currentUser].fullname){
+buttons += `<button class="btn-edit" onclick="editTiepDan(${i})">Sửa</button>`;
 }
 
-tbody.innerHTML+=`
+if(c.congchuc===users[currentUser].fullname){
+buttons += `<button class="btn-delete" onclick="deleteTiepDan(${i})">Xóa</button>`;
+}
+
+let ngay = c.ngay ? c.ngay.toString().substring(0,10) : "";
+
+tbody.innerHTML += `
 <tr>
 <td>${i+1}</td>
 <td>${ngay}</td>
@@ -1168,7 +1298,54 @@ tbody.innerHTML+=`
 <td>${c.phanloai||""}</td>
 <td>${c.noidung||""}</td>
 <td>${c.theodoi||""}</td>
+<td>
+<div class="action-buttons">
+${buttons}
+</div>
+</td>
+</tr>
+`;
+
+});
+
+}
+
+function searchTiepDan(){
+
+let key = document.getElementById("searchTiepDan").value.toLowerCase();
+
+if(key===""){
+displayTiepDan();
+return;
+}
+
+let tbody = document.getElementById("tbodyTiepDan");
+tbody.innerHTML="";
+
+let list = tiepDanList.filter(c =>
+(c.congdan||"").toLowerCase().includes(key) ||
+(c.congchuc||"").toLowerCase().includes(key)
+);
+
+list.forEach((c)=>{
+
+let realIndex = tiepDanList.indexOf(c);
+
+let ngay = c.ngay ? c.ngay.toString().substring(0,10) : "";
+
+tbody.innerHTML += `
+<tr>
 <td></td>
+<td>${ngay}</td>
+<td>${c.congchuc||""}</td>
+<td>${c.congdan||""}</td>
+<td>${c.cccd||""}</td>
+<td>${c.phanloai||""}</td>
+<td>${c.noidung||""}</td>
+<td>${c.theodoi||""}</td>
+<td>
+<button class="btn-view" onclick="viewTiepDan(${realIndex})">Xem</button>
+</td>
 </tr>
 `;
 
@@ -1177,9 +1354,54 @@ tbody.innerHTML+=`
 }
 
 
+function editTiepDan(i){
+
+let c = tiepDanList[i];
+
+td_ngay.value = c.ngay ? c.ngay.toString().substring(0,10) : "";
+td_congchuc.value = c.congchuc;
+td_congdan.value = c.congdan;
+td_cccd.value = c.cccd;
+td_noidung.value = c.noidung;
+td_phanloai.value = c.phanloai;
+
+document.getElementById("tiepDanModal").style.display="block";
+
+editIndex = i;
+
+}
+
+function deleteTiepDan(i){
+
+if(!confirm("Bạn có chắc muốn xóa?")) return;
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"deleteTiepDan",
+index:i
+})
+})
+.then(res=>res.text())
+.then(res=>{
+alert("Đã xóa");
+loadTiepDan();
+});
+
+}
 
 
 function newTiepDan(){
+
+let form = document.querySelector("#tiepDanModal form");
+
+form.reset();
+
+form.querySelectorAll("input, textarea").forEach(e=>{
+e.value="";
+});
+
+editIndex = -1;
 
 document.getElementById("tiepDanModal").style.display="block";
 
@@ -1199,17 +1421,209 @@ fetch(API_URL + "?action=getTiepDan&t=" + Date.now())
 
 .then(data=>{
 
-console.log("DATA TIEP DAN:",data);
-
 tiepDanList = data || [];
 
 displayTiepDan();
 
-})
+updateStatsTiepDan(tiepDanList);
 
-.catch(err=>{
-console.log("Lỗi load:",err);
 });
+
+}
+
+function viewTiepDan(i){
+
+let c = tiepDanList[i];
+
+document.getElementById("v_ngay").innerText =
+c.ngay ? c.ngay.toString().substring(0,10) : "";
+
+document.getElementById("v_congchuc").innerText = c.congchuc || "";
+document.getElementById("v_phong").innerText = c.phong || "";
+document.getElementById("v_congdan").innerText = c.congdan || "";
+document.getElementById("v_cccd").innerText = c.cccd || "";
+document.getElementById("v_phanloai").innerText = c.phanloai || "";
+document.getElementById("v_songuoi").innerText = c.songuoi || "";
+document.getElementById("v_noidung").innerText = c.noidung || "";
+document.getElementById("v_coquan").innerText = c.coquan || "";
+document.getElementById("v_thuly").innerText = c.thuly || "";
+document.getElementById("v_tralai").innerText = c.tralai || "";
+document.getElementById("v_chuyendon").innerText = c.chuyendon || "";
+document.getElementById("v_theodoi").innerText = c.theodoi || "";
+document.getElementById("v_vanban").innerText = c.vanban || "";
+document.getElementById("v_ghichu").innerText = c.ghichu || "";
+
+document.getElementById("viewTiepDanModal").style.display="block";
+
+}
+function closeViewTiepDan(){
+document.getElementById("viewTiepDanModal").style.display="none";
+}
+
+function printTiepDan(){
+
+let content = document.querySelector("#viewTiepDanModal .modal-content").innerHTML;
+
+let win = window.open("", "", "width=900,height=700");
+
+win.document.write(`
+<html>
+<head>
+<title>In tiếp công dân</title>
+
+<style>
+body{
+font-family:Arial;
+padding:30px;
+}
+
+.view-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px 20px;
+}
+
+.view-item{
+border:1px solid #ccc;
+padding:8px;
+border-radius:6px;
+}
+
+.view-full{
+grid-column:1 / -1;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2 style="text-align:center">SỔ TIẾP CÔNG DÂN</h2>
+
+${content}
+
+</body>
+</html>
+`);
+
+win.document.close();
+
+win.print();
+
+}
+
+function savePdfTiepDan(){
+
+printTiepDan();
+
+}
+
+function applyFilterTiepDan(){
+
+let month = document.getElementById("monthFilterTiepDan").value;
+let staff = document.getElementById("staffFilterTiepDan").value;
+let key = document.getElementById("searchTiepDan").value.toLowerCase();
+
+let filtered = tiepDanList.filter(c=>{
+
+let okMonth = true;
+let okStaff = true;
+let okKey = true;
+
+if(month){
+let m = new Date(c.ngay).getMonth()+1;
+okMonth = m == month;
+}
+
+if(staff){
+okStaff = (c.congchuc === staff);
+}
+
+if(key){
+okKey =
+(c.congdan||"").toLowerCase().includes(key) ||
+(c.congchuc||"").toLowerCase().includes(key);
+}
+
+return okMonth && okStaff && okKey;
+
+});
+
+displayFilteredTiepDan(filtered);
+
+updateStatsTiepDan(filtered);
+
+}
+
+function displayFilteredTiepDan(list){
+
+let tbody = document.getElementById("tbodyTiepDan");
+
+tbody.innerHTML="";
+
+list.forEach((c,i)=>{
+
+let realIndex = tiepDanList.indexOf(c);
+
+let ngay = c.ngay ? c.ngay.toString().substring(0,10) : "";
+
+tbody.innerHTML += `
+<tr>
+<td>${i+1}</td>
+<td>${ngay}</td>
+<td>${c.congchuc||""}</td>
+<td>${c.congdan||""}</td>
+<td>${c.cccd||""}</td>
+<td>${c.phanloai||""}</td>
+<td>${c.noidung||""}</td>
+<td>${c.theodoi||""}</td>
+<td>
+<div class="action-buttons">
+<button class="btn-view" onclick="viewTiepDan(${realIndex})">Xem</button>
+<button class="btn-edit" onclick="editTiepDan(${realIndex})">Sửa</button>
+<button class="btn-delete" onclick="deleteTiepDan(${realIndex})">Xóa</button>
+</div>
+</td>
+</tr>
+`;
+
+});
+
+}
+
+function resetFilterTiepDan(){
+
+document.getElementById("monthFilterTiepDan").value="";
+document.getElementById("staffFilterTiepDan").value="";
+document.getElementById("searchTiepDan").value="";
+
+/* hiển thị lại toàn bộ dữ liệu */
+
+displayTiepDan();
+
+/* cập nhật lại thống kê */
+
+updateStatsTiepDan(tiepDanList);
+
+}
+
+function updateStatsTiepDan(list = tiepDanList){
+
+let total = list.length;
+
+let nhi = list.filter(c=>c.congchuc==="Nguyễn Thị Nhi").length;
+let trinh = list.filter(c=>c.congchuc==="Lâm Tố Trinh").length;
+let phuong = list.filter(c=>c.congchuc==="Trịnh Thị Bích Phượng").length;
+let long = list.filter(c=>c.congchuc==="Nguyễn Thế Long").length;
+
+document.getElementById("statsTiepDan").innerHTML = `
+<b>📊 TỔNG LƯỢT TIẾP CÔNG DÂN: ${total}</b><br>
+Nguyễn Thị Nhi: ${nhi} |
+Lâm Tố Trinh: ${trinh} |
+Trịnh Thị Bích Phượng: ${phuong} |
+Nguyễn Thế Long: ${long}
+`;
 
 }
 </script>
@@ -1317,7 +1731,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option>Khác</option>
 </select>
 
-<input id="searchInput" placeholder="Tìm mã HS, họ tên..." oninput="applyFilter()">
+<input id="searchInput" placeholder="🔍Tìm mã HS, họ tên..." oninput="applyFilter()">
 
 
 <button onclick="resetFilter()">Xóa lọc</button>
@@ -1352,9 +1766,48 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <!-- ================= SỔ TIẾP CÔNG DÂN ================= -->
 
 <div id="pageTiepDan" style="display:none">
+
 <button class="btn-add" onclick="newTiepDan()">
 ➕ Nhập mới tiếp công dân
 </button>
+
+<div class="stats" id="statsTiepDan"></div>
+
+<div class="filter-row">
+
+<select id="monthFilterTiepDan" onchange="applyFilterTiepDan()">
+<option value="">-- Tháng --</option>
+<option value="1">Tháng 1</option>
+<option value="2">Tháng 2</option>
+<option value="3">Tháng 3</option>
+<option value="4">Tháng 4</option>
+<option value="5">Tháng 5</option>
+<option value="6">Tháng 6</option>
+<option value="7">Tháng 7</option>
+<option value="8">Tháng 8</option>
+<option value="9">Tháng 9</option>
+<option value="10">Tháng 10</option>
+<option value="11">Tháng 11</option>
+<option value="12">Tháng 12</option>
+</select>
+
+<select id="staffFilterTiepDan" onchange="applyFilterTiepDan()">
+<option value="">-- Công chức tiếp --</option>
+<option>Nguyễn Thị Nhi</option>
+<option>Lâm Tố Trinh</option>
+<option>Trịnh Thị Bích Phượng</option>
+<option>Nguyễn Thế Long</option>
+</select>
+
+<input id="searchTiepDan"
+placeholder="🔍 Tìm công dân..."
+oninput="applyFilterTiepDan()">
+
+<button onclick="resetFilterTiepDan()">Xóa lọc</button>
+
+</div>
+
+<table>
 <div class="modal" id="tiepDanModal">
 <div class="modal-content">
 
@@ -1364,27 +1817,54 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <form onsubmit="event.preventDefault(); saveTiepDan();">
 
-<label>Ngày tiếp công dân</label>
+<!-- PHẦN 1 -->
+<div class="section">
+<div class="section-title">I. THÔNG TIN NGƯỜI TIẾP</div>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Ngày tiếp</label>
 <input type="date" id="td_ngay">
+</div>
 
-<label>Tháng</label>
-<input id="td_thang">
+<div class="form-group">
+<label>Công chức tiếp</label>
+<select id="td_congchuc">
+<option value="">-- Chọn công chức tiếp --</option>
+<option>Nguyễn Thị Nhi</option>
+<option>Lâm Tố Trinh</option>
+<option>Trịnh Thị Bích Phượng</option>
+<option>Nguyễn Thế Long</option>
+</select>
+</div>
 
-<label>Công chức tiếp công dân</label>
-<input id="td_congchuc">
-
+<div class="form-group form-full">
 <label>Công chức phòng chuyên môn</label>
 <input id="td_phong">
+</div>
 
+</div>
+</div>
+
+
+<!-- PHẦN 2 -->
+<div class="section">
+<div class="section-title">II. NỘI DUNG TIẾP</div>
+
+<div class="form-grid">
+
+<div class="form-group form-full">
 <label>Họ tên – địa chỉ – điện thoại công dân</label>
 <textarea id="td_congdan"></textarea>
+</div>
 
+<div class="form-group">
 <label>CCCD / Hộ chiếu</label>
 <input id="td_cccd">
+</div>
 
-<label>Nội dung vụ việc</label>
-<textarea id="td_noidung"></textarea>
-
+<div class="form-group">
 <label>Phân loại đơn</label>
 <select id="td_phanloai">
 <option>Khiếu nại</option>
@@ -1393,32 +1873,69 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option>Kiến nghị</option>
 <option>Khác</option>
 </select>
+</div>
 
+<div class="form-group">
 <label>Số người</label>
 <input id="td_songuoi">
+</div>
 
+<div class="form-group form-full">
+<label>Nội dung vụ việc</label>
+<textarea id="td_noidung"></textarea>
+</div>
+
+</div>
+</div>
+
+
+<!-- PHẦN 3 -->
+<div class="section">
+<div class="section-title">III. NỘI DUNG XỬ LÝ</div>
+
+<div class="form-grid">
+
+<div class="form-group">
 <label>Cơ quan đã giải quyết</label>
 <input id="td_coquan">
+</div>
 
+<div class="form-group">
 <label>Thụ lý để giải quyết</label>
 <input id="td_thuly">
+</div>
 
+<div class="form-group">
 <label>Trả lại đơn và hướng dẫn</label>
 <input id="td_tralai">
+</div>
 
+<div class="form-group">
 <label>Chuyển đơn đến cơ quan có thẩm quyền</label>
 <input id="td_chuyendon">
+</div>
 
+<div class="form-group form-full">
 <label>Theo dõi kết quả giải quyết</label>
 <textarea id="td_theodoi"></textarea>
+</div>
 
+<div class="form-group">
 <label>Đã có văn bản giải quyết</label>
 <input id="td_vanban">
+</div>
 
+<div class="form-group form-full">
 <label>Ghi chú</label>
 <textarea id="td_ghichu"></textarea>
+</div>
 
-<button class="btn-save">Lưu</button>
+</div>
+</div>
+
+<div style="text-align:center;margin-top:15px">
+<button class="btn-save">💾 Lưu sổ tiếp công dân</button>
+</div>
 
 </form>
 
@@ -1443,7 +1960,9 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </tr>
 </thead>
 
-<tbody id="tbodyTiepDan"></tbody>
+<tbody id="tbodyTiepDan">
+
+</tbody>
 
 </table>
 
@@ -1576,7 +2095,145 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 </div>
 </div>
 
+<div class="modal" id="viewTiepDanModal">
+<div class="modal-content">
 
+<button class="close-btn" onclick="closeViewTiepDan()">Đóng</button>
+
+
+<div class="view-container">
+
+<div class="view-title">
+📖 CHI TIẾT TIẾP CÔNG DÂN
+</div>
+
+<div style="margin-bottom:15px;color:#666;font-size:13px">
+Sổ tiếp công dân – Sở Nội vụ thành phố Cần Thơ
+</div>
+
+
+<!-- PHẦN 1 -->
+<div class="section-title">
+I. THÔNG TIN NGƯỜI TIẾP
+</div>
+
+<div class="view-grid">
+
+<div class="view-item">
+<div class="view-label">Ngày tiếp</div>
+<div class="view-value" id="v_ngay"></div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Công chức tiếp</div>
+<div class="view-value" id="v_congchuc"></div>
+</div>
+
+<div class="view-item view-full">
+<div class="view-label">Công chức phòng chuyên môn</div>
+<div class="view-value" id="v_phong"></div>
+</div>
+
+</div>
+
+
+<!-- PHẦN 2 -->
+<div class="section-title">
+II. NỘI DUNG TIẾP
+</div>
+
+<div class="view-grid">
+
+<div class="view-item view-full">
+<div class="view-label">Công dân</div>
+<div class="view-value" id="v_congdan"></div>
+</div>
+
+<div class="view-item">
+<div class="view-label">CCCD</div>
+<div class="view-value" id="v_cccd"></div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Phân loại</div>
+<div class="view-value" id="v_phanloai"></div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Số người</div>
+<div class="view-value" id="v_songuoi"></div>
+</div>
+
+<div class="view-item view-full">
+<div class="view-label">Nội dung</div>
+<div class="view-value" id="v_noidung"></div>
+</div>
+
+</div>
+
+
+<!-- PHẦN 3 -->
+<div class="section-title">
+III. NỘI DUNG XỬ LÝ
+</div>
+
+<div class="view-grid">
+
+<div class="view-item">
+<div class="view-label">Cơ quan giải quyết</div>
+<div class="view-value" id="v_coquan"></div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Thụ lý</div>
+<div class="view-value" id="v_thuly"></div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Trả lại đơn</div>
+<div class="view-value" id="v_tralai"></div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Chuyển đơn</div>
+<div class="view-value" id="v_chuyendon"></div>
+</div>
+
+<div class="view-item view-full">
+<div class="view-label">Theo dõi</div>
+<div class="view-value" id="v_theodoi"></div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Văn bản</div>
+<div class="view-value" id="v_vanban"></div>
+</div>
+
+<div class="view-item view-full">
+<div class="view-label">Ghi chú</div>
+<div class="view-value" id="v_ghichu"></div>
+</div>
+
+</div>
+
+
+<!-- NÚT -->
+<div style="text-align:center;margin-top:25px">
+
+<button onclick="printTiepDan()" 
+style="background:#0d6efd;color:white;border:none;padding:7px 16px;border-radius:6px">
+🖨 In
+</button>
+
+<button onclick="savePdfTiepDan()" 
+style="background:#198754;color:white;border:none;padding:7px 16px;border-radius:6px">
+📄 Xuất PDF
+</button>
+
+</div>
+
+</div>
+</div>
 
 </body>
 </html>
