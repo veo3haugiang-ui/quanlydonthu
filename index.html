@@ -581,8 +581,13 @@ document.getElementById("pageTiepDan").style.display="block";
 
 document.querySelector(".sidebar a:nth-child(3)").classList.add("active");
 
-/* LOAD DỮ LIỆU */
-setTimeout(loadTiepDan,200);
+/* LOAD DỮ LIỆU SAU KHI DOM HIỆN */
+
+setTimeout(function(){
+
+loadTiepDan();
+
+},100);
 
 }
 
