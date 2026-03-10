@@ -576,9 +576,14 @@ document.querySelector(".sidebar a:nth-child(2)").classList.add("active");
 }
 
 if(page==="tiepdancu"){
+
 document.getElementById("pageTiepDan").style.display="block";
+
 document.querySelector(".sidebar a:nth-child(3)").classList.add("active");
-loadTiepDan();
+
+/* LOAD DỮ LIỆU */
+setTimeout(loadTiepDan,200);
+
 }
 
 if(page==="vanban"){
@@ -1185,7 +1190,7 @@ document.getElementById("tiepDanModal").style.display="none";
 
 function loadTiepDan(){
 
-fetch(API_URL+"?action=getTiepDan&t="+Date.now())
+fetch(API_URL + "?action=getTiepDan&t=" + Date.now())
 
 .then(res=>res.json())
 
@@ -1193,14 +1198,14 @@ fetch(API_URL+"?action=getTiepDan&t="+Date.now())
 
 console.log("DATA TIEP DAN:",data);
 
-tiepDanList = data;
+tiepDanList = data.filter(r => r.ngay);
 
 displayTiepDan();
 
 })
 
 .catch(err=>{
-console.log(err);
+console.log("Lỗi load:",err);
 });
 
 }
