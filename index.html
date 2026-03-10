@@ -558,21 +558,32 @@ margin:0;
 
 function showPage(page){
 
+/* Ẩn tất cả trang */
 document.getElementById("pageDonThu").style.display="none";
 document.getElementById("pageTiepDan").style.display="none";
 document.getElementById("pageVanBan").style.display="none";
 
+/* Bỏ active của tất cả menu */
+document.querySelectorAll(".sidebar a").forEach(a=>{
+a.classList.remove("active");
+});
+
+/* Hiện trang + active menu */
+
 if(page==="donthu"){
 document.getElementById("pageDonThu").style.display="block";
+document.querySelector(".sidebar a:nth-child(2)").classList.add("active");
 }
 
 if(page==="tiepdancu"){
 document.getElementById("pageTiepDan").style.display="block";
+document.querySelector(".sidebar a:nth-child(3)").classList.add("active");
 loadTiepDan();
 }
 
 if(page==="vanban"){
 document.getElementById("pageVanBan").style.display="block";
+document.querySelector(".sidebar a:nth-child(4)").classList.add("active");
 }
 
 }
