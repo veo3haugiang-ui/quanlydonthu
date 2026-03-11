@@ -12,6 +12,52 @@ table-layout:fixed;
 width:100%;
 }
 
+.btn-reset{
+background:#e53935;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+font-weight:600;
+cursor:pointer;
+transition:0.2s;
+}
+
+.btn-reset{
+margin:12px 0;
+}
+
+.btn-reset:hover{
+background:#c62828;
+transform:scale(1.05);
+}
+.date-filter{
+display:flex;
+gap:10px;
+align-items:center;
+margin-top:8px;
+}
+
+.date-box{
+display:flex;
+align-items:center;
+gap:6px;
+background:#f8f9fa;
+border:1px solid #ddd;
+padding:5px 8px;
+border-radius:6px;
+}
+
+.date-box span{
+font-size:16px;
+}
+
+.date-box input{
+border:none;
+background:transparent;
+outline:none;
+font-size:13px;
+}
 #pageTiepDan td:nth-child(2){
 text-align:center;
 font-weight:500;
@@ -827,10 +873,14 @@ function login(){
 let u = document.getElementById("username").value.trim();
 let p = document.getElementById("password").value.trim();
 
-if(users[u] && users[u].pass===p){
+if(users[u] && users[u].pass === p){
 
-currentUser=u;
-currentRole=users[u].role;
+currentUser = u;
+currentRole = users[u].role;
+
+/* LƯU PHIÊN ĐĂNG NHẬP */
+localStorage.setItem("loginUser",u);
+localStorage.setItem("loginTime",Date.now());
 
 document.getElementById("loginPage").style.display="none";
 document.getElementById("mainPage").style.display="block";
@@ -849,8 +899,13 @@ alert("Sai tài khoản hoặc mật khẩu");
 }
 
 function logout(){
+
+localStorage.removeItem("loginUser");
+localStorage.removeItem("loginTime");
+
 mainPage.style.display="none";
 loginPage.style.display="block";
+
 }
 
 function newCase(){
@@ -860,7 +915,9 @@ document.getElementById("formModal").style.display="block";
 }
 
 function generateCode(type){
+
 let year=new Date().getFullYear();
+
 let prefix={
 "Khiếu nại":"KN",
 "Tố cáo":"TC",
@@ -868,11 +925,77 @@ let prefix={
 "Hòa giải":"HG",
 "Khác":"K"
 }[type] || "HS";
-let count=cases.filter(c=>c.loaidon===type).length+1;
-return prefix+String(count).padStart(2,'0')+"-"+year;
+
+let count = cases.filter(c =>
+c.mahoso && c.mahoso.startsWith(prefix)
+).length + 1;
+
+return prefix + String(count).padStart(2,'0') + "-" + year;
+
 }
 
 function addCase(){
+/* ===== KIỂM TRA THÔNG TIN HỒ SƠ ===== */
+
+if(!ngayden.value){
+alert("⚠ Vui lòng nhập ngày nhận đơn");
+ngayden.focus();
+return;
+}
+
+if(!loaidonField.value){
+alert("⚠ Vui lòng chọn loại đơn");
+loaidonField.focus();
+return;
+}
+
+if(!nguondon.value.trim()){
+alert("⚠ Vui lòng nhập nguồn đơn");
+nguondon.focus();
+return;
+}
+
+if(!linhvuc.value.trim()){
+alert("⚠ Vui lòng nhập lĩnh vực");
+linhvuc.focus();
+return;
+}
+
+if(!soluong.value.trim()){
+alert("⚠ Vui lòng nhập số người");
+soluong.focus();
+return;
+}
+
+if(isNaN(soluong.value)){
+alert("⚠ Số người phải là định dạng số");
+soluong.focus();
+return;
+}
+
+if(!noidung.value.trim()){
+alert("⚠ Vui lòng nhập nội dung đơn");
+noidung.focus();
+return;
+}
+
+if(!dienthoai.value.trim()){
+alert("⚠ Vui lòng nhập số điện thoại");
+dienthoai.focus();
+return;
+}
+
+if(isNaN(dienthoai.value)){
+alert("⚠ Số điện thoại chỉ được nhập số");
+dienthoai.focus();
+return;
+}
+
+if(dienthoai.value.length < 9 || dienthoai.value.length > 11){
+alert("⚠ Số điện thoại không hợp lệ");
+dienthoai.focus();
+return;
+}
 
 let loaidon=loaidonField.value;
 let mahoso=(editIndex===-1)?generateCode(loaidon):cases[editIndex].mahoso;
@@ -911,6 +1034,8 @@ alert("✅ Đã lưu hồ sơ thành công");
 closeForm();
 loadData();
 });
+
+
 }
 
 function deleteCase(i){
@@ -926,6 +1051,11 @@ return;
 }
 
 if(!confirm("⚠️ Bạn có chắc chắn muốn xóa hồ sơ này không?")){
+return;
+}
+if(!noidung.value.trim()){
+alert("⚠ Vui lòng nhập nội dung đơn");
+noidung.focus();
 return;
 }
 
@@ -1166,29 +1296,54 @@ Khác: ${k}
 }
 
 function applyFilter(){
+
 let m = monthFilter.value;
 let t = typeFilter.value;
 let k = searchInput.value.toLowerCase();
 
+let from = document.getElementById("fromDate").value;
+let to = document.getElementById("toDate").value;
+
 filteredCases = cases.filter(c=>{
-let okMonth = !m || (new Date(c.ngayden).getMonth()+1 == m);
+
+let date = new Date(c.ngayden);
+
+let okMonth = !m || (date.getMonth()+1 == m);
 let okType = !t || c.loaidon === t;
-let okKey = (c.mahoso||"").toLowerCase().includes(k) ||
-            (c.hoten||"").toLowerCase().includes(k);
-return okMonth && okType && okKey;
+
+let okKey =
+(c.mahoso||"").toLowerCase().includes(k) ||
+(c.hoten||"").toLowerCase().includes(k);
+
+let okDate = true;
+
+if(from && to){
+okDate = date >= new Date(from) && date <= new Date(to);
+}
+
+return okMonth && okType && okKey && okDate;
+
 });
 
 displayFiltered(filteredCases);
 updateStats(filteredCases);
+
 }
 
 function resetFilter(){
+
 monthFilter.value="";
 typeFilter.value="";
 searchInput.value="";
+
+document.getElementById("fromDate").value="";
+document.getElementById("toDate").value="";
+
 filteredCases = [...cases];
+
 displayFiltered(filteredCases);
 updateStats(cases);
+
 }
 
 function displayFiltered(list){
@@ -1246,6 +1401,32 @@ document.getElementById("dateTimeBox").innerHTML =
 
 window.onload = function(){
 
+/* KIỂM TRA PHIÊN ĐĂNG NHẬP */
+
+let savedUser = localStorage.getItem("loginUser");
+let loginTime = localStorage.getItem("loginTime");
+
+if(savedUser && loginTime){
+
+let now = Date.now();
+
+/* 2 tiếng = 7200000 ms */
+
+if(now - loginTime < 7200000){
+
+currentUser = savedUser;
+currentRole = users[savedUser].role;
+
+document.getElementById("loginPage").style.display="none";
+document.getElementById("mainPage").style.display="block";
+
+document.getElementById("welcomeBox").innerHTML =
+"👤 <b>"+users[savedUser].fullname+"</b> | Vai trò: "+users[savedUser].role;
+
+}
+
+}
+
 tbody = document.getElementById("tbody");
 
 loadData();
@@ -1284,7 +1465,34 @@ document.getElementById("formModal").style.display="none";
 
 }
 
+
 function saveTiepDan(){
+
+/* ===== KIỂM TRA DỮ LIỆU ===== */
+
+if(!td_ngay.value){
+alert("⚠ Vui lòng nhập Ngày tiếp");
+td_ngay.focus();
+return;
+}
+
+if(!td_congchuc.value){
+alert("⚠ Vui lòng chọn Công chức tiếp");
+td_congchuc.focus();
+return;
+}
+
+if(!td_congdan.value.trim()){
+alert("⚠ Vui lòng nhập Họ tên – địa chỉ – điện thoại công dân");
+td_congdan.focus();
+return;
+}
+
+if(!td_noidung.value.trim()){
+alert("⚠ Vui lòng nhập Nội dung vụ việc");
+td_noidung.focus();
+return;
+}
 
 let action = (editIndex === -1) ? "addTiepDan" : "updateTiepDan";
 
@@ -1704,6 +1912,18 @@ Nguyễn Thế Long: ${long}
 `;
 
 }
+
+function resetFilterCitizen(){
+
+document.getElementById("searchInput").value = "";
+document.getElementById("officerFilter").value = "";
+document.getElementById("monthFilter").value = "";
+document.getElementById("fromDateCitizen").value = "";
+document.getElementById("toDateCitizen").value = "";
+
+applyFilterCitizen();
+
+}
 </script>
 </head>
 <body>
@@ -1785,8 +2005,10 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <div class="filter-row">
 
+<input id="searchInput" placeholder="🔍 Tìm mã HS, họ tên..." oninput="applyFilter()">
+
 <select id="monthFilter" onchange="applyFilter()">
-<option value="">-- Tháng --</option>
+<option value="">-- Tìm theo tháng --</option>
 <option value="1">Tháng 1</option>
 <option value="2">Tháng 2</option>
 <option value="3">Tháng 3</option>
@@ -1802,7 +2024,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </select>
 
 <select id="typeFilter" onchange="applyFilter()">
-<option value="">-- Loại đơn --</option>
+<option value="">-- Tìm theo loại đơn --</option>
 <option>Khiếu nại</option>
 <option>Tố cáo</option>
 <option>Phản ánh</option>
@@ -1810,13 +2032,29 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option>Khác</option>
 </select>
 
-<input id="searchInput" placeholder="🔍Tìm mã HS, họ tên..." oninput="applyFilter()">
+<div class="date-search">
 
+<div class="date-title">
+📅 Tìm kiếm theo ngày
+</div>
 
-<button onclick="resetFilter()">Xóa lọc</button>
+<div class="date-filter">
+
+<div class="date-box">
+<input type="date" id="fromDate" onchange="applyFilter()">
+</div>
+
+<div class="date-arrow">→</div>
+
+<div class="date-box">
+<input type="date" id="toDate" onchange="applyFilter()">
+</div>
 
 </div>
 
+</div>
+</div>
+<button class="btn-reset" onclick="resetFilter()">🗑 Xóa lọc</button>
 <h3>Danh sách hồ sơ</h3>
 
 <table>
@@ -1862,8 +2100,20 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <div class="filter-row">
 </div>
+<input id="searchTiepDan"
+placeholder="🔍 Tìm công dân..."
+oninput="applyFilterTiepDan()">
+
+<select id="staffFilterTiepDan" onchange="applyFilterTiepDan()">
+<option value="">-- Tìm theo công chức tiếp --</option>
+<option>Nguyễn Thị Nhi</option>
+<option>Lâm Tố Trinh</option>
+<option>Trịnh Thị Bích Phượng</option>
+<option>Nguyễn Thế Long</option>
+</select>
+
 <select id="monthFilterTiepDan" onchange="applyFilterTiepDan()">
-<option value="">-- Tháng --</option>
+<option value="">-- Tìm theo tháng --</option>
 <option value="1">Tháng 1</option>
 <option value="2">Tháng 2</option>
 <option value="3">Tháng 3</option>
@@ -1878,19 +2128,30 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option value="12">Tháng 12</option>
 </select>
 
-<select id="staffFilterTiepDan" onchange="applyFilterTiepDan()">
-<option value="">-- Công chức tiếp --</option>
-<option>Nguyễn Thị Nhi</option>
-<option>Lâm Tố Trinh</option>
-<option>Trịnh Thị Bích Phượng</option>
-<option>Nguyễn Thế Long</option>
-</select>
 
-<input id="searchTiepDan"
-placeholder="🔍 Tìm công dân..."
-oninput="applyFilterTiepDan()">
+<div class="date-search">
 
-<button onclick="resetFilterTiepDan()">Xóa lọc</button>
+<div class="date-title">
+📅 Tìm kiếm theo ngày
+</div>
+
+<div class="date-filter">
+
+<div class="date-box">
+<input type="date" id="fromDateCitizen" onchange="applyFilterCitizen()">
+</div>
+
+<div class="date-arrow">→</div>
+
+<div class="date-box">
+<input type="date" id="toDateCitizen" onchange="applyFilterCitizen()">
+</div>
+
+</div>
+
+</div>
+
+<button class="btn-reset" onclick="resetFilterTiepDan()">🗑 Xóa lọc</button>
 
 </div>
 
@@ -2098,10 +2359,10 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <div class="section">
 <div class="section-title">Thông tin hồ sơ</div>
 
-<label>Ngày</label>
+<label>Ngày gửi <span style="color:red">*</span></label>
 <input type="date" id="ngayden">
 
-<label>Loại đơn</label>
+<label>Loại đơn <span style="color:red">*</span></label>
 <select id="loaidonField">
 <option>Khiếu nại</option>
 <option>Tố cáo</option>
@@ -2110,13 +2371,13 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <option>Khác</option>
 </select>
 
-<label>Nguồn đơn</label>
+<label>Nguồn đơn <span style="color:red">*</span></label>
 <input id="nguondon">
 
-<label>Lĩnh vực</label>
+<label>Lĩnh vực <span style="color:red">*</span></label>
 <input id="linhvuc">
 
-<label>Số người</label>
+<label>Số người <span style="color:red">*</span></label>
 <input id="soluong">
 
 </div>
@@ -2138,7 +2399,7 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 
 
 <div class="section">
-<div class="section-title">Nội dung đơn</div>
+<div class="section-title">Nội dung đơn <span style="color:red">*</span></div>
 
 <textarea id="noidung"></textarea>
 
@@ -2231,17 +2492,17 @@ II. NỘI DUNG TIẾP
 <div class="view-grid">
 
 <div class="view-item view-full">
-<div class="view-label">Công dân</div>
+<div class="view-label">Họ tên - địa chỉ - số điện thoại công dân</div>
 <div class="view-value" id="v_congdan"></div>
 </div>
 
 <div class="view-item">
-<div class="view-label">CCCD</div>
+<div class="view-label">Số CCCD của công dân</div>
 <div class="view-value" id="v_cccd"></div>
 </div>
 
 <div class="view-item">
-<div class="view-label">Phân loại</div>
+<div class="view-label">Phân loại đơn</div>
 <div class="view-value" id="v_phanloai"></div>
 </div>
 
@@ -2251,7 +2512,7 @@ II. NỘI DUNG TIẾP
 </div>
 
 <div class="view-item view-full">
-<div class="view-label">Nội dung</div>
+<div class="view-label">Nội dung đơn</div>
 <div class="view-value" id="v_noidung"></div>
 </div>
 
