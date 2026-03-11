@@ -79,6 +79,34 @@ font-size:12px;
 border-radius:5px;
 }
 
+.user-info{
+display:flex;
+flex-direction:column;
+align-items:flex-end;
+gap:4px;
+}
+
+.user-actions{
+display:flex;
+gap:8px;
+}
+
+.user-actions button{
+font-size:12px;
+padding:4px 8px;
+border-radius:5px;
+border:none;
+cursor:pointer;
+}
+
+.user-actions button:first-child{
+background:#ffc107;
+}
+
+.user-actions button:first-child:hover{
+background:#e0a800;
+}
+
 #pageTiepDan th,
 #pageTiepDan td{
 padding:8px;
@@ -839,7 +867,7 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbxdEX56jnqM9duEwXlP0faB3ro2OsVcFzZZDRg6kPjYRBVHJltQiQSlYPBgrEK3VTxE/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbyFSXbtG9QfjLoQ84rwjrL8ix9ZkQ_2AT-290sx8nIygPQulb1Y-6Nncyop6ti1hxpG/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -870,15 +898,25 @@ updateStats(cases);
 
 function login(){
 
-let u = document.getElementById("username").value.trim();
-let p = document.getElementById("password").value.trim();
+let u=document.getElementById("username").value;
+let p=document.getElementById("password").value;
 
-if(users[u] && users[u].pass === p){
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"login",
+username:u,
+password:p
+})
+})
+.then(res=>res.json())
+.then(data=>{
 
-currentUser = u;
-currentRole = users[u].role;
+if(data.success){
 
-/* LƯU PHIÊN ĐĂNG NHẬP */
+currentUser=u;
+currentRole=data.role;
+
 localStorage.setItem("loginUser",u);
 localStorage.setItem("loginTime",Date.now());
 
@@ -886,7 +924,7 @@ document.getElementById("loginPage").style.display="none";
 document.getElementById("mainPage").style.display="block";
 
 document.getElementById("welcomeBox").innerHTML =
-"👤 <b>"+users[u].fullname+"</b> | Vai trò: "+users[u].role;
+"👤 "+data.fullname+" | Vai trò: "+data.role;
 
 loadData();
 
@@ -896,6 +934,7 @@ alert("Sai tài khoản hoặc mật khẩu");
 
 }
 
+});
 }
 
 function logout(){
@@ -1924,6 +1963,53 @@ document.getElementById("toDateCitizen").value = "";
 applyFilterCitizen();
 
 }
+
+function openChangePassword(){
+document.getElementById("changePassModal").style.display="block";
+}
+
+function closeChangePassword(){
+document.getElementById("changePassModal").style.display="none";
+}
+
+function changePassword(){
+
+let oldPass = document.getElementById("oldPass").value;
+let newPass = document.getElementById("newPass").value;
+let confirmPass = document.getElementById("confirmPass").value;
+
+if(!oldPass || !newPass || !confirmPass){
+alert("Vui lòng nhập đầy đủ thông tin");
+return;
+}
+
+if(newPass !== confirmPass){
+alert("Mật khẩu mới không khớp");
+return;
+}
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"changePassword",
+username:currentUser,
+oldPassword:oldPass,
+newPassword:newPass
+})
+})
+.then(res=>res.json())
+.then(data=>{
+
+if(data.success){
+alert("Đổi mật khẩu thành công");
+closeChangePassword();
+}else{
+alert("Mật khẩu cũ không đúng");
+}
+
+});
+
+}
 </script>
 </head>
 <body>
@@ -1980,8 +2066,17 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </div>
 
 <div class="header-right">
+
+<div class="user-info">
 <div id="welcomeBox"></div>
+
+<div class="user-actions">
+<button onclick="openChangePassword()">🔑 Đổi mật khẩu</button>
 <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+</div>
+
+</div>
+
 </div>
 </header>
 
@@ -2443,6 +2538,7 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 </div>
 
 <div class="modal" id="viewTiepDanModal">
+
 <div class="modal-content">
 
 <button class="close-btn" onclick="closeViewTiepDan()">Đóng</button>
@@ -2578,10 +2674,29 @@ style="background:#198754;color:white;border:none;padding:7px 16px;border-radius
 </button>
 
 </div>
-
 </div>
 </div>
+</div>
+<!-- 🔐 POPUP ĐỔI MẬT KHẨU (ĐẶT TẠI ĐÂY) -->
+<div class="modal" id="changePassModal">
 
+<div class="modal-content">
+
+<button class="close-btn" onclick="closeChangePassword()">Đóng</button>
+
+<h3>Đổi mật khẩu</h3>
+
+<input type="password" id="oldPass" placeholder="Mật khẩu cũ">
+
+<input type="password" id="newPass" placeholder="Mật khẩu mới">
+
+<input type="password" id="confirmPass" placeholder="Nhập lại mật khẩu mới">
+
+<button class="btn-save" onclick="changePassword()">Cập nhật mật khẩu</button>
+
+</div>
+
+</div>
 </body>
 </html>
 
