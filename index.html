@@ -12,6 +12,76 @@ table-layout:fixed;
 width:100%;
 }
 
+.search-bar{
+display:flex;
+gap:10px;
+align-items:flex-end;
+flex-wrap:wrap;
+margin-bottom:10px;
+}
+
+.search-bar input,
+.search-bar select{
+height:34px;
+padding:6px 10px;
+border:1px solid #ccc;
+border-radius:5px;
+font-size:13px;
+}
+
+
+
+.search-bar input[type="date"]{
+width:150px;
+}
+
+
+
+
+
+
+.search-bar input,
+.search-bar select,
+.search-bar button{
+height:36px;
+padding:6px 10px;
+border-radius:6px;
+border:1px solid #ccc;
+font-size:13px;
+box-sizing:border-box;
+}
+
+.search-bar input[type="text"]{
+width:260px;
+}
+
+
+
+
+
+
+
+.date-arrow{
+display:flex;
+align-items:center;
+font-weight:bold;
+}
+.search-bar input,
+.search-bar select{
+width:auto;
+height:34px;
+padding:6px 10px;
+border:1px solid #ccc;
+border-radius:5px;
+font-size:13px;
+}
+
+
+
+
+
+
+
 .date-row{
 display:flex;
 align-items:center;
@@ -24,21 +94,9 @@ height:34px;
 padding:5px 8px;
 }
 
-.date-arrow{
-font-size:16px;
-color:#555;
-}
 
-.btn-reset{
-height:34px;
-padding:0 14px;
-background:#e53935;
-color:white;
-border:none;
-border-radius:6px;
-font-weight:600;
-cursor:pointer;
-}
+
+
 .table-toolbar{
 display:flex;
 justify-content:space-between;
@@ -53,25 +111,17 @@ font-size:16px;
 
 /* THANH TÌM KIẾM GỌN */
 
-.search-bar{
-display:flex;
-gap:8px;
-flex-wrap:wrap;
-align-items:center;
-margin:10px 0;
-}
+
 
 .search-bar input,
-.search-bar select{
-padding:6px 8px;
-font-size:13px;
-height:34px;
+.search-bar select,
+.search-bar button{
+height:36px;
+line-height:36px;
 box-sizing:border-box;
 }
 
-.search-bar input[type="date"]{
-width:140px;
-}
+
 
 #searchInput{
 width:220px;
@@ -81,13 +131,14 @@ width:220px;
 background:#e53935;
 color:white;
 border:none;
-height:34px;
 padding:0 14px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
 border-radius:6px;
 font-weight:600;
 cursor:pointer;
-display:flex;
-align-items:center;
 }
 
 
@@ -98,7 +149,7 @@ transform:scale(1.05);
 .date-filter{
 display:flex;
 gap:10px;
-align-items:center;
+align-items:flex-end;
 margin-top:8px;
 }
 
@@ -945,7 +996,9 @@ if(!Array.isArray(data)){
 console.error("Dữ liệu không hợp lệ:", data);
 cases=[];
 }else{
-cases=data;
+cases=data.sort((a,b)=>{
+return new Date(b.ngayden) - new Date(a.ngayden);
+});
 }
 displayData();
 filteredCases=[...cases];
@@ -2160,26 +2213,28 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <div class="search-bar">
 
-<input id="searchInput" placeholder="🔍 Tìm mã HS, họ tên..." oninput="applyFilter()">
+<input id="searchInput" 
+placeholder="🔍 Tìm mã HS, họ tên..." 
+oninput="applyFilter()">
 
 <select id="monthFilter" onchange="applyFilter()">
-<option value="">Tìm theo tháng</option>
-<option value="1">T1</option>
-<option value="2">T2</option>
-<option value="3">T3</option>
-<option value="4">T4</option>
-<option value="5">T5</option>
-<option value="6">T6</option>
-<option value="7">T7</option>
-<option value="8">T8</option>
-<option value="9">T9</option>
-<option value="10">T10</option>
-<option value="11">T11</option>
-<option value="12">T12</option>
+<option value="">Tháng</option>
+<option value="1">Tháng 1</option>
+<option value="2">Tháng 2</option>
+<option value="3">Tháng 3</option>
+<option value="4">Tháng 4</option>
+<option value="5">Tháng 5</option>
+<option value="6">Tháng 6</option>
+<option value="7">Tháng 7</option>
+<option value="8">Tháng 8</option>
+<option value="9">Tháng 9</option>
+<option value="10">Tháng 10</option>
+<option value="11">Tháng 11</option>
+<option value="12">Tháng 12</option>
 </select>
 
 <select id="typeFilter" onchange="applyFilter()">
-<option value="">Tìm theo loại đơn</option>
+<option value="">Loại đơn</option>
 <option>Khiếu nại</option>
 <option>Tố cáo</option>
 <option>Phản ánh</option>
@@ -2187,14 +2242,14 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option>Khác</option>
 </select>
 
-<div class="date-row">
 <input type="date" id="fromDate" onchange="applyFilter()">
 
-<span>→</span>
+<span class="date-arrow">→</span>
 
 <input type="date" id="toDate" onchange="applyFilter()">
 
-<button class="btn-reset" onclick="resetFilter()">Xóa lọc</button>
+<button class="btn-reset" onclick="resetFilter()">🗑 Xóa lọc</button>
+
 </div>
 </div>
 <div class="table-toolbar">
@@ -2227,7 +2282,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </div>
 </div>
 
-</div>
+
 
 
 <!-- ================= SỔ TIẾP CÔNG DÂN ================= -->
@@ -2250,12 +2305,14 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <div class="filter-row">
 </div>
+<div class="search-bar">
+
 <input id="searchTiepDan"
 placeholder="🔍 Tìm công dân..."
 oninput="applyFilterTiepDan()">
 
 <select id="staffFilterTiepDan" onchange="applyFilterTiepDan()">
-<option value="">-- Tìm theo công chức tiếp --</option>
+<option value="">Công chức tiếp</option>
 <option>Nguyễn Thị Nhi</option>
 <option>Lâm Tố Trinh</option>
 <option>Trịnh Thị Bích Phượng</option>
@@ -2263,7 +2320,7 @@ oninput="applyFilterTiepDan()">
 </select>
 
 <select id="monthFilterTiepDan" onchange="applyFilterTiepDan()">
-<option value="">-- Tìm theo tháng --</option>
+<option value="">Tháng</option>
 <option value="1">Tháng 1</option>
 <option value="2">Tháng 2</option>
 <option value="3">Tháng 3</option>
@@ -2278,26 +2335,13 @@ oninput="applyFilterTiepDan()">
 <option value="12">Tháng 12</option>
 </select>
 
+<input type="date" id="fromDateCitizen" onchange="applyFilterCitizen()">
 
-<div class="date-search">
+<span class="date-arrow">→</span>
 
-<div class="date-title">
-📅 Tìm kiếm theo ngày
-</div>
+<input type="date" id="toDateCitizen" onchange="applyFilterCitizen()">
 
-<div class="date-filter">
-
-<div class="date-box">
-<input type="date" id="fromDate" onchange="applyFilter()">
-</div>
-
-<div class="date-arrow">→</div>
-
-<div class="date-box">
-<input type="date" id="toDate" onchange="applyFilter()">
-</div>
-
-<button class="btn-reset" onclick="resetFilter()">🗑 Xóa lọc</button>
+<button class="btn-reset" onclick="resetFilterTiepDan()">🗑 Xóa lọc</button>
 
 </div>
 
@@ -2473,12 +2517,6 @@ oninput="applyFilterTiepDan()">
 Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 </div>
 
-</div>
-<div class="modal" id="modal">
-<div class="modal-content">
-<button class="close-btn" onclick="closeModal()">Đóng</button>
-<div id="modalBody"></div>
-</div>
 </div>
 
 
@@ -2748,6 +2786,13 @@ style="background:#198754;color:white;border:none;padding:7px 16px;border-radius
 </div>
 
 </div>
+<div class="modal" id="modal">
+<div class="modal-content">
+<button class="close-btn" onclick="closeModal()">Đóng</button>
+<div id="modalBody"></div>
+</div>
+</div>
+
 </body>
 </html>
 
