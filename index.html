@@ -1187,7 +1187,7 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbzNrJ_imcVjqbf8EJV8Mvxm1rrRuSNkYdicaHG5mBP-VD_DhgNp7WUtStxJXolrEyKo/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbxENfU0HPJ8mKoW3yZdQS42ZFP5ghAQr4czQdIyn5MM1AGfaDDzTHu7FhJkT0F8KYFa/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -1993,11 +1993,8 @@ noidung:td_noidung.value,
 phanloai:td_phanloai.value,
 songuoi:td_songuoi.value,
 coquan:td_coquan.value,
-thuly:td_thuly.value,
-tralai:td_tralai.value,
-chuyendon:td_chuyendon.value,
+xuly:td_xuly.value,
 theodoi:td_theodoi.value,
-vanban:td_vanban.value,
 ghichu:td_ghichu.value
 
 };
@@ -2051,7 +2048,7 @@ tbody.innerHTML += `
 <td>${c.cccd||""}</td>
 <td>${c.phanloai||""}</td>
 <td>${c.noidung||""}</td>
-<td>${c.theodoi||""}</td>
+<td>${c.xuly||""}</td>
 <td>
 <div class="action-buttons">
 ${buttons}
@@ -2204,11 +2201,8 @@ document.getElementById("v_phanloai").innerText = c.phanloai || "";
 document.getElementById("v_songuoi").innerText = c.songuoi || "";
 document.getElementById("v_noidung").innerText = c.noidung || "";
 document.getElementById("v_coquan").innerText = c.coquan || "";
-document.getElementById("v_thuly").innerText = c.thuly || "";
-document.getElementById("v_tralai").innerText = c.tralai || "";
-document.getElementById("v_chuyendon").innerText = c.chuyendon || "";
+document.getElementById("v_thuly").innerText = c.xuly || "";
 document.getElementById("v_theodoi").innerText = c.theodoi || "";
-document.getElementById("v_vanban").innerText = c.vanban || "";
 document.getElementById("v_ghichu").innerText = c.ghichu || "";
 
 document.getElementById("viewTiepDanModal").style.display="block";
@@ -2748,7 +2742,7 @@ oninput="applyFilterTiepDan()">
 <th>CCCD</th>
 <th>Phân loại</th>
 <th>Nội dung</th>
-<th>Theo dõi</th>
+<th>Hướng xử lý</th>
 <th>Thao tác</th>
 
 </tr>
@@ -2911,7 +2905,7 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <div class="form-grid">
 
 <div class="form-group">
-<label>Ngày tiếp</label>
+<label>Ngày tiếp công dân</label>
 <input type="date" id="td_ngay">
 </div>
 
@@ -2937,7 +2931,7 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 
 <!-- PHẦN 2 -->
 <div class="section">
-<div class="section-title">II. NỘI DUNG TIẾP</div>
+<div class="section-title">II. Thông tin công dân</div>
 
 <div class="form-grid">
 
@@ -2947,19 +2941,8 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 </div>
 
 <div class="form-group">
-<label>CCCD / Hộ chiếu</label>
+<label>Số CCCD / Hộ chiếu công dân</label>
 <input id="td_cccd">
-</div>
-
-<div class="form-group">
-<label>Phân loại đơn</label>
-<select id="td_phanloai">
-<option>Khiếu nại</option>
-<option>Tố cáo</option>
-<option>Phản ánh</option>
-<option>Kiến nghị</option>
-<option>Khác</option>
-</select>
 </div>
 
 <div class="form-group">
@@ -2967,10 +2950,6 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <input id="td_songuoi">
 </div>
 
-<div class="form-group form-full">
-<label>Nội dung vụ việc</label>
-<textarea id="td_noidung"></textarea>
-</div>
 
 </div>
 </div>
@@ -2978,28 +2957,39 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 
 <!-- PHẦN 3 -->
 <div class="section">
-<div class="section-title">III. NỘI DUNG XỬ LÝ</div>
+<div class="section-title">III. NỘI DUNG VÀ XỬ LÝ</div>
 
 <div class="form-grid">
 
+<div class="form-group form-full">
+<label>Nội dung vụ việc</label>
+<textarea id="td_noidung"></textarea>
+</div>
+
 <div class="form-group">
-<label>Cơ quan đã giải quyết</label>
+<label>Phân loại đơn</label>
+<select id="td_phanloai">
+<option>Khiếu nại</option>
+<option>Tố cáo</option>
+<option>Phản ánh - Kiến nghị</option>
+<option>Yêu cầu hòa giải</option>
+<option>Khác</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Cơ quan giải quyết</label>
 <input id="td_coquan">
 </div>
 
 <div class="form-group">
-<label>Thụ lý để giải quyết</label>
-<input id="td_thuly">
-</div>
-
-<div class="form-group">
-<label>Trả lại đơn và hướng dẫn</label>
-<input id="td_tralai">
-</div>
-
-<div class="form-group">
-<label>Chuyển đơn đến cơ quan có thẩm quyền</label>
-<input id="td_chuyendon">
+<label>Hướng xử lý</label>
+<select id="td_xuly">
+<option>Thụ lý để giải quyết</option>
+<option>Trả lại đơn và hướng dẫn</option>
+<option>Chuyển đơn đến cơ quan, tổ chức có thẩm quyền</option>
+<option>Khác</option>
+</select>
 </div>
 
 <div class="form-group">
@@ -3007,10 +2997,6 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <textarea id="td_theodoi"></textarea>
 </div>
 
-<div class="form-group">
-<label>Đã có văn bản giải quyết</label>
-<input id="td_vanban">
-</div>
 
 <div class="form-group form-full">
 <label>Ghi chú</label>
@@ -3049,7 +3035,7 @@ Sổ tiếp công dân – Sở Nội vụ thành phố Cần Thơ
 
 <!-- PHẦN 1 -->
 <div class="section-title">
-I. THÔNG TIN NGƯỜI TIẾP
+I. THÔNG TIN NGƯỜI TIẾP CÔNG DÂN
 </div>
 
 <div class="view-grid">
@@ -3074,7 +3060,7 @@ I. THÔNG TIN NGƯỜI TIẾP
 
 <!-- PHẦN 2 -->
 <div class="section-title">
-II. NỘI DUNG TIẾP
+II. THÔNG TIN CÔNG DÂN
 </div>
 
 <div class="view-grid">
@@ -3085,34 +3071,28 @@ II. NỘI DUNG TIẾP
 </div>
 
 <div class="view-item">
-<div class="view-label">Số CCCD của công dân</div>
+<div class="view-label">Số CCCD </div>
 <div class="view-value" id="v_cccd"></div>
-</div>
-
-<div class="view-item">
-<div class="view-label">Phân loại đơn</div>
-<div class="view-value" id="v_phanloai"></div>
 </div>
 
 <div class="view-item">
 <div class="view-label">Số người</div>
 <div class="view-value" id="v_songuoi"></div>
 </div>
+</div>
 
+<div class="section-title">
+III. NỘI DUNG VÀ XỬ LÝ
+</div>
+<div class="view-grid">
 <div class="view-item view-full">
-<div class="view-label">Nội dung đơn</div>
+<div class="view-label">Nội dung vụ việc</div>
 <div class="view-value" id="v_noidung"></div>
 </div>
-
+<div class="view-item">
+<div class="view-label">Phân loại đơn</div>
+<div class="view-value" id="v_phanloai"></div>
 </div>
-
-
-<!-- PHẦN 3 -->
-<div class="section-title">
-III. NỘI DUNG XỬ LÝ
-</div>
-
-<div class="view-grid">
 
 <div class="view-item">
 <div class="view-label">Cơ quan giải quyết</div>
@@ -3120,35 +3100,19 @@ III. NỘI DUNG XỬ LÝ
 </div>
 
 <div class="view-item">
-<div class="view-label">Thụ lý</div>
+<div class="view-label">Hướng xử lý</div>
 <div class="view-value" id="v_thuly"></div>
 </div>
 
 <div class="view-item">
-<div class="view-label">Trả lại đơn</div>
-<div class="view-value" id="v_tralai"></div>
-</div>
-
-<div class="view-item">
-<div class="view-label">Chuyển đơn</div>
-<div class="view-value" id="v_chuyendon"></div>
-</div>
-
-<div class="view-item view-full">
-<div class="view-label">Theo dõi</div>
+<div class="view-label">Theo dõi kết quả giải quyết</div>
 <div class="view-value" id="v_theodoi"></div>
-</div>
-
-<div class="view-item">
-<div class="view-label">Văn bản</div>
-<div class="view-value" id="v_vanban"></div>
 </div>
 
 <div class="view-item view-full">
 <div class="view-label">Ghi chú</div>
 <div class="view-value" id="v_ghichu"></div>
 </div>
-
 </div>
 
 
