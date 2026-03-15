@@ -12,6 +12,15 @@ table-layout:fixed;
 width:100%;
 }
 
+#pageTiepDan tbody tr:nth-child(even){
+background:white;
+}
+
+table tbody tr:hover{
+background:#e8f1ff;
+cursor:pointer;
+}
+
 .rows-control{
 display:flex;
 align-items:center;
@@ -59,7 +68,7 @@ margin-top:10px;
 .search-bar{
 display:flex;
 gap:10px;
-align-items:flex-end;
+align-items:center;
 flex-wrap:wrap;
 margin-bottom:10px;
 }
@@ -172,17 +181,11 @@ width:220px;
 }
 
 .btn-reset{
-background:#e53935;
-color:white;
-border:none;
-padding:0 14px;
 height:36px;
+padding:0 14px;
 display:flex;
 align-items:center;
 justify-content:center;
-border-radius:6px;
-font-weight:600;
-cursor:pointer;
 }
 
 .icon-btn{
@@ -241,15 +244,16 @@ background:#f1f6ff;
 
 .action-buttons{
 display:flex;
-justify-content:flex-start;
-gap:6px;
-padding-left:6px;
+justify-content:left;
+align-items:left;
+gap:8px;
 }
 
 .action-buttons button{
-padding:4px 8px;
+padding:6px 12px;
 font-size:12px;
-border-radius:5px;
+border-radius:6px;
+min-width:45px;
 }
 
 #pagination{
@@ -361,7 +365,8 @@ text-align:center;
 #pageTiepDan th:nth-child(7),
 #pageTiepDan td:nth-child(7){
 width:260px;
-white-space:nowrap;
+white-space:normal;
+word-break:break-word;
 overflow:hidden;
 text-overflow:ellipsis;
 }
@@ -375,7 +380,7 @@ width:130px;
 /* Thao tác */
 #pageTiepDan th:nth-child(9),
 #pageTiepDan td:nth-child(9){
-width:130px;
+width:160px;
 text-align:center;
 }
 
@@ -413,6 +418,7 @@ background:#34495e;
 border-left:4px solid #ffc107;
 }
 
+
 .sidebar a.active{
 background:#1a252f;
 border-left:4px solid #ffc107;
@@ -425,7 +431,8 @@ padding:10px;
 
 td:nth-child(7){
 max-width:300px;
-white-space:nowrap;
+white-space:normal;
+word-break:break-word;
 overflow:hidden;
 text-overflow:ellipsis;
 }
@@ -570,6 +577,30 @@ font-size:13px;
 opacity:0.9;
 }
 
+.filter-item{
+display:flex;
+flex-direction:column;
+}
+
+.filter-item label{
+font-size:13px;
+margin-bottom:4px;
+height:18px;
+}
+
+.table-area{
+background:transparent;
+padding:0;
+margin-top:10px;
+}
+
+.search-bar{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+align-items:flex-start;
+}
+
 .container{width:98%;margin:15px auto;}
 .card{background:white;padding:15px;border-radius:8px;margin-bottom:15px;}
 input,select,textarea{width:100%;padding:6px;margin-bottom:8px;}
@@ -678,6 +709,10 @@ transform:translateY(-1px);
 
 .view-section{
 margin-bottom:20px;
+}
+
+.table-area table{
+background:transparent;
 }
 
 body{
@@ -2604,7 +2639,7 @@ oninput="applyFilter()">
 
 <input type="date" id="toDate" onchange="applyFilter()">
 
-<button class="btn-reset" onclick="resetFilter()">🗑 Xóa lọc</button>
+<button class="btn-reset" onclick="resetFilter()">⟳ Reset</button>
 
 </div>
 </div>
@@ -2615,11 +2650,9 @@ oninput="applyFilter()">
 <button class="btn-add" onclick="newCase()">
 ➕ Thêm hồ sơ
 </button>
-
 </div>
 
-
-
+<div class="table-scroll">
 <table>
 <thead>
 <tr>
@@ -2636,9 +2669,10 @@ oninput="applyFilter()">
 </tr>
 </thead>
 
-<tbody id="tbody"></tbody>
-
+<tbody id="tbody">
+</tbody>
 </table>
+</div>
 <div id="pagination"></div>
 <div class="table-footer">
 
@@ -2678,13 +2712,7 @@ oninput="applyFilter()">
 <div class="container">
 
 
-<div class="card">
 
-<button class="btn-add" onclick="newTiepDan()">
-➕ Nhập mới tiếp công dân
-</button>
-
-</div>
 <div class="card">
 
 <div class="stats" id="statsTiepDan"></div>
@@ -2720,17 +2748,28 @@ oninput="applyFilterTiepDan()">
 <option value="11">Tháng 11</option>
 <option value="12">Tháng 12</option>
 </select>
-
-<input type="date" id="fromDateCitizen" onchange="applyFilterTiepDan()">
-
-<span class="date-arrow">→</span>
-
-<input type="date" id="toDateCitizen" onchange="applyFilterTiepDan()">
-
-<button class="btn-reset" onclick="resetFilterTiepDan()">🗑 Xóa lọc</button>
-
+<div class="date-group">
+<label>Từ ngày </label><input type="date" id="fromDateCitizen" onchange="applyFilterTiepDan()">
+</div>
+<div class="date-group"><label>Tới ngày </label><input type="date" id="toDateCitizen" onchange="applyFilterTiepDan()">
 </div>
 
+<button class="btn-reset" onclick="resetFilterTiepDan()">⟲ Reset </button>
+<div class="filter-item">
+<label>&nbsp;</label>
+</div>
+</div>
+</div>
+<div class="table-area">
+
+<h3>Danh sách tiếp công dân</h3>
+
+<button class="btn-add" onclick="newTiepDan()">
+➕ Nhập mới tiếp công dân
+</button>
+</div>
+
+<div class="table-area">
 <table>
 <thead>
 <tr>
@@ -2753,8 +2792,8 @@ oninput="applyFilterTiepDan()">
 </tbody>
 
 </table>
-
 </div>
+
 
 
 <!-- ================= THƯ VIỆN VĂN BẢN ================= -->
