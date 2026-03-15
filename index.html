@@ -184,8 +184,9 @@ background:#f1f6ff;
 
 .action-buttons{
 display:flex;
-justify-content:center;
+justify-content:flex-start;
 gap:6px;
+padding-left:6px;
 }
 
 .action-buttons button{
@@ -616,19 +617,21 @@ padding-bottom:6px;
 margin-bottom:12px;
 }
 
-.form-group label{
-font-weight:600;
-font-size:13px;
-display:block;
-margin-bottom:4px;
+input,select,textarea{
+padding:9px 12px;
+border:1px solid #cfcfcf;
+border-radius:6px;
+font-size:14px;
+background:#fafafa;
+transition:all .15s;
 }
 
-input,select,textarea{
-width:100%;
-padding:8px 10px;
-border:1px solid #ccc;
-border-radius:4px;
-font-size:13px;
+input:focus,
+select:focus,
+textarea:focus{
+border-color:#b02a37;
+background:white;
+box-shadow:0 0 0 2px rgba(176,42,55,0.15);
 }
 
 textarea{
@@ -754,19 +757,15 @@ background:#8c1f2b;
 }
 
 .form-group label{
-font-weight:600;
-font-size:13px;
-margin-bottom:4px;
-color:#444;
+font-weight:700;
+font-size:14px;
+color:#2c3e50;
+margin-bottom:6px;
+display:block;
+padding-left:6px;
+border-left:3px solid #b02a37;
 }
 
-input,select,textarea{
-padding:8px 10px;
-border:1px solid #ccc;
-border-radius:4px;
-font-size:13px;
-width:100%;
-}
 
 input:focus,
 select:focus,
@@ -982,7 +981,7 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbyFSXbtG9QfjLoQ84rwjrL8ix9ZkQ_2AT-290sx8nIygPQulb1Y-6Nncyop6ti1hxpG/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbzNrJ_imcVjqbf8EJV8Mvxm1rrRuSNkYdicaHG5mBP-VD_DhgNp7WUtStxJXolrEyKo/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -1175,6 +1174,7 @@ soanthao:soanthao.value,
 ghichu:ghichu.value,
 tinhtrang:tinhtrang.value,
 loaidon,
+dieukien:dieukien.value,
 owner:(editIndex===-1)?currentUser:cases[editIndex].owner,
 history:[]
 };
@@ -1263,7 +1263,7 @@ function displayData(){
 tbody.innerHTML="";
 cases.forEach((c,i)=>{
 let buttons=`<button class="btn-view" onclick="viewCase(${i})">Xem</button>`;
-if(c.tinhtrang!=="Đã giải quyết"){
+if(c.tinhtrang!=="Đã xử lý"){
 if(currentRole==="Phó Giám đốc" || c.owner===currentUser){
 buttons+=`<button class="btn-edit" onclick="editCase(${i})">Sửa</button>`;
 }
@@ -1278,6 +1278,9 @@ tbody.innerHTML+=`
 <td>${formatDate(c.ngayden)}</td>
 <td>${c.hoten}</td>
 <td>${c.loaidon}</td>
+<td>${c.dieukien}</td>
+<td>${c.coquan}</td>
+<td>${c.tinhtrang}</td>
 <td>${users[c.owner] ? users[c.owner].fullname : c.owner}</td>
 <td>
 <div class="action-buttons">
@@ -1298,7 +1301,7 @@ function viewCase(i){
 let c = cases[i];
 
 let statusClass = "status-processing";
-if(c.tinhtrang==="Đã giải quyết") statusClass="status-done";
+if(c.tinhtrang==="Đã xử lý") statusClass="status-done";
 if(c.tinhtrang==="Chuyển cơ quan khác") statusClass="status-transfer";
 
 modalBody.innerHTML = `
@@ -1331,20 +1334,15 @@ modalBody.innerHTML = `
 <div class="view-label">Lĩnh vực</div>
 <div class="view-value">${c.linhvuc||""}</div>
 </div>
-
-<div class="view-item">
-<div class="view-label">Số người</div>
-<div class="view-value">${c.soluong||""}</div>
 </div>
+
+<div class="view-section">
+<div class="section-title">Thông tin người gửi đơn</div>
+<div class="view-grid">
 
 <div class="view-item">
 <div class="view-label">Họ tên</div>
 <div class="view-value">${c.hoten||""}</div>
-</div>
-
-<div class="view-item view-full">
-<div class="view-label">Địa chỉ</div>
-<div class="view-value">${c.diachi||""}</div>
 </div>
 
 <div class="view-item">
@@ -1353,7 +1351,55 @@ modalBody.innerHTML = `
 </div>
 
 <div class="view-item">
-<div class="view-label">Tình trạng</div>
+<div class="view-label">Địa chỉ</div>
+<div class="view-value">${c.diachi||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Số người gửi đơn</div>
+<div class="view-value">${c.soluong||""}</div>
+</div>
+
+
+
+</div>
+</div>
+
+<div class="view-section">
+<div class="section-title">Nội dung đơn và thẩm quyền giải quyết</div>
+<div class="view-grid">
+
+<div class="view-item view-full">
+<div class="view-label">Nội dung đơn</div>
+<div class="view-value">${c.noidung||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Điều kiện thụ lý</div>
+<div class="view-value">${c.dieukien||""}</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Thẩm quyền giải quyết</div>
+<div class="view-value">${c.coquan||""}</div>
+</div>
+
+
+</div>
+
+<div class="view-section">
+<div class="section-title">Kết quả xử lý đơn</div>
+<div class="view-grid">
+
+<div class="view-item">
+<div class="view-label">Người xử lý đơn</div>
+<div class="view-value">
+${users[c.owner] ? users[c.owner].fullname : c.owner}
+</div>
+</div>
+
+<div class="view-item">
+<div class="view-label">Tình trạng xử lý đơn</div>
 <div class="view-value">
 <span class="status-badge ${statusClass}">
 ${c.tinhtrang||""}
@@ -1361,53 +1407,31 @@ ${c.tinhtrang||""}
 </div>
 </div>
 
-</div>
-</div>
-
-<div class="view-section">
-<div class="section-title">Nội dung & xử lý</div>
-<div class="view-grid">
-
-<div class="view-item view-full">
-<div class="view-label">Nội dung</div>
-<div class="view-value">${c.noidung||""}</div>
-</div>
-
-<div class="view-item view-full">
-<div class="view-label">Cơ quan xử lý</div>
-<div class="view-value">${c.coquan||""}</div>
-</div>
-
 <div class="view-item">
-<div class="view-label">Kết quả</div>
+<div class="view-label">Kết quả xử lý đơn</div>
 <div class="view-value">${c.ketqua||""}</div>
 </div>
 
 <div class="view-item">
-<div class="view-label">Số ký hiệu</div>
+<div class="view-label">Số ký hiệu văn bản</div>
 <div class="view-value">${c.sokyhieu||""}</div>
 </div>
 
 <div class="view-item">
-<div class="view-label">Ký duyệt</div>
+<div class="view-label">Lãnh đạo ký duyệt</div>
 <div class="view-value">${c.kyduyet||""}</div>
 </div>
 
 <div class="view-item">
-<div class="view-label">Soạn thảo</div>
+<div class="view-label">Người tham mưu văn bản</div>
 <div class="view-value">${c.soanthao||""}</div>
 </div>
+
+
 
 <div class="view-item view-full">
 <div class="view-label">Ghi chú</div>
 <div class="view-value">${c.ghichu||""}</div>
-</div>
-
-<div class="view-item">
-<div class="view-label">Người nhập</div>
-<div class="view-value">
-${users[c.owner] ? users[c.owner].fullname : c.owner}
-</div>
 </div>
 
 </div>
@@ -1457,6 +1481,10 @@ let m = monthFilter.value;
 let t = typeFilter.value;
 let k = searchInput.value.toLowerCase();
 
+let authority = document.getElementById("authorityFilter").value;
+let condition = document.getElementById("conditionFilter").value;
+let status = document.getElementById("statusFilter").value;
+
 let from = document.getElementById("fromDate").value;
 let to = document.getElementById("toDate").value;
 
@@ -1467,6 +1495,10 @@ let date = new Date(c.ngayden);
 let okMonth = !m || (date.getMonth()+1 == m);
 let okType = !t || c.loaidon === t;
 
+let okAuthority = !authority || c.coquan === authority;
+let okCondition = !condition || c.dieukien === condition;
+let okStatus = !status || (c.tinhtrang || "").trim() === status;
+
 let okKey =
 (c.mahoso||"").toLowerCase().includes(k) ||
 (c.hoten||"").toLowerCase().includes(k);
@@ -1474,10 +1506,21 @@ let okKey =
 let okDate = true;
 
 if(from && to){
-okDate = date >= new Date(from) && date <= new Date(to);
+
+let d = new Date(date);
+d.setHours(0,0,0,0);
+
+let f = new Date(from);
+f.setHours(0,0,0,0);
+
+let t = new Date(to);
+t.setHours(23,59,59,999);
+
+okDate = d >= f && d <= t;
+
 }
 
-return okMonth && okType && okKey && okDate;
+return okMonth && okType && okAuthority && okCondition && okStatus && okKey && okDate;
 
 });
 
@@ -1494,6 +1537,9 @@ searchInput.value="";
 
 document.getElementById("fromDate").value="";
 document.getElementById("toDate").value="";
+document.getElementById("authorityFilter").value="";
+document.getElementById("conditionFilter").value="";
+document.getElementById("statusFilter").value="";
 
 filteredCases = [...cases];
 
@@ -1512,7 +1558,7 @@ let realIndex = cases.findIndex(x=>x.mahoso===c.mahoso);
 
 let buttons=`<button class="btn-view" onclick="viewCase(${realIndex})">Xem</button>`;
 
-if(c.tinhtrang!=="Đã giải quyết"){
+if(c.tinhtrang!=="Đã xử lý"){
 
 if(currentRole==="Phó Giám đốc" || c.owner===currentUser){
 buttons+=`<button class="btn-edit" onclick="editCase(${realIndex})">Sửa</button>`;
@@ -1531,8 +1577,12 @@ tbody.innerHTML+=`
 <td>${formatDate(c.ngayden)}</td>
 <td>${c.hoten}</td>
 <td>${c.loaidon}</td>
+<td>${c.dieukien}</td>
+<td>${c.coquan}</td>
+<td>${c.tinhtrang}</td>
 <td>${users[c.owner] ? users[c.owner].fullname : c.owner}</td>
 <td>${buttons}</td>
+
 </tr>`;
 
 });
@@ -2242,6 +2292,24 @@ oninput="applyFilter()">
 <option>Khác</option>
 </select>
 
+<select id="authorityFilter" onchange="applyFilter()">
+<option value="">Thẩm quyền</option>
+<option>Thuộc thẩm quyền giải quyết</option>
+<option>Không thuộc thẩm quyền giải quyết</option>
+</select>
+
+<select id="conditionFilter" onchange="applyFilter()">
+<option value="">Điều kiện xử lý</option>
+<option>Đủ điều kiện xử lý</option>
+<option>Không đủ điều kiện xử lý</option>
+</select>
+
+<select id="statusFilter" onchange="applyFilter()">
+<option value="">Tình trạng</option>
+<option>Đang xử lý</option>
+<option>Đã xử lý</option>
+</select>
+
 <input type="date" id="fromDate" onchange="applyFilter()">
 
 <span class="date-arrow">→</span>
@@ -2267,10 +2335,13 @@ oninput="applyFilter()">
 <tr>
 <th>STT</th>
 <th>Mã HS</th>
-<th>Ngày</th>
-<th>Họ tên</th>
-<th>Loại</th>
-<th>Người nhập</th>
+<th>Ngày gửi đơn</th>
+<th>Họ tên người gửi đơn</th>
+<th>Loại đơn</th>
+<th>Điều kiện</th>
+<th>Thẩm quyền giải quyết</th>
+<th>Tình trạng xử lý</th>
+<th>Người xử lý</th>
 <th>Thao tác</th>
 </tr>
 </thead>
@@ -2453,7 +2524,7 @@ oninput="applyFilterTiepDan()">
 <input id="td_chuyendon">
 </div>
 
-<div class="form-group form-full">
+<div class="form-group">
 <label>Theo dõi kết quả giải quyết</label>
 <textarea id="td_theodoi"></textarea>
 </div>
@@ -2534,7 +2605,7 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <div class="modal" id="formModal">
 <div class="modal-content">
 
-<button class="close-btn" onclick="closeForm()">Đóng</button>
+<button type="button" class="close-btn" onclick="closeForm()">Đóng</button>
 
 <h3 style="color:#b02a37">Nhập / Sửa hồ sơ</h3>
 
@@ -2548,6 +2619,7 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 
 <label>Loại đơn <span style="color:red">*</span></label>
 <select id="loaidonField">
+<option value="">-- Chọn loại đơn --</option>
 <option>Khiếu nại</option>
 <option>Tố cáo</option>
 <option>Phản ánh</option>
@@ -2593,13 +2665,25 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <div class="section">
 <div class="section-title">Xử lý hồ sơ</div>
 
-<label>Cơ quan xử lý</label>
-<input id="coquan">
+<label>Thẩm quyền giải quyết</label>
+<select id="coquan">
+<option value="">-- Chọn thẩm quyền giải quyết --</option>
+<option>Thuộc thẩm quyền giải quyết</option>
+<option>Không thuộc thẩm quyền giải quyết</option>
+</select>
 
-<label>Trạng thái</label>
+<label>Điều kiện thụ lý</label>
+<select id="dieukien">
+<option value="">-- Chọn điều kiện --</option>
+<option>Đủ điều kiện giải quyết</option>
+<option>Không đủ điều kiện giải quyết</option>
+</select>
+
+<label>Tình trạng xử lý đơn</label>
 <select id="tinhtrang">
+<option value="">-- Chọn tình trạng --</option>
 <option>Đang xử lý</option>
-<option>Đã giải quyết</option>
+<option>Đã xử lý</option>
 </select>
 
 <label>Kết quả</label>
@@ -2795,4 +2879,3 @@ style="background:#198754;color:white;border:none;padding:7px 16px;border-radius
 
 </body>
 </html>
-
