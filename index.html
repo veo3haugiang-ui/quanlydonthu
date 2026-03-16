@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -2542,7 +2543,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <div class="sidebar-title">MENU HỆ THỐNG</div>
 
 <a href="#" class="active" onclick="showPage('donthu')">
-📂 Quản lý đơn thư
+📚 Quản lý đơn thư
 </a>
 
 <a href="#" onclick="showPage('tiepdancu')">
@@ -2550,7 +2551,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </a>
 
 <a href="#" onclick="showPage('vanban')">
-📚 Thư viện văn bản
+📂 Thư viện văn bản
 </a>
 
 </div>
@@ -2839,9 +2840,12 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <div class="section">
 <div class="section-title">Thông tin hồ sơ</div>
 
+<div class="form-group">
 <label>Ngày gửi <span style="color:red">*</span></label>
 <input type="date" id="ngayden">
+</div>
 
+<div class="form-group">
 <label>Loại đơn <span style="color:red">*</span></label>
 <select id="loaidonField">
 <option value="">-- Chọn loại đơn --</option>
@@ -2851,80 +2855,116 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <option>Hòa giải</option>
 <option>Khác</option>
 </select>
+</div>
 
+<div class="form-group">
 <label>Nguồn đơn <span style="color:red">*</span></label>
 <input id="nguondon">
+</div>
 
+<div class="form-group">
 <label>Lĩnh vực <span style="color:red">*</span></label>
 <input id="linhvuc">
+</div>
 
+<div class="form-group">
 <label>Số người <span style="color:red">*</span></label>
 <input id="soluong">
-
+</div>
 </div>
 
 
 <div class="section">
 <div class="section-title">Thông tin người gửi</div>
-
+<div class="form-group">
 <label>Họ tên</label>
 <input id="hoten">
+</div>
 
+<div class="form-group">
 <label>Điện thoại</label>
 <input id="dienthoai">
+</div>
 
+<div class="form-group">
 <label>Địa chỉ</label>
 <input id="diachi">
+</div>
 
 </div>
 
-
+<div class="form-group">
 <div class="section">
 <div class="section-title">Nội dung đơn <span style="color:red">*</span></div>
 
 <textarea id="noidung"></textarea>
 
 </div>
+</div>
 
 
 <div class="section">
 <div class="section-title">Xử lý hồ sơ</div>
 
+<div class="form-group">
 <label>Thẩm quyền giải quyết</label>
 <select id="coquan">
 <option value="">-- Chọn thẩm quyền giải quyết --</option>
 <option>Thuộc thẩm quyền giải quyết</option>
 <option>Không thuộc thẩm quyền giải quyết</option>
 </select>
+</div>
 
+<div class="form-group">
 <label>Điều kiện thụ lý</label>
 <select id="dieukien">
 <option value="">-- Chọn điều kiện --</option>
 <option>Đủ điều kiện giải quyết</option>
 <option>Không đủ điều kiện giải quyết</option>
 </select>
+</div>
 
+<div class="form-group">
 <label>Tình trạng xử lý đơn</label>
 <select id="tinhtrang">
 <option value="">-- Chọn tình trạng --</option>
 <option>Đang xử lý</option>
 <option>Đã xử lý</option>
 </select>
+</div>
 
-<label>Kết quả</label>
-<input id="ketqua">
+<div class="form-group">
+<label>Kết quả xử lý đơn</label>
+<select id="ketqua">
+<option value="">-- Chọn kết quả --</option>
+<option>Văn bản phúc đáp</option>
+<option>Phiếu hướng dẫn</option>
+<option>Phiếu chuyển đơn</option>
+<option>Phiếu đề xuất</option>
+<option>Lưu đơn</option>
+<option>Khác</option>
+</select>
+</div>
 
+<div class="form-group">
 <label>Số ký hiệu</label>
 <input id="sokyhieu">
+</div>
 
+<div class="form-group">
 <label>Ký duyệt</label>
 <input id="kyduyet">
+</div>
 
+<div class="form-group">
 <label>Soạn thảo</label>
 <input id="soanthao">
+</div>
 
+<div class="form-group">
 <label>Ghi chú</label>
 <textarea id="ghichu"></textarea>
+</div>
 
 </div>
 
