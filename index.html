@@ -1230,7 +1230,7 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbxENfU0HPJ8mKoW3yZdQS42ZFP5ghAQr4czQdIyn5MM1AGfaDDzTHu7FhJkT0F8KYFa/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbxYt2-OeLUDP1RUexvqmpawAISdgFnwOhwWntUBe9IR_ndzBgvl_ZZe7HH1ecFRrLa3/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -1409,7 +1409,6 @@ let mahoso=(editIndex===-1)?generateCode(loaidon):cases[editIndex].mahoso;
 let newData={
 action:(editIndex===-1)?"add":"update",
 mahoso,
-created: Date.now(),   // thời gian nhập hồ sơ
 ngayden:ngayden.value,
 nguondon:nguondon.value,
 linhvuc:linhvuc.value,
@@ -1428,6 +1427,7 @@ tinhtrang:tinhtrang.value,
 loaidon,
 dieukien:dieukien.value,
 owner:(editIndex===-1)?currentUser:cases[editIndex].owner,
+created: Date.now(),   // thời gian nhập hồ sơ
 history:[]
 };
 
