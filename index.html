@@ -1240,18 +1240,21 @@ throw new Error("Lỗi kết nối API");
 return res.json();
 })
 .then(data=>{
-if(!Array.isArray(data)){
-console.error("Dữ liệu không hợp lệ:", data);
-cases=[];
-}else{
-cases=data.sort((a,b)=>{
-return new Date(b.ngayden) - new Date(a.ngayden);
-});
-}
-filteredCases=[...cases];
-currentPage = 1;
-displayFiltered(filteredCases);
-updateStats(cases);
+  if(!Array.isArray(data)){
+    cases=[];
+  }else{
+    cases=data.sort((a,b)=>{
+      return new Date(b.ngayden) - new Date(a.ngayden);
+    });
+  }
+
+  filteredCases=[...cases];
+  currentPage = 1;
+  displayFiltered(filteredCases);
+  updateStats(cases);
+
+  // 👇 THÊM DÒNG NÀY
+  loadNguoiXuLyFilter();
 })
 .catch(err=>{
 console.error("Lỗi tải dữ liệu:", err);
@@ -1327,7 +1330,7 @@ let year=new Date().getFullYear();
 let prefix={
 "Khiếu nại":"KN",
 "Tố cáo":"TC",
-"Phản ánh":"PA",
+"Phản ánh - Kiến nghị":"PA",
 "Hòa giải":"HG",
 "Khác":"K"
 }[type] || "HS";
@@ -1349,9 +1352,9 @@ ngayden.focus();
 return;
 }
 
-if(!loaidonField.value){
+if(!document.getElementById("loaidon").value){
 alert("⚠ Vui lòng chọn loại đơn");
-loaidonField.focus();
+document.getElementById("loaidon").focus();
 return;
 }
 
@@ -1385,11 +1388,7 @@ noidung.focus();
 return;
 }
 
-if(!dienthoai.value.trim()){
-alert("⚠ Vui lòng nhập số điện thoại");
-dienthoai.focus();
-return;
-}
+if(dienthoai.value.trim() !== ""){
 
 if(isNaN(dienthoai.value)){
 alert("⚠ Số điện thoại chỉ được nhập số");
@@ -1403,8 +1402,13 @@ dienthoai.focus();
 return;
 }
 
-let loaidon=loaidonField.value;
-let mahoso=(editIndex===-1)?generateCode(loaidon):cases[editIndex].mahoso;
+}
+
+let loaiDonValue = document.getElementById("loaidon").value;
+
+let mahoso = (editIndex===-1)
+? generateCode(loaiDonValue)
+: cases[editIndex].mahoso;
 
 let newData={
 action:(editIndex===-1)?"add":"update",
@@ -1424,10 +1428,10 @@ kyduyet:kyduyet.value,
 soanthao:soanthao.value,
 ghichu:ghichu.value,
 tinhtrang:tinhtrang.value,
-loaidon,
+loaidon: loaiDonValue,   // ✅ CHUẨN
 dieukien:dieukien.value,
 owner:(editIndex===-1)?currentUser:cases[editIndex].owner,
-created: Date.now(),   // thời gian nhập hồ sơ
+created: Date.now(),
 history:[]
 };
 
@@ -1461,11 +1465,7 @@ return;
 if(!confirm("⚠️ Bạn có chắc chắn muốn xóa hồ sơ này không?")){
 return;
 }
-if(!noidung.value.trim()){
-alert("⚠ Vui lòng nhập nội dung đơn");
-noidung.focus();
-return;
-}
+
 
 fetch(API_URL,{
 method:"POST",
@@ -1530,8 +1530,8 @@ tbody.innerHTML+=`
 <td>${formatDate(c.ngayden)}</td>
 <td>${c.hoten}</td>
 <td>${c.loaidon}</td>
-<td>${c.dieukien}</td>
 <td>${c.coquan}</td>
+<td>${c.dieukien}</td>
 <td>${c.tinhtrang}</td>
 <td>${users[c.owner] ? users[c.owner].fullname : c.owner}</td>
 <td>
@@ -1712,7 +1712,7 @@ function updateStats(list = cases){
 let total = list.length;
 let kn = list.filter(c=>c.loaidon==="Khiếu nại").length;
 let tc = list.filter(c=>c.loaidon==="Tố cáo").length;
-let pa = list.filter(c=>c.loaidon==="Phản ánh").length;
+let pa = list.filter(c=>c.loaidon==="Phản ánh - Kiến nghị").length;
 let hg = list.filter(c=>c.loaidon==="Hòa giải").length;
 let k = list.filter(c=>c.loaidon==="Khác").length;
 
@@ -1721,15 +1721,15 @@ document.getElementById("statsBox").innerHTML = `
 <b>📊 TỔNG SỐ HỒ SƠ: ${total}</b><br>
 Khiếu nại: ${kn} |
 Tố cáo: ${tc} |
-Phản ánh: ${pa} |
+Phản ánh - Kiến nghị: ${pa} |
 Hòa giải: ${hg} |
 Khác: ${k}
 `;
 }
 
 function applyFilter(){
-currentPage = 1;   // reset về trang 1 khi lọc
 
+currentPage = 1;
 
 let m = monthFilter.value;
 let t = typeFilter.value;
@@ -1738,6 +1738,9 @@ let k = searchInput.value.toLowerCase();
 let authority = document.getElementById("authorityFilter").value;
 let condition = document.getElementById("conditionFilter").value;
 let status = document.getElementById("statusFilter").value;
+
+// 👇 THÊM Ở ĐÂY
+let nguoiXuLy = document.getElementById("filterNguoiXuLy").value;
 
 let from = document.getElementById("fromDate").value;
 let to = document.getElementById("toDate").value;
@@ -1757,10 +1760,13 @@ let okKey =
 (c.mahoso||"").toLowerCase().includes(k) ||
 (c.hoten||"").toLowerCase().includes(k);
 
+// 👇 THÊM Ở ĐÂY
+let tenNguoiXuLy = users[c.owner] ? users[c.owner].fullname : c.owner;
+let okNguoi = !nguoiXuLy || tenNguoiXuLy === nguoiXuLy;
+
 let okDate = true;
 
 if(from && to){
-
 let d = new Date(date);
 d.setHours(0,0,0,0);
 
@@ -1771,10 +1777,10 @@ let t = new Date(to);
 t.setHours(23,59,59,999);
 
 okDate = d >= f && d <= t;
-
 }
 
-return okMonth && okType && okAuthority && okCondition && okStatus && okKey && okDate;
+// 👇 SỬA DÒNG NÀY
+return okMonth && okType && okAuthority && okCondition && okStatus && okKey && okDate && okNguoi;
 
 });
 
@@ -1820,12 +1826,12 @@ let buttons=`<button class="btn-view" onclick="viewCase(${realIndex})">Xem</butt
 if(c.tinhtrang!=="Đã giải quyết"){
 
 if(currentRole==="Phó Giám đốc"){
-buttons+=`<button class="btn-edit" onclick="editCase(${i})">Sửa</button>`;
+buttons+=`<button class="btn-edit" onclick="editCase(${realIndex})">Sửa</button>`;
 }
 
 if(c.owner===currentUser){
-buttons+=`<button class="btn-edit" onclick="editCase(${i})">Sửa</button>`;
-buttons+=`<button class="btn-delete" onclick="deleteCase(${i})">Xóa</button>`;
+buttons+=`<button class="btn-edit" onclick="editCase(${realIndex})">Sửa</button>`;
+buttons+=`<button class="btn-delete" onclick="deleteCase(${realIndex})">Xóa</button>`;
 }
 
 }
@@ -1837,8 +1843,8 @@ tbody.innerHTML+=`
 <td>${formatDate(c.ngayden)}</td>
 <td>${c.hoten}</td>
 <td>${c.loaidon}</td>
-<td>${c.dieukien}</td>
 <td>${c.coquan}</td>
+<td>${c.dieukien}</td>
 <td>${c.tinhtrang}</td>
 <td>${users[c.owner] ? users[c.owner].fullname : c.owner}</td>
 <td>${buttons}</td>
@@ -2508,6 +2514,28 @@ alert("Mật khẩu cũ không đúng");
 });
 
 }
+
+function loadNguoiXuLyFilter() {
+  const select = document.getElementById("filterNguoiXuLy");
+
+  const danhSach = new Set();
+
+  cases.forEach(c => {
+    const ten = users[c.owner] ? users[c.owner].fullname : c.owner;
+    if (ten) danhSach.add(ten);
+  });
+
+  select.innerHTML = '<option value="">Người xử lý</option>';
+
+  danhSach.forEach(ten => {
+    const option = document.createElement("option");
+    option.value = ten;
+    option.textContent = ten;
+    select.appendChild(option);
+  });
+}
+
+
 </script>
 </head>
 <body>
@@ -2618,7 +2646,7 @@ oninput="applyFilter()">
 <option value="">Loại đơn</option>
 <option>Khiếu nại</option>
 <option>Tố cáo</option>
-<option>Phản ánh</option>
+<option>Phản ánh - Kiến nghị</option>
 <option>Hòa giải</option>
 <option>Khác</option>
 </select>
@@ -2641,6 +2669,10 @@ oninput="applyFilter()">
 <option>Đã xử lý</option>
 </select>
 
+<select id="filterNguoiXuLy" onchange="applyFilter()">
+  <option value="">Người xử lý</option>
+</select>
+
 <input type="date" id="fromDate" onchange="applyFilter()">
 
 <span class="date-arrow">→</span>
@@ -2661,7 +2693,7 @@ oninput="applyFilter()">
 </div>
 
 <div class="table-scroll">
-<table>
+<table id="tableHoSo">
 <thead>
 <tr>
 <th>STT</th>
@@ -2669,8 +2701,8 @@ oninput="applyFilter()">
 <th>Ngày gửi đơn</th>
 <th>Họ tên người gửi đơn</th>
 <th>Loại đơn</th>
-<th>Điều kiện</th>
 <th>Thẩm quyền giải quyết</th>
+<th>Điều kiện xử lý</th>
 <th>Tình trạng xử lý</th>
 <th>Người xử lý</th>
 <th>Thao tác</th>
@@ -2847,11 +2879,11 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 
 <div class="form-group">
 <label>Loại đơn <span style="color:red">*</span></label>
-<select id="loaidonField">
+<select id="loaidon">
 <option value="">-- Chọn loại đơn --</option>
 <option>Khiếu nại</option>
 <option>Tố cáo</option>
-<option>Phản ánh</option>
+<option>Phản ánh - Kiến nghị</option>
 <option>Hòa giải</option>
 <option>Khác</option>
 </select>
@@ -2952,12 +2984,12 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 </div>
 
 <div class="form-group">
-<label>Ký duyệt</label>
+<label>Lãnh đạo ký duyệt</label>
 <input id="kyduyet">
 </div>
 
 <div class="form-group">
-<label>Soạn thảo</label>
+<label>Người tham mưu soạn thảo</label>
 <input id="soanthao">
 </div>
 
