@@ -402,8 +402,10 @@ display:flex;
 width:220px;
 background:#2c3e50;
 color:white;
-min-height:calc(100vh - 60px);
 padding-top:10px;
+position:sticky;
+top:0;
+height:100vh;
 }
 
 .sidebar-title{
@@ -1153,6 +1155,8 @@ XLSX.writeFile(wb,"danhsach_donthu.xlsx");
 }
 let currentPage = 1;
 let rowsPerPage = 10;
+let currentPageTiepDan = 1;
+let rowsPerPageTiepDan = 10;
 let tiepDanList = [];
 
 function showPage(page){
@@ -1230,7 +1234,7 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbxYt2-OeLUDP1RUexvqmpawAISdgFnwOhwWntUBe9IR_ndzBgvl_ZZe7HH1ecFRrLa3/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbzseYH5Cy1S6f8B1zxsAmYUMVxDflAYo3oI3stT_ey-PbGA6C4OY_TC_LNElgHpLpp_/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -2067,19 +2071,27 @@ loadTiepDan();
 
 
 function displayTiepDan(){
+
 let tbody=document.getElementById("tbodyTiepDan");
 tbody.innerHTML="";
 
-tiepDanList.forEach((c,i)=>{
+let start = (currentPageTiepDan - 1) * rowsPerPageTiepDan;
+let end = start + rowsPerPageTiepDan;
 
-let buttons = `<button class="btn-view" onclick="viewTiepDan(${i})">Xem</button>`;
+let pageItems = tiepDanList.slice(start, end);
+
+pageItems.forEach((c,i)=>{
+
+let realIndex = tiepDanList.indexOf(c);
+
+let buttons = `<button class="btn-view" onclick="viewTiepDan(${realIndex})">Xem</button>`;
 
 if(currentRole==="Phó Giám đốc" || c.congchuc===users[currentUser].fullname){
-buttons += `<button class="btn-edit" onclick="editTiepDan(${i})">Sửa</button>`;
+buttons += `<button class="btn-edit" onclick="editTiepDan(${realIndex})">Sửa</button>`;
 }
 
 if(c.congchuc===users[currentUser].fullname){
-buttons += `<button class="btn-delete" onclick="deleteTiepDan(${i})">Xóa</button>`;
+buttons += `<button class="btn-delete" onclick="deleteTiepDan(${realIndex})">Xóa</button>`;
 }
 
 let ngay = "";
@@ -2090,7 +2102,7 @@ ngay = d.toLocaleDateString("vi-VN");
 
 tbody.innerHTML += `
 <tr>
-<td>${i+1}</td>
+<td>${start+i+1}</td>
 <td>${ngay}</td>
 <td>${c.congchuc||""}</td>
 <td>${c.congdan||""}</td>
@@ -2108,6 +2120,55 @@ ${buttons}
 
 });
 
+renderPaginationTiepDan(tiepDanList.length);
+updateStatsTiepDan(tiepDanList); // 👈 THÊM DÒNG NÀY
+}
+
+function renderPaginationTiepDan(totalRows){
+
+let totalPages = Math.ceil(totalRows / rowsPerPageTiepDan);
+
+let html="";
+
+html += `<button class="page-btn" onclick="goPageTiepDan(1)" ${currentPageTiepDan==1?'disabled':''}>«</button>`;
+
+html += `<button class="page-btn" onclick="goPageTiepDan(${currentPageTiepDan-1})" ${currentPageTiepDan==1?'disabled':''}>‹</button>`;
+
+for(let i=1;i<=totalPages;i++){
+html += `<button class="page-btn ${i==currentPageTiepDan?'active':''}" onclick="goPageTiepDan(${i})">${i}</button>`;
+}
+
+html += `<button class="page-btn" onclick="goPageTiepDan(${currentPageTiepDan+1})" ${currentPageTiepDan==totalPages?'disabled':''}>›</button>`;
+
+html += `<button class="page-btn" onclick="goPageTiepDan(${totalPages})" ${currentPageTiepDan==totalPages?'disabled':''}>»</button>`;
+
+document.getElementById("paginationTiepDan").innerHTML = html;
+
+}
+
+function goPageTiepDan(page){
+currentPageTiepDan = page;
+displayTiepDan();
+}
+
+function changeRowsPerPageTiepDan(){
+
+rowsPerPageTiepDan = parseInt(document.getElementById("rowsPerPageTiepDan").value);
+
+currentPageTiepDan = 1;
+
+displayTiepDan();
+
+}
+
+function printTiepDanList(){
+window.print();
+}
+
+function exportExcelTiepDan(){
+let table = document.querySelector("#pageTiepDan table");
+let wb = XLSX.utils.table_to_book(table);
+XLSX.writeFile(wb,"sotiepcongdan.xlsx");
 }
 
 function searchTiepDan(){
@@ -2418,7 +2479,7 @@ tbody.innerHTML += `
 `;
 
 });
-
+updateStatsTiepDan(list);
 }
 
 function resetFilterTiepDan(){
@@ -2441,18 +2502,20 @@ function updateStatsTiepDan(list = tiepDanList){
 
 let total = list.length;
 
-let nhi = list.filter(c=>c.congchuc==="Nguyễn Thị Nhi").length;
-let trinh = list.filter(c=>c.congchuc==="Lâm Tố Trinh").length;
-let phuong = list.filter(c=>c.congchuc==="Trịnh Thị Bích Phượng").length;
-let long = list.filter(c=>c.congchuc==="Nguyễn Thế Long").length;
+let count = {};
 
-document.getElementById("statsTiepDan").innerHTML = `
-<b>📊 TỔNG LƯỢT TIẾP CÔNG DÂN: ${total}</b><br>
-Nguyễn Thị Nhi: ${nhi} |
-Lâm Tố Trinh: ${trinh} |
-Trịnh Thị Bích Phượng: ${phuong} |
-Nguyễn Thế Long: ${long}
-`;
+list.forEach(c=>{
+  let name = c.congchuc || "Khác";
+  count[name] = (count[name] || 0) + 1;
+});
+
+let text = `<b>📊 TỔNG LƯỢT TIẾP CÔNG DÂN: ${total}</b><br>`;
+
+for(let name in count){
+  text += `${name}: ${count[name]} | `;
+}
+
+document.getElementById("statsTiepDan").innerHTML = text;
 
 }
 
@@ -2834,6 +2897,34 @@ oninput="applyFilterTiepDan()">
 </tbody>
 
 </table>
+
+<div id="paginationTiepDan"></div>
+
+<div class="table-footer">
+
+  <div class="rows-control">
+    <span>Hiển thị</span>
+
+    <select id="rowsPerPageTiepDan" onchange="changeRowsPerPageTiepDan()">
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+
+    <span>hồ sơ / trang</span>
+
+    <button onclick="printTiepDanList()" class="icon-btn" title="In">
+      🖨
+    </button>
+
+    <button onclick="exportExcelTiepDan()" class="icon-btn" title="Tải Excel">
+      📥
+    </button>
+  </div>
+
+</div>
+
 </div>
 
 
