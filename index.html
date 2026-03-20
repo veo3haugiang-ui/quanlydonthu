@@ -9,8 +9,15 @@
 /* ===== BẢNG SỔ TIẾP DÂN ĐẸP HƠN ===== */
 
 #pageTiepDan table{
-table-layout:fixed;
 width:100%;
+}
+
+.clamp-4{
+  display: -webkit-box;
+  -webkit-line-clamp: 4;   /* 👈 số dòng muốn hiển thị */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .table-header{
@@ -22,6 +29,11 @@ margin:15px 0;
 
 #pageTiepDan tbody tr:nth-child(even){
 background:white;
+}
+
+.table-scroll{
+  overflow-x:auto;
+  width:100%;
 }
 
 table tbody tr:hover{
@@ -1164,6 +1176,7 @@ function showPage(page){
 document.getElementById("pageDonThu").style.display="none";
 document.getElementById("pageTiepDan").style.display="none";
 document.getElementById("pageVanBan").style.display="none";
+document.getElementById("pageUsers").style.display="none"; // 👈 THÊM
 
 document.querySelectorAll(".sidebar a").forEach(a=>{
 a.classList.remove("active");
@@ -1188,7 +1201,9 @@ document.querySelectorAll(".sidebar a")[1].classList.add("active");
 document.getElementById("pageTitle").innerText="SỔ TIẾP CÔNG DÂN";
 
 setTimeout(function(){
-loadTiepDan();
+loadUsers().then(()=>{
+  loadTiepDan();
+});
 },100);
 
 }
@@ -1215,26 +1230,36 @@ if(page==="vanban"){
 document.getElementById("pageTitle").innerText="THƯ VIỆN VĂN BẢN";
 }
 
+if(page==="users"){
+
+  if(currentRole !== "Admin"){
+    alert("⚠ Bạn không có quyền truy cập");
+    return;
+  }
+
+  document.getElementById("pageUsers").style.display="block";
+  document.querySelectorAll(".sidebar a")[3].classList.add("active");
+  document.getElementById("pageTitle").innerText="QUẢN LÝ TÀI KHOẢN";
+
+  setTimeout(loadUsers, 50);
+
+}
+
+
 }
 
 window.addEventListener("error", function(e){
 console.error("Lỗi JS:", e.message);
 });
 
-const users={
-lbphuc:{pass:"123",role:"Phó Giám đốc",fullname:"Lục Bích Phúc"},
-ntnhi:{pass:"123",role:"Phó Chánh Văn phòng",fullname:"Nguyễn Thị Nhi"},
-ntlong:{pass:"123",role:"Cán bộ xử lý",fullname:"Nguyễn Thế Long"},
-lttrinh:{pass:"123",role:"Cán bộ xử lý",fullname:"Lâm Tố Trinh"},
-ttbphuong:{pass:"123",role:"Cán bộ xử lý",fullname:"Trịnh Thị Bích Phượng"}
-};
+let users = {};
 
 let currentUser=null;
 let currentRole=null;
 let cases=[];
 let editIndex=-1;
 
-const API_URL="https://script.google.com/macros/s/AKfycbzseYH5Cy1S6f8B1zxsAmYUMVxDflAYo3oI3stT_ey-PbGA6C4OY_TC_LNElgHpLpp_/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbyYlCJ3_jZ4jyi35ZQjEXNfujnv27iZDB3cTO47Fw15x6OhZmVDBPRqxloE3x0JwI37/exec";
 function loadData(){
 fetch(API_URL)
 .then(res=>{
@@ -1288,8 +1313,10 @@ password:p
 
 if(data.success){
 
-currentUser=u;
-currentRole=data.role;
+currentUser = u;
+currentRole = data.role;
+
+applyRoleUI();
 
 localStorage.setItem("loginUser",u);
 localStorage.setItem("loginTime",Date.now());
@@ -1302,7 +1329,7 @@ document.getElementById("welcomeBox").innerHTML =
 
 loadData();
 
-}else{
+} else {
 
 alert("Sai tài khoản hoặc mật khẩu");
 
@@ -1456,7 +1483,7 @@ loadData();
 
 function deleteCase(i){
 
-if(currentRole==="Phó Giám đốc"){
+if(currentRole==="Phó Giám đốc" || currentRole==="Admin"){
 alert("Lãnh đạo không được xóa");
 return;
 }
@@ -1523,7 +1550,7 @@ if(c.tinhtrang!=="Đã xử lý"){
 if(currentRole==="Phó Giám đốc" || c.owner===currentUser){
 buttons+=`<button class="btn-edit" onclick="editCase(${i})">Sửa</button>`;
 }
-if(c.owner===currentUser){
+if(c.owner===currentUser || currentRole==="Admin"){
 buttons+=`<button class="btn-delete" onclick="deleteCase(${i})">Xóa</button>`;
 }
 }
@@ -1829,12 +1856,11 @@ let buttons=`<button class="btn-view" onclick="viewCase(${realIndex})">Xem</butt
 
 if(c.tinhtrang!=="Đã giải quyết"){
 
-if(currentRole==="Phó Giám đốc"){
+if(currentRole==="Phó Giám đốc" || currentRole==="Admin" || c.owner===currentUser){
 buttons+=`<button class="btn-edit" onclick="editCase(${realIndex})">Sửa</button>`;
 }
 
-if(c.owner===currentUser){
-buttons+=`<button class="btn-edit" onclick="editCase(${realIndex})">Sửa</button>`;
+if(c.owner===currentUser || currentRole==="Admin"){
 buttons+=`<button class="btn-delete" onclick="deleteCase(${realIndex})">Xóa</button>`;
 }
 
@@ -1935,7 +1961,14 @@ document.getElementById("dateTimeBox").innerHTML =
 
 window.onload = function(){
 
-/* KIỂM TRA PHIÊN ĐĂNG NHẬP */
+loadUsers().then(()=>{
+  loadData();
+}); // 👈 BẮT BUỘC
+
+tbody = document.getElementById("tbody");
+
+  setInterval(updateDateTime,1000);
+  updateDateTime();
 
 let savedUser = localStorage.getItem("loginUser");
 let loginTime = localStorage.getItem("loginTime");
@@ -1944,18 +1977,22 @@ if(savedUser && loginTime){
 
 let now = Date.now();
 
-/* 2 tiếng = 7200000 ms */
-
 if(now - loginTime < 7200000){
 
 currentUser = savedUser;
-currentRole = users[savedUser].role;
 
-document.getElementById("loginPage").style.display="none";
-document.getElementById("mainPage").style.display="block";
+setTimeout(()=>{
+  if(users[savedUser]){
+    currentRole = users[savedUser].role;
+    applyRoleUI();
 
-document.getElementById("welcomeBox").innerHTML =
-"👤 <b>"+users[savedUser].fullname+"</b> | Vai trò: "+users[savedUser].role;
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("mainPage").style.display="block";
+
+    document.getElementById("welcomeBox").innerHTML =
+    "👤 <b>"+users[savedUser].fullname+"</b> | Vai trò: "+users[savedUser].role;
+  }
+},200);
 
 }
 
@@ -1990,6 +2027,7 @@ document.getElementById("formModal").style.display="block";
 document.getElementById("form").reset();
 
 editIndex=-1;
+setDefaultCongChuc(); // 👈 THÊM DÒNG NÀY Ở ĐÂY
 
 }
 
@@ -2005,7 +2043,7 @@ function saveTiepDan(){
 /* ===== KIỂM TRA DỮ LIỆU ===== */
 
 if(!td_ngay.value){
-alert("⚠ Vui lòng nhập Ngày tiếp");
+alert("⚠ Vui lòng nhập Ngày tiếp công dân");
 td_ngay.focus();
 return;
 }
@@ -2025,6 +2063,12 @@ return;
 if(!td_noidung.value.trim()){
 alert("⚠ Vui lòng nhập Nội dung vụ việc");
 td_noidung.focus();
+return;
+
+}
+if(!td_ghichu.value.trim()){
+alert("⚠ Vui lòng nhập Nội dung ghi chú kết quả xử lý trong ngày");
+td_ghichu.focus();
 return;
 }
 
@@ -2084,14 +2128,17 @@ pageItems.forEach((c,i)=>{
 
 let realIndex = tiepDanList.indexOf(c);
 
+let fullName = (users[currentUser]?.fullname || "").trim().toLowerCase();
+let congChuc = (c.congchuc || "").trim().toLowerCase();
+
 let buttons = `<button class="btn-view" onclick="viewTiepDan(${realIndex})">Xem</button>`;
 
-if(currentRole==="Phó Giám đốc" || c.congchuc===users[currentUser].fullname){
-buttons += `<button class="btn-edit" onclick="editTiepDan(${realIndex})">Sửa</button>`;
+if(currentRole==="Phó Giám đốc" || congChuc === fullName){
+  buttons += `<button class="btn-edit" onclick="editTiepDan(${realIndex})">Sửa</button>`;
 }
 
-if(c.congchuc===users[currentUser].fullname){
-buttons += `<button class="btn-delete" onclick="deleteTiepDan(${realIndex})">Xóa</button>`;
+if(congChuc === fullName){
+  buttons += `<button class="btn-delete" onclick="deleteTiepDan(${realIndex})">Xóa</button>`;
 }
 
 let ngay = "";
@@ -2108,7 +2155,11 @@ tbody.innerHTML += `
 <td>${c.congdan||""}</td>
 <td>${c.cccd||""}</td>
 <td>${c.phanloai||""}</td>
-<td>${c.noidung||""}</td>
+<td>
+  <div class="clamp-4">
+    ${c.noidung || ""}
+  </div>
+</td>
 <td>${c.xuly||""}</td>
 <td>
 <div class="action-buttons">
@@ -2149,6 +2200,25 @@ document.getElementById("paginationTiepDan").innerHTML = html;
 function goPageTiepDan(page){
 currentPageTiepDan = page;
 displayTiepDan();
+}
+
+function setDefaultCongChuc() {
+
+  let select = document.getElementById("td_congchuc"); // 👈 đúng ID của bạn
+
+  let user = localStorage.getItem("loginUser"); // 👈 SỬA CHỖ NÀY
+
+  if (!user) return;
+
+  let fullName = users[user] ? users[user].fullname : "";
+
+  for (let i = 0; i < select.options.length; i++) {
+    if (select.options[i].text === fullName) {
+      select.selectedIndex = i;
+      break;
+    }
+  }
+
 }
 
 function changeRowsPerPageTiepDan(){
@@ -2258,17 +2328,15 @@ loadTiepDan();
 
 function newTiepDan(){
 
-let form = document.querySelector("#tiepDanModal form");
+  let form = document.querySelector("#tiepDanModal form");
 
-form.reset();
+  form.reset();
 
-form.querySelectorAll("input, textarea").forEach(e=>{
-e.value="";
-});
+  editIndex = -1;
 
-editIndex = -1;
+  document.getElementById("tiepDanModal").style.display="block";
 
-document.getElementById("tiepDanModal").style.display="block";
+  setDefaultCongChuc(); // 👈 PHẢI ĐẶT Ở ĐÂY
 
 }
 
@@ -2286,7 +2354,9 @@ fetch(API_URL + "?action=getTiepDan&t=" + Date.now())
 
 .then(data=>{
 
-tiepDanList = data || [];
+tiepDanList = (data || []).sort((a,b)=>{
+  return new Date(b.ngay) - new Date(a.ngay); // 👈 mới nhất lên đầu
+});
 
 displayTiepDan();
 
@@ -2408,7 +2478,7 @@ okMonth = m == month;
 }
 
 if(staff){
-okStaff = (c.congchuc === staff);
+okStaff = (c.congchuc || "").trim() === (staff || "").trim();
 }
 
 if(key){
@@ -2598,6 +2668,158 @@ function loadNguoiXuLyFilter() {
   });
 }
 
+function renderUsers(){
+
+  let tbody = document.getElementById("userTable");
+  let isAdmin = currentRole === "Admin";
+
+  if(!tbody){
+    console.error("Không tìm thấy userTable");
+    return;
+  }
+
+  tbody.innerHTML = "";
+
+  for(let u in users){
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${u}</td>
+        <td>${users[u].fullname}</td>
+        <td>${users[u].role}</td>
+
+        <td>
+          ${isAdmin ? `
+            <span id="pass_${u}">••••••</span>
+            <button onclick="togglePass('${u}')">👁</button>
+          ` : "🔒"}
+        </td>
+
+        <td>
+          ${isAdmin ? `
+            <button onclick="editUser('${u}')">Sửa</button>
+            <button onclick="deleteUser('${u}')">Xóa</button>
+          ` : ""}
+        </td>
+
+      </tr>
+    `;
+  }
+
+}
+
+function addUser(){
+if(currentRole !== "Admin"){
+alert("Không có quyền");
+  return;
+}
+
+let u = prompt("Tài khoản:");
+let p = prompt("Mật khẩu:");
+let name = prompt("Họ tên:");
+let role = prompt("Vai trò:");
+
+if(!u || !p) return;
+
+users[u] = {
+pass:p,
+fullname:name,
+role:role
+};
+
+renderUsers();
+
+}
+
+function deleteUser(u){
+
+if(currentRole !== "Admin"){
+  alert("Không có quyền");
+  return;
+}
+
+if(confirm("Xóa tài khoản?")){
+delete users[u];
+renderUsers();
+}
+
+}
+
+function editUser(u){
+    if(currentRole !== "Admin"){
+  alert("Không có quyền");
+  return;
+}
+
+let name = prompt("Họ tên:", users[u].fullname);
+let role = prompt("Vai trò:", users[u].role);
+let pass = prompt("Mật khẩu mới:", users[u].pass);
+
+users[u].fullname = name;
+users[u].role = role;
+
+if(pass){
+  users[u].pass = pass;
+}
+
+renderUsers();
+
+}
+
+function applyRoleUI(){
+
+  const isAdmin = currentRole === "Admin";
+
+  const menuUsers = document.getElementById("menuUsers");
+
+  if(menuUsers){
+    if(isAdmin){
+      menuUsers.style.display = "block";
+    }else{
+      menuUsers.style.display = "none";
+    }
+  }
+
+}
+
+function togglePass(u){
+
+  let el = document.getElementById("pass_"+u);
+
+  if(el.innerText === "••••••"){
+    el.innerText = users[u].pass;
+  }else{
+    el.innerText = "••••••";
+  }
+
+}
+
+
+function loadUsers(){
+
+  return fetch(API_URL + "?action=getUsers")
+  .then(res=>{
+    if(!res.ok){
+      throw new Error("API lỗi");
+    }
+    return res.json();
+  })
+  .then(data=>{
+
+    users = {};
+
+    data.forEach(u=>{
+      users[u.username] = {
+        pass: u.password,
+        role: u.role,
+        fullname: u.fullname
+      };
+    });
+
+    renderUsers();
+
+  });
+}
 
 </script>
 </head>
@@ -2643,6 +2865,10 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <a href="#" onclick="showPage('vanban')">
 📂 Thư viện văn bản
+</a>
+
+<a href="#" id="menuUsers" onclick="showPage('users')">
+👤 Quản lý tài khoản
 </a>
 
 </div>
@@ -2728,8 +2954,8 @@ oninput="applyFilter()">
 
 <select id="conditionFilter" onchange="applyFilter()">
 <option value="">Điều kiện xử lý</option>
-<option>Đủ điều kiện xử lý</option>
-<option>Không đủ điều kiện xử lý</option>
+<option>Đủ điều kiện giải quyết</option>
+<option>Không đủ điều kiện giải quyết</option>
 </select>
 
 <select id="statusFilter" onchange="applyFilter()">
@@ -2816,14 +3042,10 @@ oninput="applyFilter()">
 
 <div class="container">
 
-
-
+<!-- KHỐI THỐNG KÊ -->
 <div class="card">
-
 <div class="stats" id="statsTiepDan"></div>
 
-<div class="filter-row">
-</div>
 <div class="search-bar">
 
 <input id="searchTiepDan"
@@ -2853,20 +3075,17 @@ oninput="applyFilterTiepDan()">
 <option value="11">Tháng 11</option>
 <option value="12">Tháng 12</option>
 </select>
-<div class="date-group">
-<label>Từ ngày </label><input type="date" id="fromDateCitizen" onchange="applyFilterTiepDan()">
+
+<input type="date" id="fromDateCitizen" onchange="applyFilterTiepDan()">
+<input type="date" id="toDateCitizen" onchange="applyFilterTiepDan()">
+
+<button class="btn-reset" onclick="resetFilterTiepDan()">⟲ Reset</button>
+
 </div>
-<div class="date-group"><label>Tới ngày </label><input type="date" id="toDateCitizen" onchange="applyFilterTiepDan()">
 </div>
 
-<button class="btn-reset" onclick="resetFilterTiepDan()">⟲ Reset </button>
-<div class="filter-item">
-<label>&nbsp;</label>
-</div>
-</div>
-</div>
-<div class="table-header">
-
+<!-- HEADER TABLE -->
+<div class="table-toolbar">
 <h3>Danh sách tiếp công dân</h3>
 
 <button class="btn-add" onclick="newTiepDan()">
@@ -2874,11 +3093,11 @@ oninput="applyFilterTiepDan()">
 </button>
 </div>
 
-<div class="table-area">
+<!-- TABLE -->
+<div class="table-scroll">
 <table>
 <thead>
 <tr>
-
 <th>STT</th>
 <th>Ngày tiếp</th>
 <th>Công chức tiếp</th>
@@ -2888,46 +3107,62 @@ oninput="applyFilterTiepDan()">
 <th>Nội dung</th>
 <th>Hướng xử lý</th>
 <th>Thao tác</th>
-
 </tr>
 </thead>
 
-<tbody id="tbodyTiepDan">
-
-</tbody>
-
+<tbody id="tbodyTiepDan"></tbody>
 </table>
 
 <div id="paginationTiepDan"></div>
 
 <div class="table-footer">
+<div class="rows-control">
 
-  <div class="rows-control">
-    <span>Hiển thị</span>
+<span>Hiển thị</span>
 
-    <select id="rowsPerPageTiepDan" onchange="changeRowsPerPageTiepDan()">
-      <option value="10">10</option>
-      <option value="20">20</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-    </select>
+<select id="rowsPerPageTiepDan" onchange="changeRowsPerPageTiepDan()">
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="50">50</option>
+<option value="100">100</option>
+</select>
 
-    <span>hồ sơ / trang</span>
+<span>hồ sơ / trang</span>
 
-    <button onclick="printTiepDanList()" class="icon-btn" title="In">
-      🖨
-    </button>
+<button onclick="printTiepDanList()" class="icon-btn">🖨</button>
+<button onclick="exportExcelTiepDan()" class="icon-btn">📥</button>
 
-    <button onclick="exportExcelTiepDan()" class="icon-btn" title="Tải Excel">
-      📥
-    </button>
-  </div>
-
+</div>
 </div>
 
 </div>
+</div>
+</div>
 
 
+<!-- ================= QUAN LY TAI KHOAN ================= -->
+<div id="pageUsers" style="display:none">
+
+<div class="card">
+<h3>Quản lý tài khoản</h3>
+
+<button onclick="addUser()">➕ Thêm tài khoản</button>
+
+<table>
+<thead>
+<tr>
+<th>Tài khoản</th>
+<th>Họ tên</th>
+<th>Vai trò</th>
+<th>Mật khẩu</th>
+<th>Thao tác</th>
+</tr>
+</thead>
+<tbody id="userTable"></tbody>
+</table>
+
+</div>
+</div>
 
 <!-- ================= THƯ VIỆN VĂN BẢN ================= -->
 
@@ -3116,12 +3351,12 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <div class="form-grid">
 
 <div class="form-group">
-<label>Ngày tiếp công dân</label>
+<label>Ngày tiếp công dân <span style="color:red">*</span></label>
 <input type="date" id="td_ngay">
 </div>
 
 <div class="form-group">
-<label>Công chức tiếp</label>
+<label>Công chức tiếp <span style="color:red">*</span></label>
 <select id="td_congchuc">
 <option value="">-- Chọn công chức tiếp --</option>
 <option>Nguyễn Thị Nhi</option>
@@ -3147,7 +3382,7 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <div class="form-grid">
 
 <div class="form-group form-full">
-<label>Họ tên – địa chỉ – điện thoại công dân</label>
+<label>Họ tên – địa chỉ – điện thoại công dân <span style="color:red">*</span></label>
 <textarea id="td_congdan"></textarea>
 </div>
 
@@ -3173,13 +3408,14 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <div class="form-grid">
 
 <div class="form-group form-full">
-<label>Nội dung vụ việc</label>
+<label>Nội dung vụ việc <span style="color:red">*</span></label>
 <textarea id="td_noidung"></textarea>
 </div>
 
 <div class="form-group">
 <label>Phân loại đơn</label>
 <select id="td_phanloai">
+<option value="">-- Chọn loại đơn --</option>
 <option>Khiếu nại</option>
 <option>Tố cáo</option>
 <option>Phản ánh - Kiến nghị</option>
@@ -3196,6 +3432,7 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 <div class="form-group">
 <label>Hướng xử lý</label>
 <select id="td_xuly">
+<option value="">-- Chọn --</option>
 <option>Thụ lý để giải quyết</option>
 <option>Trả lại đơn và hướng dẫn</option>
 <option>Chuyển đơn đến cơ quan, tổ chức có thẩm quyền</option>
@@ -3210,7 +3447,7 @@ Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
 
 
 <div class="form-group form-full">
-<label>Ghi chú</label>
+<label>Ghi chú kết quả xử lý trong ngày <span style="color:red">*</span></label>
 <textarea id="td_ghichu"></textarea>
 </div>
 
