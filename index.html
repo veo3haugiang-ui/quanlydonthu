@@ -1778,10 +1778,10 @@ let okKey =
 (c.hoten||"").toLowerCase().includes(k);
 
 // 👇 THÊM Ở ĐÂY
-let tenNguoiXuLy = getFullName(c.owner).toLowerCase();
+let tenNguoiXuLy = (c.fullname || getFullName(c.owner) || "").toString().trim().toLowerCase();
 let nguoiFilter = (nguoiXuLy || "").toString().trim().toLowerCase();
 
-let okNguoi = !nguoiFilter || tenNguoiXuLy === nguoiFilter;
+let okNguoi = !nguoiFilter || tenNguoiXuLy.includes(nguoiFilter);
 
 let okDate = true;
 
@@ -1810,20 +1810,23 @@ updateStats(filteredCases);
 
 function resetFilter(){
 
-monthFilter.value="";
-typeFilter.value="";
-searchInput.value="";
+  monthFilter.value="";
+  typeFilter.value="";
+  searchInput.value="";
 
-document.getElementById("fromDate").value="";
-document.getElementById("toDate").value="";
-document.getElementById("authorityFilter").value="";
-document.getElementById("conditionFilter").value="";
-document.getElementById("statusFilter").value="";
+  document.getElementById("fromDate").value="";
+  document.getElementById("toDate").value="";
+  document.getElementById("authorityFilter").value="";
+  document.getElementById("conditionFilter").value="";
+  document.getElementById("statusFilter").value="";
 
-filteredCases = [...cases];
+  // 🔥 THÊM DÒNG NÀY
+  document.getElementById("filterNguoiXuLy").value = "";
 
-displayFiltered(filteredCases);
-updateStats(cases);
+  filteredCases = [...cases];
+
+  displayFiltered(filteredCases);
+  updateStats(cases);
 
 }
 
@@ -1951,9 +1954,6 @@ window.onload = function(){
 
 loadUsers().then(()=>{
 
-  loadCongChucDropdown();
-
-  loadNguoiXuLyFilter(); // 👈 GỌI NGAY Ở ĐÂY
 
   loadData();
   loadTiepDan();
@@ -2157,9 +2157,9 @@ tbody.innerHTML += `
 </td>
 <td>${c.xuly||""}</td>
 <td>
-<div class="action-buttons">
-${buttons}
-</div>
+  <div class="action-buttons">
+    ${buttons}
+  </div>
 </td>
 </tr>
 `;
@@ -2264,9 +2264,12 @@ tbody.innerHTML += `
 <td>${c.congchuc}</td>
 <td>${c.congdan||""}</td>
 <td>${c.cccd||""}</td>
-<td>${c.phanloai||""}</td>
-<td>${c.noidung||""}</td>
-<td>${c.theodoi||""}</td>
+<td>
+  <div class="clamp-4">
+    ${c.noidung || ""}
+  </div>
+</td>
+<td>${c.xuly || ""}</td>
 <td>
 <button class="btn-view" onclick="viewTiepDan(${realIndex})">Xem</button>
 </td>
@@ -2545,14 +2548,21 @@ tbody.innerHTML += `
 <td>${c.congchuc}</td>
 <td>${c.congdan||""}</td>
 <td>${c.cccd||""}</td>
-<td>${c.phanloai||""}</td>
-<td>${c.noidung||""}</td>
-<td>${c.theodoi||""}</td>
+
+<td>
+  <div class="clamp-4">
+    ${c.noidung || ""}
+  </div>
+</td>
+
+<td>${c.xuly||""}</td>
+
 <td>
 <div class="action-buttons">
 ${buttons}
 </div>
 </td>
+
 </tr>
 `;
 });
@@ -2808,12 +2818,7 @@ function togglePass(u){
 function loadUsers(){
 
   return fetch(API_URL + "?action=getUsers")
-  .then(res=>{
-    if(!res.ok){
-      throw new Error("API lỗi");
-    }
-    return res.json();
-  })
+  .then(res=>res.json())
   .then(data=>{
 
     users = {};
@@ -2828,7 +2833,11 @@ function loadUsers(){
 
     renderUsers();
 
-  }); // 👈 ĐÚNG: phải có dấu này
+    // 🔥 THÊM 2 DÒNG NÀY
+    loadNguoiXuLyFilter();
+    loadCongChucDropdown();
+
+  });
 
 }
 
@@ -3009,6 +3018,11 @@ oninput="applyFilter()">
 
 <select id="filterNguoiXuLy" onchange="applyFilter()">
   <option value="">Người xử lý</option>
+  <option value="Nguyễn Thị Nhi">Nguyễn Thị Nhi</option>
+  <option value="Lâm Tố Trinh">Lâm Tố Trinh</option>
+  <option value="Trịnh Thị Bích Phượng">Trịnh Thị Bích Phượng</option>
+  <option value="Nguyễn Thế Long">Nguyễn Thế Long</option>
+  
 </select>
 
 
