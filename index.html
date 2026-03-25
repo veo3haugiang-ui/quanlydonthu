@@ -6,6 +6,94 @@
 <title>HỆ THỐNG QUẢN LÝ ĐƠN THƯ</title>
 
 <style>
+.btn-report{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 36px;              /* 🔥 đồng bộ với input */
+  padding: 0 16px;
+
+  background: linear-gradient(135deg,#e53935,#c62828);
+  color: #fff;
+
+  border: none;
+  border-radius: 6px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-report:hover{
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-reset{
+  background:#6c757d;
+}
+
+/* ===== BÁO CÁO CHUYÊN NGHIỆP ===== */
+
+.report-box{
+    background:#fff;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+.report-title{
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:15px;
+}
+
+.report-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.report-card{
+    background:linear-gradient(135deg,#f6f9ff,#eef3ff);
+    border-left:5px solid #4a6cf7;
+    padding:15px;
+    border-radius:8px;
+}
+
+.report-card h4{
+    margin:0;
+    font-size:14px;
+    color:#555;
+}
+
+.report-card span{
+    font-size:22px;
+    font-weight:bold;
+    color:#222;
+}
+
+.report-section{
+    margin-top:20px;
+}
+
+.report-section h3{
+    font-size:16px;
+    margin-bottom:10px;
+    border-left:4px solid #e53935;
+    padding-left:10px;
+}
+
+.report-list{
+    line-height:1.8;
+    padding-left:10px;
+}
+
 /* ===== BẢNG SỔ TIẾP DÂN ĐẸP HƠN ===== */
 
 #pageTiepDan table{
@@ -1143,13 +1231,16 @@ let tiepDanList = [];
 
 function showPage(page){
 
+// ẨN TẤT CẢ TRANG
 document.getElementById("pageDonThu").style.display="none";
 document.getElementById("pageTiepDan").style.display="none";
 document.getElementById("pageVanBan").style.display="none";
-document.getElementById("pageUsers").style.display="none"; // 👈 THÊM
+document.getElementById("pageUsers").style.display="none";
+document.getElementById("pageBaoCao").style.display="none"; // 👈 THÊM DÒNG NÀY
 
+// reset active menu
 document.querySelectorAll(".sidebar a").forEach(a=>{
-a.classList.remove("active");
+  a.classList.remove("active");
 });
 
 if(page==="donthu"){
@@ -1173,16 +1264,28 @@ document.getElementById("pageTitle").innerText="SỔ TIẾP CÔNG DÂN";
 loadTiepDan();
 
 }
-data.forEach(c=>{
-  if(!c.fullname){
-    c.fullname = c.congchuc;
-  }
-});
+
+
+if(page==="baocao"){
+
+  document.getElementById("pageBaoCao").style.display="block";
+  document.querySelectorAll(".sidebar a")[2].classList.add("active");
+  document.getElementById("pageTitle").innerText="BÁO CÁO THỐNG KÊ";
+
+  // 👉 reset ô ngày
+  document.getElementById("fromDateBaoCao").value = "";
+  document.getElementById("toDateBaoCao").value = "";
+
+  // 👉 hiển thị báo cáo toàn bộ
+  setTimeout(()=>{
+  renderBaoCao();
+},300);
+}
 
 if(page==="vanban"){
 
 document.getElementById("pageVanBan").style.display="block";
-document.querySelectorAll(".sidebar a")[2].classList.add("active");
+document.querySelectorAll(".sidebar a")[3].classList.add("active");
 
 /* đổi tiêu đề */
 document.getElementById("pageTitle").innerText="THƯ VIỆN VĂN BẢN";
@@ -1209,7 +1312,7 @@ if(page==="users"){
   }
 
   document.getElementById("pageUsers").style.display="block";
-  document.querySelectorAll(".sidebar a")[3].classList.add("active");
+  document.querySelectorAll(".sidebar a")[4].classList.add("active");
   document.getElementById("pageTitle").innerText="QUẢN LÝ TÀI KHOẢN";
 
   setTimeout(loadUsers, 50);
@@ -1256,7 +1359,9 @@ return res.json();
   currentPage = 1;
   displayFiltered(filteredCases);
   updateStats(cases);
-
+if(document.getElementById("pageBaoCao").style.display === "block"){
+    renderBaoCao();
+  }
  
 })
 .catch(err=>{
@@ -2873,6 +2978,195 @@ function loadCongChucDropdown(){
   }
 
 }
+
+function renderBaoCao(isClick = false){
+
+  let from = document.getElementById("fromDateBaoCao").value;
+  let to = document.getElementById("toDateBaoCao").value;
+
+  let list = [];
+
+ // 👉 Nếu bấm nút mà chưa chọn ngày → chặn
+  if(isClick && (!from || !to)){
+    alert("Vui lòng chọn khoảng thời gian");
+    return;
+  }
+
+  // 👉 Nếu có chọn ngày → lọc
+  if(from && to){
+
+    let f = new Date(from);
+    let t = new Date(to);
+    t.setHours(23,59,59,999);
+
+    list = cases.filter(c=>{
+      let d = new Date(c.ngayden);
+      return d >= f && d <= t;
+    });
+
+}else{
+  // 👉 chưa chọn ngày → lấy toàn bộ
+  list = [...cases];
+}
+
+
+  // 🔥 TÍNH TOÁN
+  let total = list.length;
+
+let done = list.filter(c => 
+  c.tinhtrang === "Đã xử lý"
+).length;
+
+let dangXuLy = list.filter(c => 
+  c.tinhtrang === "Đang xử lý"
+).length;
+
+let duDieuKien = list.filter(c => 
+  c.dieukien === "Đủ điều kiện giải quyết"
+).length;
+
+let khongDu = list.filter(c => 
+  c.dieukien === "Không đủ điều kiện giải quyết"
+).length;
+
+let thuoc = list.filter(c => 
+  c.coquan === "Thuộc thẩm quyền giải quyết"
+).length;
+
+let khongThuoc = list.filter(c => 
+  c.coquan === "Không thuộc thẩm quyền giải quyết"
+).length;
+
+let khieuNai = list.filter(c => 
+  c.loaidon === "Khiếu nại"
+).length;
+
+let toCao = list.filter(c => 
+  c.loaidon === "Tố cáo"
+).length;
+
+let kienNghi = list.filter(c => 
+  c.loaidon === "Phản ánh - Kiến nghị"
+).length;
+
+let hoaGiai = list.filter(c => 
+  c.loaidon === "Hòa giải"
+).length;
+
+let khac = list.filter(c => 
+  c.loaidon === "Khac"
+).length;
+
+
+
+  // 🔥 RENDER
+  document.getElementById("baoCaoContent").innerHTML = `
+    <div class="report-box">
+
+      <div class="report-title">
+        📊 Báo cáo từ ${from} đến ${to}
+      </div>
+
+      <div class="report-grid">
+        <div class="report-card">
+          <h4>Tổng số đơn</h4>
+          <span>${total}</span>
+        </div>
+
+        <div class="report-card">
+          <h4>Đã xử lý</h4>
+          <span>${done}</span>
+        </div>
+
+        <div class="report-card">
+          <h4>Đang xử lý </h4>
+          <span>${dangXuLy}</span>
+        </div>
+
+      </div>
+
+      <div class="report-section">
+        <h3>1. Phân loại thẩm quyền</h3>
+        <div class="report-list">
+          - Thuộc thẩm quyền: <b>${thuoc}</b><br>
+          - Không thuộc thẩm quyền: <b>${khongThuoc}</b>
+        </div>
+      </div>
+
+      <div class="report-section">
+        <h3>2. Phần theo điều kiện</h3>
+        <div class="report-list">
+          - Đủ điều kiện xử lý: <b>${duDieuKien}</b><br>
+          - Không đủ điều kiện xử lý: <b>${khongDu}</b>
+        </div>
+      </div>
+
+      <div class="report-section">
+        <h3>3. Phân loại đơn</h3>
+        <div class="report-list">
+          - Khiếu nại: <b>${khieuNai}</b><br>
+          - Tố cáo: <b>${toCao}</b><br>
+          - Kiến nghị, phản ánh: <b>${kienNghi}</b><br>
+          - Hòa giải: <b>${hoaGiai}</b><br>
+          - Khac: <b>${khac}</b>
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+function handleBaoCao(){
+
+  let btn = document.getElementById("btnBaoCao");
+
+  // 👉 Nếu đang là reset → quay về ban đầu
+  if(btn.dataset.mode === "reset"){
+
+    // reset input
+    document.getElementById("fromDateBaoCao").value = "";
+    document.getElementById("toDateBaoCao").value = "";
+
+    // hiển thị lại toàn bộ
+    renderBaoCao();
+
+    // đổi lại nút
+    btn.innerText = "Xem báo cáo";
+    btn.classList.remove("btn-reset");
+    btn.dataset.mode = "";
+
+    return;
+  }
+
+  // 👉 Kiểm tra chọn ngày
+  let from = document.getElementById("fromDateBaoCao").value;
+  let to = document.getElementById("toDateBaoCao").value;
+
+  if(!from || !to){
+    alert("Vui lòng chọn khoảng thời gian");
+    return;
+  }
+
+  // 👉 render báo cáo theo thời gian
+  renderBaoCao(true);
+
+  // 👉 đổi nút thành RESET
+  btn.innerText = "Reset";
+  btn.classList.add("btn-reset");
+  btn.dataset.mode = "reset";
+}
+
+function onChangeDate(){
+
+  let btn = document.getElementById("btnBaoCao");
+
+  // 👉 Nếu đang ở chế độ reset thì chuyển lại
+  if(btn.dataset.mode === "reset"){
+    btn.innerText = "📊 Xem báo cáo";
+    btn.classList.remove("btn-reset");
+    btn.dataset.mode = "";
+  }
+}
 </script>
 </head>
 <body>
@@ -2915,6 +3209,10 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 📖 Sổ tiếp công dân
 </a>
 
+<a href="#" onclick="showPage('baocao')">
+📊 Báo cáo
+</a>
+
 <a href="#" onclick="showPage('vanban')">
 📂 Thư viện văn bản
 </a>
@@ -2948,295 +3246,255 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </header>
 
 <!-- ================= QUẢN LÝ ĐƠN THƯ ================= -->
-
 <div id="pageDonThu">
+  <div class="container">
 
+    <div class="card">
+      <div class="stats" id="statsBox"></div>
 
+      <div class="search-bar">
+        <input id="searchInput" placeholder="🔍 Tìm mã HS, họ tên..." oninput="applyFilter()">
 
-<div class="container">
+        <input type="date" id="fromDate" onchange="applyFilter()">
+        <span class="date-arrow">→</span>
+        <input type="date" id="toDate" onchange="applyFilter()">
 
+        <select id="monthFilter" onchange="applyFilter()">
+          <option value="">Tháng</option>
+          <option value="1">Tháng 1</option>
+          <option value="2">Tháng 2</option>
+          <option value="3">Tháng 3</option>
+          <option value="4">Tháng 4</option>
+          <option value="5">Tháng 5</option>
+          <option value="6">Tháng 6</option>
+          <option value="7">Tháng 7</option>
+          <option value="8">Tháng 8</option>
+          <option value="9">Tháng 9</option>
+          <option value="10">Tháng 10</option>
+          <option value="11">Tháng 11</option>
+          <option value="12">Tháng 12</option>
+        </select>
 
+        <select id="typeFilter" onchange="applyFilter()">
+          <option value="">Loại đơn</option>
+          <option>Khiếu nại</option>
+          <option>Tố cáo</option>
+          <option>Phản ánh - Kiến nghị</option>
+          <option>Hòa giải</option>
+          <option>Khác</option>
+        </select>
 
-<div class="card">
+        <select id="authorityFilter" onchange="applyFilter()">
+          <option value="">Thẩm quyền</option>
+          <option>Thuộc thẩm quyền giải quyết</option>
+          <option>Không thuộc thẩm quyền giải quyết</option>
+        </select>
 
-<div class="stats" id="statsBox"></div>
+        <select id="conditionFilter" onchange="applyFilter()">
+          <option value="">Điều kiện xử lý</option>
+          <option>Đủ điều kiện giải quyết</option>
+          <option>Không đủ điều kiện giải quyết</option>
+        </select>
 
-<div class="search-bar">
+        <select id="statusFilter" onchange="applyFilter()">
+          <option value="">Tình trạng</option>
+          <option>Đang xử lý</option>
+          <option>Đã xử lý</option>
+        </select>
 
-<input id="searchInput" 
-placeholder="🔍 Tìm mã HS, họ tên..." 
-oninput="applyFilter()">
+        <select id="filterNguoiXuLy" onchange="applyFilter()">
+          <option value="">Người xử lý</option>
+          <option>Nguyễn Thị Nhi</option>
+          <option>Lâm Tố Trinh</option>
+          <option>Trịnh Thị Bích Phượng</option>
+          <option>Nguyễn Thế Long</option>
+        </select>
 
-<input type="date" id="fromDate" onchange="applyFilter()">
+        <button class="btn-reset" onclick="resetFilter()">⟳ Reset</button>
+      </div>
+    </div>
 
-<span class="date-arrow">→</span>
+    <div class="table-toolbar">
+      <h3>Danh sách hồ sơ</h3>
+      <button class="btn-add" onclick="newCase()">➕ Thêm hồ sơ</button>
+    </div>
 
-<input type="date" id="toDate" onchange="applyFilter()">
+    <div class="table-scroll">
+      <table id="tableHoSo">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Mã HS</th>
+            <th>Ngày gửi đơn</th>
+            <th>Họ tên người gửi đơn</th>
+            <th>Loại đơn</th>
+            <th>Thẩm quyền giải quyết</th>
+            <th>Điều kiện xử lý</th>
+            <th>Tình trạng xử lý</th>
+            <th>Người xử lý</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
 
-<select id="monthFilter" onchange="applyFilter()">
-<option value="">Tháng</option>
-<option value="1">Tháng 1</option>
-<option value="2">Tháng 2</option>
-<option value="3">Tháng 3</option>
-<option value="4">Tháng 4</option>
-<option value="5">Tháng 5</option>
-<option value="6">Tháng 6</option>
-<option value="7">Tháng 7</option>
-<option value="8">Tháng 8</option>
-<option value="9">Tháng 9</option>
-<option value="10">Tháng 10</option>
-<option value="11">Tháng 11</option>
-<option value="12">Tháng 12</option>
-</select>
+    <div id="pagination"></div>
 
-<select id="typeFilter" onchange="applyFilter()">
-<option value="">Loại đơn</option>
-<option>Khiếu nại</option>
-<option>Tố cáo</option>
-<option>Phản ánh - Kiến nghị</option>
-<option>Hòa giải</option>
-<option>Khác</option>
-</select>
+    <div class="table-footer">
+      <div class="rows-control">
+        <span>Hiển thị</span>
 
-<select id="authorityFilter" onchange="applyFilter()">
-<option value="">Thẩm quyền</option>
-<option>Thuộc thẩm quyền giải quyết</option>
-<option>Không thuộc thẩm quyền giải quyết</option>
-</select>
+        <select id="rowsPerPage" onchange="changeRowsPerPage()">
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
 
-<select id="conditionFilter" onchange="applyFilter()">
-<option value="">Điều kiện xử lý</option>
-<option>Đủ điều kiện giải quyết</option>
-<option>Không đủ điều kiện giải quyết</option>
-</select>
+        <span>hồ sơ / trang</span>
 
-<select id="statusFilter" onchange="applyFilter()">
-<option value="">Tình trạng</option>
-<option>Đang xử lý</option>
-<option>Đã xử lý</option>
-</select>
+        <button onclick="printList()" class="icon-btn">🖨</button>
+        <button onclick="exportExcel()" class="icon-btn">📥</button>
+      </div>
+    </div>
 
-<select id="filterNguoiXuLy" onchange="applyFilter()">
-  <option value="">Người xử lý</option>
-  <option value="Nguyễn Thị Nhi">Nguyễn Thị Nhi</option>
-  <option value="Lâm Tố Trinh">Lâm Tố Trinh</option>
-  <option value="Trịnh Thị Bích Phượng">Trịnh Thị Bích Phượng</option>
-  <option value="Nguyễn Thế Long">Nguyễn Thế Long</option>
-  
-</select>
-
-
-
-<button class="btn-reset" onclick="resetFilter()">⟳ Reset</button>
-
-</div>
-</div>
-<div class="table-toolbar">
-
-<h3>Danh sách hồ sơ</h3>
-
-<button class="btn-add" onclick="newCase()">
-➕ Thêm hồ sơ
-</button>
-</div>
-
-<div class="table-scroll">
-<table id="tableHoSo">
-<thead>
-<tr>
-<th>STT</th>
-<th>Mã HS</th>
-<th>Ngày gửi đơn</th>
-<th>Họ tên người gửi đơn</th>
-<th>Loại đơn</th>
-<th>Thẩm quyền giải quyết</th>
-<th>Điều kiện xử lý</th>
-<th>Tình trạng xử lý</th>
-<th>Người xử lý</th>
-<th>Thao tác</th>
-</tr>
-</thead>
-
-<tbody id="tbody">
-</tbody>
-</table>
-</div>
-<div id="pagination"></div>
-<div class="table-footer">
-
-
-<div class="rows-control">
-<span>Hiển thị</span>
-
-<select id="rowsPerPage" onchange="changeRowsPerPage()">
-<option value="10">10</option>
-<option value="20">20</option>
-<option value="50">50</option>
-<option value="100">100</option>
-</select>
-
-<span>hồ sơ / trang</span>
-
-<button onclick="printList()" class="icon-btn" title="In danh sách">
-🖨
-</button>
-
-<button onclick="exportExcel()" class="icon-btn" title="Tải Excel">
-📥
-</button>
-
+  </div>
 </div>
 
-</div>
+<!-- ================= BÁO CÁO ================= -->
+<div id="pageBaoCao" style="display:none">
+  <div class="container">
+    <div class="card">
+      <h3>📊 BÁO CÁO TIẾP NHẬN VÀ XỬ LÝ ĐƠN</h3>
 
-</div>
-</div>
+      <div class="search-bar">
+        <input type="date" id="fromDateBaoCao" onchange="onChangeDate()">
+        <span>→</span>
+        <input type="date" id="toDateBaoCao" onchange="onChangeDate()">
+        <button id="btnBaoCao" class="btn-report" onclick="handleBaoCao()">Xem báo cáo</button>
+      </div>
 
+      <div id="baoCaoContent" style="margin-top:15px"></div>
+    </div>
+  </div>
+</div>
 
 <!-- ================= SỔ TIẾP CÔNG DÂN ================= -->
-
 <div id="pageTiepDan" style="display:none">
+  <div class="container">
 
-<div class="container">
+    <div class="card">
+      <div class="stats" id="statsTiepDan"></div>
 
-<!-- KHỐI THỐNG KÊ -->
-<div class="card">
-<div class="stats" id="statsTiepDan"></div>
+      <div class="search-bar">
+        <input id="searchTiepDan" placeholder="🔍 Tìm công dân..." oninput="applyFilterTiepDan()">
 
-<div class="search-bar">
+        <select id="staffFilterTiepDan" onchange="applyFilterTiepDan()">
+          <option value="">Công chức tiếp</option>
+          <option>Nguyễn Thị Nhi</option>
+          <option>Lâm Tố Trinh</option>
+          <option>Trịnh Thị Bích Phượng</option>
+          <option>Nguyễn Thế Long</option>
+        </select>
 
-<input id="searchTiepDan"
-placeholder="🔍 Tìm công dân..."
-oninput="applyFilterTiepDan()">
+        <select id="monthFilterTiepDan" onchange="applyFilterTiepDan()">
+          <option value="">Tháng</option>
+          <option value="1">Tháng 1</option>
+          <option value="2">Tháng 2</option>
+          <option value="3">Tháng 3</option>
+          <option value="4">Tháng 4</option>
+          <option value="5">Tháng 5</option>
+          <option value="6">Tháng 6</option>
+          <option value="7">Tháng 7</option>
+          <option value="8">Tháng 8</option>
+          <option value="9">Tháng 9</option>
+          <option value="10">Tháng 10</option>
+          <option value="11">Tháng 11</option>
+          <option value="12">Tháng 12</option>
+        </select>
 
-<select id="staffFilterTiepDan" onchange="applyFilterTiepDan()">
-<option value="">Công chức tiếp</option>
-<option>Nguyễn Thị Nhi</option>
-<option>Lâm Tố Trinh</option>
-<option>Trịnh Thị Bích Phượng</option>
-<option>Nguyễn Thế Long</option>
-</select>
+        <input type="date" id="fromDateCitizen" onchange="applyFilterTiepDan()">
+        <input type="date" id="toDateCitizen" onchange="applyFilterTiepDan()">
 
-<select id="monthFilterTiepDan" onchange="applyFilterTiepDan()">
-<option value="">Tháng</option>
-<option value="1">Tháng 1</option>
-<option value="2">Tháng 2</option>
-<option value="3">Tháng 3</option>
-<option value="4">Tháng 4</option>
-<option value="5">Tháng 5</option>
-<option value="6">Tháng 6</option>
-<option value="7">Tháng 7</option>
-<option value="8">Tháng 8</option>
-<option value="9">Tháng 9</option>
-<option value="10">Tháng 10</option>
-<option value="11">Tháng 11</option>
-<option value="12">Tháng 12</option>
-</select>
+        <button class="btn-reset" onclick="resetFilterTiepDan()">⟲ Reset</button>
+      </div>
+    </div>
 
-<input type="date" id="fromDateCitizen" onchange="applyFilterTiepDan()">
-<input type="date" id="toDateCitizen" onchange="applyFilterTiepDan()">
+    <div class="table-toolbar">
+      <h3>Danh sách tiếp công dân</h3>
+      <button class="btn-add" onclick="newTiepDan()">➕ Nhập mới tiếp công dân</button>
+    </div>
 
-<button class="btn-reset" onclick="resetFilterTiepDan()">⟲ Reset</button>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Ngày tiếp</th>
+            <th>Công chức tiếp</th>
+            <th>Công dân</th>
+            <th>CCCD</th>
+            <th>Nội dung</th>
+            <th>Hướng xử lý</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
 
-</div>
-</div>
+        <tbody id="tbodyTiepDan"></tbody>
+      </table>
 
-<!-- HEADER TABLE -->
-<div class="table-toolbar">
-<h3>Danh sách tiếp công dân</h3>
+      <div id="paginationTiepDan"></div>
 
-<button class="btn-add" onclick="newTiepDan()">
-➕ Nhập mới tiếp công dân
-</button>
-</div>
+      <div class="table-footer">
+        <div class="rows-control">
+          <span>Hiển thị</span>
 
-<!-- TABLE -->
-<div class="table-scroll">
-<table>
-<thead>
-<tr>
-<th>STT</th>
-<th>Ngày tiếp</th>
-<th>Công chức tiếp</th>
-<th>Công dân</th>
-<th>CCCD</th>
+          <select id="rowsPerPageTiepDan" onchange="changeRowsPerPageTiepDan()">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
 
-<th>Nội dung</th>
-<th>Hướng xử lý</th>
-<th>Thao tác</th>
-</tr>
-</thead>
+          <span>hồ sơ / trang</span>
 
-<tbody id="tbodyTiepDan"></tbody>
-</table>
+          <button onclick="printTiepDanList()" class="icon-btn">🖨</button>
+          <button onclick="exportExcelTiepDan()" class="icon-btn">📥</button>
+        </div>
+      </div>
 
-<div id="paginationTiepDan"></div>
-
-<div class="table-footer">
-<div class="rows-control">
-
-<span>Hiển thị</span>
-
-<select id="rowsPerPageTiepDan" onchange="changeRowsPerPageTiepDan()">
-<option value="10">10</option>
-<option value="20">20</option>
-<option value="50">50</option>
-<option value="100">100</option>
-</select>
-
-<span>hồ sơ / trang</span>
-
-<button onclick="printTiepDanList()" class="icon-btn">🖨</button>
-<button onclick="exportExcelTiepDan()" class="icon-btn">📥</button>
-
-</div>
+    </div>
+  </div>
 </div>
 
-</div>
-</div>
-</div>
-
-
-<!-- ================= QUAN LY TAI KHOAN ================= -->
+<!-- ================= QUẢN LÝ TÀI KHOẢN ================= -->
 <div id="pageUsers" style="display:none">
+  <div class="card">
+    <h3>Quản lý tài khoản</h3>
+    <button onclick="addUser()">➕ Thêm tài khoản</button>
 
-<div class="card">
-<h3>Quản lý tài khoản</h3>
-
-<button onclick="addUser()">➕ Thêm tài khoản</button>
-
-<table>
-<thead>
-<tr>
-<th>Tài khoản</th>
-<th>Họ tên</th>
-<th>Vai trò</th>
-<th>Mật khẩu</th>
-<th>Thao tác</th>
-</tr>
-</thead>
-<tbody id="userTable"></tbody>
-</table>
-
-</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Tài khoản</th>
+          <th>Họ tên</th>
+          <th>Vai trò</th>
+          <th>Mật khẩu</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="userTable"></tbody>
+    </table>
+  </div>
 </div>
 
 <!-- ================= THƯ VIỆN VĂN BẢN ================= -->
-
 <div id="pageVanBan" style="display:none">
-
-<h2>Thư viện văn bản</h2>
-
-<div class="card">
-Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
-</div>
-
-</div>
-
-
-
-</div>
-
+  <h2>Thư viện văn bản</h2>
+  <div class="card">
+    Nơi lưu trữ các văn bản hướng dẫn, pháp luật, mẫu biểu.
+  </div>
 </div>
 
 </div>
