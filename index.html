@@ -3397,6 +3397,45 @@ function closeBaoCaoTuan(){
   bc_notdone.disabled = false;
   bc_plan.disabled = false;
 }
+
+function searchBaoCaoTuan(){
+
+  let key = document.getElementById("searchBaoCaoTuan").value.toLowerCase();
+
+  let tbody = document.getElementById("tbodyBaoCaoTuan");
+  tbody.innerHTML = "";
+
+  let list = baoCaoTuanList.filter(c =>
+
+    (c.tuan || "").toLowerCase().includes(key) ||
+    (c.hoanthanh || "").toLowerCase().includes(key) ||
+    (c.chuahoanthanh || "").toLowerCase().includes(key) ||
+    (c.kehoach || "").toLowerCase().includes(key)
+
+  );
+
+  list.forEach((c,i)=>{
+
+    let buttons = `<button onclick="viewBaoCaoTuan(${i})">Xem</button>`;
+
+    if(currentRole==="Admin" || c.username===currentUser){
+      buttons += `<button onclick="editBaoCaoTuan(${i})">Sửa</button>`;
+      buttons += `<button onclick="deleteBaoCaoTuan('${c.id}')">Xóa</button>`;
+    }
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${c.tuan||""}</td>
+        <td>${c.hoanthanh||""}</td>
+        <td>${c.chuahoanthanh||""}</td>
+        <td>${c.kehoach||""}</td>
+        <td>${buttons}</td>
+      </tr>
+    `;
+  });
+
+}
 </script>
 </head>
 <body>
@@ -3625,11 +3664,14 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <div style="margin-bottom:10px; display:flex; gap:10px;">
   <input 
     type="text" 
-    id="searchBaoCao" 
+    id="searchBaoCaoTuan" 
     placeholder="🔍 Tìm kiếm báo cáo..."
-    oninput="filterBaoCao()"
+    oninput="searchBaoCaoTuan()"
+    onkeyup="searchBaoCaoTuan()"
     style="padding:6px; width:250px;"
   >
+
+  
 </div>
   <table>
     <thead>
