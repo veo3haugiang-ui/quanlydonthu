@@ -6,6 +6,38 @@
 <title>HỆ THỐNG QUẢN LÝ ĐƠN THƯ</title>
 
 <style>
+/* Nút trong cột thao tác */
+td button{
+  font-weight: 600;          /* 👈 làm chữ đậm */
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Nút Xem */
+td button:nth-child(1){
+  background: #e3f2fd;
+  color: #0e2f66;
+}
+
+/* Nút Sửa */
+td button:nth-child(2){
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Nút Xóa */
+td button:nth-child(3){
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Hover cho đẹp hơn */
+td button:hover{
+  opacity: 0.85;
+}
+
 .btn-report{
   display: inline-flex;
   align-items: center;
@@ -1237,6 +1269,7 @@ document.getElementById("pageTiepDan").style.display="none";
 document.getElementById("pageVanBan").style.display="none";
 document.getElementById("pageUsers").style.display="none";
 document.getElementById("pageBaoCao").style.display="none"; // 👈 THÊM DÒNG NÀY
+document.getElementById("pageBaoCaoTuan").style.display="none";
 
 // reset active menu
 document.querySelectorAll(".sidebar a").forEach(a=>{
@@ -1280,6 +1313,15 @@ if(page==="baocao"){
   setTimeout(()=>{
   renderBaoCao();
 },300);
+}
+
+if(page==="baocaotuan"){
+
+  document.getElementById("pageBaoCaoTuan").style.display="block";
+
+  document.getElementById("pageTitle").innerText="BÁO CÁO TUẦN";
+
+  loadBaoCaoTuan();
 }
 
 if(page==="vanban"){
@@ -1334,7 +1376,7 @@ let cases=[];
 let editIndex=-1;
 let currentEditId = null; // 👈 THÊM DÒNG NÀY
 
-const API_URL="https://script.google.com/macros/s/AKfycbyOISLXQnBwJE2nYZ33KtRp2fEYTJVoZsIxJCCWEo_vADJtGuSNVPH1M7QY9yLjDP-9/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbwCZ5T_3XuNs6QJ_wCeP8RBr6ksf7tiQsREkN7Dd4eM6fRyrs-85Ruxkr7fJ47MSwrp/exec";
 function loadData(){
 cases.forEach(c=>{
   c.fullname = getFullName(c.owner);
@@ -2474,6 +2516,163 @@ fetch(API_URL + "?action=getTiepDan")  // 👈 đổi sang GET
 });
 }
 
+let baoCaoTuanList = [];
+
+function loadBaoCaoTuan(){
+
+  fetch(API_URL + "?action=getBaoCaoTuan")
+  .then(res => res.json())
+  .then(data => {
+
+    baoCaoTuanList = data.sort((a,b)=>
+      new Date(b.created) - new Date(a.created)
+    );
+
+    displayBaoCaoTuan();
+  });
+
+}
+
+function displayBaoCaoTuan(){
+
+  let tbody = document.getElementById("tbodyBaoCaoTuan");
+  tbody.innerHTML = "";
+
+  baoCaoTuanList.forEach((c,i)=>{
+
+    let buttons = `<button onclick="viewBaoCaoTuan(${i})">Xem</button>`;
+
+    if(currentRole==="Admin" || c.username===currentUser){
+      buttons += `<button onclick="editBaoCaoTuan(${i})">Sửa</button>`;
+      buttons += `<button onclick="deleteBaoCaoTuan('${c.id}')">Xóa</button>`;
+    }
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${c.tuan||""}</td>
+        <td>${c.hoanthanh||""}</td>
+        <td>${c.chuahoanthanh||""}</td>
+        <td>${c.kehoach||""}</td>
+        <td>${buttons}</td>
+      </tr>
+    `;
+  });
+
+}
+
+// ===== THÊM =====
+function newBaoCaoTuan(){
+
+  currentEditId = null; // 👈 reset
+
+  bc_tuan.value = "";
+  bc_done.value = "";
+  bc_notdone.value = "";
+  bc_plan.value = "";
+
+  document.getElementById("baoCaoTuanModal").style.display="block";
+}
+
+// ===== LƯU =====
+function saveBaoCaoTuan(){
+
+  console.log("EDIT ID:", currentEditId);
+
+  let isEdit = currentEditId != null;
+
+  // 👉 LẤY DOM ĐÚNG CÁCH
+  let tuanEl = document.getElementById("bc_tuan");
+  let doneEl = document.getElementById("bc_done");
+  let notdoneEl = document.getElementById("bc_notdone");
+  let planEl = document.getElementById("bc_plan");
+
+  // ===== VALIDATE =====
+  if(!tuanEl.value.trim()){
+    alert("⚠ Nhập nhiệm vụ đã thực hiện");
+    tuanEl.focus();
+    return;
+  }
+  if(!doneEl.value.trim()){
+    alert("⚠ Nhập nhiệm vụ đã thực hiện");
+    doneEl.focus();
+    return;
+  }
+
+  if(!notdoneEl.value.trim()){
+    alert("⚠ Nhập nhiệm vụ chưa thực hiện");
+    notdoneEl.focus();
+    return;
+  }
+
+  if(!planEl.value.trim()){
+    alert("⚠ Nhập kế hoạch");
+    planEl.focus();
+    return;
+  }
+
+  let data = {
+    action: isEdit ? "updateBaoCaoTuan" : "addBaoCaoTuan",
+    id: isEdit ? currentEditId : Date.now(),
+    username: currentUser,
+    tuan: tuanEl.value,
+    hoanthanh: doneEl.value,
+    chuahoanthanh: notdoneEl.value,
+    kehoach: planEl.value,
+    created: new Date().toISOString()
+  };
+
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify(data)
+  })
+  .then(()=>{
+
+    alert("✅ Đã lưu");
+
+    currentEditId = null;
+
+    closeBaoCaoTuan();
+    loadBaoCaoTuan();
+
+  });
+
+}
+
+// ===== SỬA =====
+function editBaoCaoTuan(i){
+
+  let c = baoCaoTuanList[i];
+
+  bc_tuan.value = c.tuan;
+  bc_done.value = c.hoanthanh;
+  bc_notdone.value = c.chuahoanthanh;
+  bc_plan.value = c.kehoach;
+
+  currentEditId = c.id; // 👈 BẮT BUỘC
+  console.log("EDIT ID (khi bấm sửa):", currentEditId); // 👈 THÊM Ở ĐÂY
+
+  document.getElementById("baoCaoTuanModal").style.display="block";
+}
+
+// ===== XÓA =====
+function deleteBaoCaoTuan(id){
+
+  if(!confirm("Bạn có chắc muốn xóa?")) return;
+
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"deleteBaoCaoTuan",
+      id:id
+    })
+  })
+  .then(()=>{
+    loadBaoCaoTuan();
+  });
+
+}
+
 function viewTiepDan(i){
 
 let c = tiepDanList[i];
@@ -2546,6 +2745,7 @@ ${content}
 <footer class="system-footer">
 © 2026 - Bản quyền thuộc Sở Nội vụ thành phố Cần Thơ
 </footer>
+
 
 </body>
 
@@ -3167,6 +3367,36 @@ function onChangeDate(){
     btn.dataset.mode = "";
   }
 }
+
+
+function viewBaoCaoTuan(i){
+
+  let c = baoCaoTuanList[i];
+
+  bc_tuan.value = c.tuan;
+  bc_done.value = c.hoanthanh;
+  bc_notdone.value = c.chuahoanthanh;
+  bc_plan.value = c.kehoach;
+
+  // 👇 khóa không cho sửa
+  bc_tuan.disabled = true;
+  bc_done.disabled = true;
+  bc_notdone.disabled = true;
+  bc_plan.disabled = true;
+
+  document.getElementById("baoCaoTuanModal").style.display="block";
+}
+
+function closeBaoCaoTuan(){
+
+  document.getElementById("baoCaoTuanModal").style.display="none";
+
+  // mở lại input
+  bc_tuan.disabled = false;
+  bc_done.disabled = false;
+  bc_notdone.disabled = false;
+  bc_plan.disabled = false;
+}
 </script>
 </head>
 <body>
@@ -3373,6 +3603,10 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
         <span>→</span>
         <input type="date" id="toDateBaoCao" onchange="onChangeDate()">
         <button id="btnBaoCao" class="btn-report" onclick="handleBaoCao()">Xem báo cáo</button>
+        <button class="btn-report" style="margin-left:10px;background:#0d6efd"
+        onclick="showPage('baocaotuan')">
+        📅 Báo cáo nhiệm vụ theo tuần
+        </button>
       </div>
 
       <div id="baoCaoContent" style="margin-top:15px"></div>
@@ -3380,6 +3614,40 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
   </div>
 </div>
 
+<!-- ================= BÁO CÁO TUAN ================= -->
+ <div id="pageBaoCaoTuan" style="display:none">
+
+  <div class="table-toolbar">
+    <h3>📋 Danh sách báo cáo nhiệm vụ theo tuần</h3>
+
+    <button class="btn-add" onclick="newBaoCaoTuan()">➕ Thêm báo cáo tuần</button>
+  </div>
+<div style="margin-bottom:10px; display:flex; gap:10px;">
+  <input 
+    type="text" 
+    id="searchBaoCao" 
+    placeholder="🔍 Tìm kiếm báo cáo..."
+    oninput="filterBaoCao()"
+    style="padding:6px; width:250px;"
+  >
+</div>
+  <table>
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Tuần báo cáo</th>
+        <th>Công việc đã làm</th>
+        <th>Công việc chưa làm</th>
+        <th>Kế hoạch thời gian tới</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody id="tbodyBaoCaoTuan"></tbody>
+  </table>
+
+  <div id="paginationBaoCaoTuan"></div>
+
+</div>
 <!-- ================= SỔ TIẾP CÔNG DÂN ================= -->
 <div id="pageTiepDan" style="display:none">
   <div class="container">
@@ -3922,6 +4190,43 @@ style="background:#198754;color:white;border:none;padding:7px 16px;border-radius
 <button class="close-btn" onclick="closeModal()">Đóng</button>
 <div id="modalBody"></div>
 </div>
+</div>
+
+</footer>
+
+<!-- 👇 THÊM MODAL Ở ĐÂY -->
+<div id="baoCaoTuanModal" class="modal">
+  <div class="modal-content">
+
+    <button class="close-btn" onclick="closeBaoCaoTuan()">X</button>
+
+    <h3>📝 Nhập báo cáo tuần</h3>
+
+    <div class="form-group">
+      <label>Tuần báo cáo</label>
+      <input id="bc_tuan">
+    </div>
+
+    <div class="form-group">
+      <label>Nhiệm vụ đã thực hiện</label>
+      <textarea id="bc_done" rows="6"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Nhiệm vụ chưa thực hiện</label>
+      <textarea id="bc_notdone" rows="6"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Kế hoạch thời gian tới</label>
+      <textarea id="bc_plan" rows="6"></textarea>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn-save" onclick="saveBaoCaoTuan()">💾 Lưu báo cáo</button>
+    </div>
+
+  </div>
 </div>
 
 </body>
