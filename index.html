@@ -3222,11 +3222,11 @@ let dangXuLy = list.filter(c =>
 ).length;
 
 let duDieuKien = list.filter(c => 
-  c.dieukien === "Đủ điều kiện giải quyết"
+  c.dieukien === "Đủ điều kiện xử lý"
 ).length;
 
 let khongDu = list.filter(c => 
-  c.dieukien === "Không đủ điều kiện giải quyết"
+  c.dieukien === "Không đủ điều kiện xử lý"
 ).length;
 
 let thuoc = list.filter(c => 
@@ -3561,8 +3561,8 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
         <select id="conditionFilter" onchange="applyFilter()">
           <option value="">Điều kiện xử lý</option>
-          <option>Đủ điều kiện giải quyết</option>
-          <option>Không đủ điều kiện giải quyết</option>
+          <option>Đủ điều kiện xử lý</option>
+          <option>Không đủ điều kiện xử lý</option>
         </select>
 
         <select id="statusFilter" onchange="applyFilter()">
@@ -3904,8 +3904,8 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <label>Điều kiện thụ lý</label>
 <select id="dieukien">
 <option value="">-- Chọn điều kiện --</option>
-<option>Đủ điều kiện giải quyết</option>
-<option>Không đủ điều kiện giải quyết</option>
+<option>Đủ điều kiện xử lý</option>
+<option>Không đủ điều kiện xử lý</option>
 </select>
 </div>
 
