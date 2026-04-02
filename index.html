@@ -1277,6 +1277,7 @@ document.querySelectorAll(".sidebar a").forEach(a=>{
 });
 
 if(page==="donthu"){
+ currentPage = 1; // 🔥 THÊM DÒNG NÀY
 
 document.getElementById("pageDonThu").style.display="block";
 document.querySelectorAll(".sidebar a")[0].classList.add("active");
@@ -1287,6 +1288,7 @@ document.getElementById("pageTitle").innerText="HỆ THỐNG QUẢN LÝ ĐƠN TH
 }
 
 if(page==="tiepdancu"){
+currentPage = 1; // 🔥 THÊM DÒNG NÀY
 
 document.getElementById("pageTiepDan").style.display="block";
 document.querySelectorAll(".sidebar a")[1].classList.add("active");
@@ -3254,7 +3256,7 @@ let hoaGiai = list.filter(c =>
 ).length;
 
 let khac = list.filter(c => 
-  c.loaidon === "Khac"
+  c.loaidon === "Khác"
 ).length;
 
 
@@ -3264,7 +3266,7 @@ let khac = list.filter(c =>
     <div class="report-box">
 
       <div class="report-title">
-        📊 Báo cáo từ ${from} đến ${to}
+        📊 Báo cáo từ ngày ${formatDateVN(from)} đến ngày ${formatDateVN(to)}
       </div>
 
       <div class="report-grid">
@@ -3308,7 +3310,7 @@ let khac = list.filter(c =>
           - Tố cáo: <b>${toCao}</b><br>
           - Kiến nghị, phản ánh: <b>${kienNghi}</b><br>
           - Hòa giải: <b>${hoaGiai}</b><br>
-          - Khac: <b>${khac}</b>
+          - Khác: <b>${khac}</b>
         </div>
       </div>
 
@@ -3435,6 +3437,12 @@ function searchBaoCaoTuan(){
     `;
   });
 
+}
+
+function formatDateVN(dateStr){
+  if(!dateStr) return "";
+  let d = new Date(dateStr);
+  return d.toLocaleDateString("vi-VN");
 }
 </script>
 </head>
