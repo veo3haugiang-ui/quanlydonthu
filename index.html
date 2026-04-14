@@ -1651,7 +1651,9 @@ if(document.getElementById(k)){
 
 if(k==="ngayden" && c[k]){
 let d=new Date(c[k]);
-let iso=d.toISOString().split("T")[0];
+ let iso = d.getFullYear() + "-" +
+            String(d.getMonth()+1).padStart(2,'0') + "-" +
+            String(d.getDate()).padStart(2,'0');
 document.getElementById(k).value=iso;
 }else{
 document.getElementById(k).value=c[k];
