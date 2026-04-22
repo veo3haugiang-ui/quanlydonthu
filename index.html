@@ -6,33 +6,6 @@
 <title>HỆ THỐNG QUẢN LÝ ĐƠN THƯ</title>
 
 <style>
-.report-col{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.report-block{
-  background:#fff;
-  border-left:4px solid #b02a37;
-  padding:8px;
-  border-radius:6px;
-  font-size:13px;
-  line-height:1.5;
-}
-
-.report-block b{
-  display:block;
-  margin-bottom:4px;
-  color:#b02a37;
-}
-
-.report-block div{
-  display:-webkit-box;
-  -webkit-line-clamp:4;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
 /* Nút trong cột thao tác */
 td button{
   font-weight: 600;          /* 👈 làm chữ đậm */
@@ -1286,8 +1259,6 @@ let currentPage = 1;
 let rowsPerPage = 10;
 let currentPageTiepDan = 1;
 let rowsPerPageTiepDan = 10;
-let currentPageBaoCaoTuan = 1;
-let rowsPerPageBaoCaoTuan = 10;
 let tiepDanList = [];
 
 function showPage(page){
@@ -1347,7 +1318,6 @@ if(page==="baocao"){
 }
 
 if(page==="baocaotuan"){
-  currentPageBaoCaoTuan = 1; // 👈 THÊM
 
   document.getElementById("pageBaoCaoTuan").style.display="block";
 
@@ -1408,7 +1378,7 @@ let cases=[];
 let editIndex=-1;
 let currentEditId = null; // 👈 THÊM DÒNG NÀY
 
-const API_URL="https://script.google.com/macros/s/AKfycbzFO_YQhTH4zatNv-2d6BuGVoPMjUfn8VL8lW-GB2j8DdH4xK6VDaDzx7AQ4tJB4wQ/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbyRkqXnvQfdmeBcBZZ4PGFdg9x0NBA74iA28VFD5aU7ygkTcEsq0xHCzEYKryuV3Qb-/exec";
 function loadData(){
 cases.forEach(c=>{
   c.fullname = getFullName(c.owner);
@@ -1605,7 +1575,7 @@ linhvuc:linhvuc.value,
 soluong:soluong.value,
 hoten:hoten.value,
 diachi:diachi.value,
-dienthoai: String(dienthoai.value).trim(),
+dienthoai:dienthoai.value,
 noidung:noidung.value,
 coquan:coquan.value,
 ketqua:ketqua.value,
@@ -1742,11 +1712,10 @@ ${buttons}
 }
 
 function formatDate(dateStr){
-  if(!dateStr) return "";
-
-  let parts = dateStr.split("-");
-  return parts[2] + "/" + parts[1] + "/" + parts[0];
-}eturn d.toLocaleDateString("vi-VN");
+if(!dateStr) return "";
+let d = new Date(dateStr);
+return d.toLocaleDateString("vi-VN");
+}
 
 function viewCase(i){
 let c = cases[i];
@@ -2573,131 +2542,38 @@ function displayBaoCaoTuan(){
   let tbody = document.getElementById("tbodyBaoCaoTuan");
   tbody.innerHTML = "";
 
-  let start = (currentPageBaoCaoTuan - 1) * rowsPerPageBaoCaoTuan;
-  let end = start + rowsPerPageBaoCaoTuan;
+  baoCaoTuanList.forEach((c,i)=>{
 
-  let pageItems = baoCaoTuanList.slice(start, end);
-
-  pageItems.forEach((c,i)=>{
-
-    let realIndex = baoCaoTuanList.indexOf(c);
-
-    let buttons = `<button onclick="viewBaoCaoTuan(${realIndex})">Xem</button>`;
+    let buttons = `<button onclick="viewBaoCaoTuan(${i})">Xem</button>`;
 
     if(currentRole==="Admin" || c.username===currentUser){
-      buttons += `<button onclick="editBaoCaoTuan(${realIndex})">Sửa</button>`;
+      buttons += `<button onclick="editBaoCaoTuan(${i})">Sửa</button>`;
       buttons += `<button onclick="deleteBaoCaoTuan('${c.id}')">Xóa</button>`;
     }
 
     tbody.innerHTML += `
       <tr>
-        <td>${start + i + 1}</td>
+        <td>${i+1}</td>
         <td>${c.tuan||""}</td>
-        <td>
-  <div class="report-col">
-
-    <div class="report-block">
-      <b>📌 Tiếp công dân, KNTC</b>
-      <div>${c.hoanthanh_tiepdan || "<i>Không có</i>"}</div>
-    </div>
-
-    <div class="report-block">
-      <b>📌 Văn thư, lưu trữ</b>
-      <div>${c.hoanthanh_vanthu || "<i>Không có</i>"}</div>
-    </div>
-
-  </div>
-</td>
-
-<td>
-  <div class="report-col">
-
-    <div class="report-block">
-      <b>📌 Tiếp công dân, KNTC</b>
-      <div>${c.chuahoanthanh_tiepdan || "<i>Không có</i>"}</div>
-    </div>
-
-    <div class="report-block">
-      <b>📌 Văn thư, lưu trữ</b>
-      <div>${c.chuahoanthanh_vanthu || "<i>Không có</i>"}</div>
-    </div>
-
-  </div>
-</td>
-
-<td>
-  <div class="report-col">
-
-    <div class="report-block">
-      <b>📌 Tiếp công dân, KNTC</b>
-      <div>${c.kehoach_tiepdan || "<i>Không có</i>"}</div>
-    </div>
-
-    <div class="report-block">
-      <b>📌 Văn thư, lưu trữ</b>
-      <div>${c.kehoach_vanthu || "<i>Không có</i>"}</div>
-    </div>
-
-  </div>
-</td>
+        <td>${c.hoanthanh||""}</td>
+        <td>${c.chuahoanthanh||""}</td>
+        <td>${c.kehoach||""}</td>
         <td>${buttons}</td>
       </tr>
     `;
   });
 
-  renderPaginationBaoCaoTuan(baoCaoTuanList.length);
 }
-
-function renderPaginationBaoCaoTuan(totalRows){
-
-  let totalPages = Math.ceil(totalRows / rowsPerPageBaoCaoTuan);
-
-  let html = "";
-
-  html += `<button class="page-btn" onclick="goPageBaoCaoTuan(1)" ${currentPageBaoCaoTuan==1?'disabled':''}>«</button>`;
-
-  html += `<button class="page-btn" onclick="goPageBaoCaoTuan(${currentPageBaoCaoTuan-1})" ${currentPageBaoCaoTuan==1?'disabled':''}>‹</button>`;
-
-  for(let i=1;i<=totalPages;i++){
-    html += `<button class="page-btn ${i==currentPageBaoCaoTuan?'active':''}" onclick="goPageBaoCaoTuan(${i})">${i}</button>`;
-  }
-
-  html += `<button class="page-btn" onclick="goPageBaoCaoTuan(${currentPageBaoCaoTuan+1})" ${currentPageBaoCaoTuan==totalPages?'disabled':''}>›</button>`;
-
-  html += `<button class="page-btn" onclick="goPageBaoCaoTuan(${totalPages})" ${currentPageBaoCaoTuan==totalPages?'disabled':''}>»</button>`;
-
-  document.getElementById("paginationBaoCaoTuan").innerHTML = html;
-}
-
-function goPageBaoCaoTuan(page){
-  currentPageBaoCaoTuan = page;
-  displayBaoCaoTuan();
-}
-
-function changeRowsPerPageBaoCaoTuan(){
-  rowsPerPageBaoCaoTuan = parseInt(document.getElementById("rowsPerPageBaoCaoTuan").value);
-  currentPageBaoCaoTuan = 1;
-  displayBaoCaoTuan();
-}
-
-
 
 // ===== THÊM =====
 function newBaoCaoTuan(){
 
-  currentEditId = null;
+  currentEditId = null; // 👈 reset
 
-  document.getElementById("bc_tuan").value = "";
-
-  // ✅ ĐÚNG FIELD MỚI
-  document.getElementById("bc_done_tiepdan").value = "";
-  document.getElementById("bc_done_vanthu").value = "";
-
-  document.getElementById("bc_notdone_tiepdan").value = "";
-  document.getElementById("bc_notdone_vanthu").value = "";
-
-  document.getElementById("bc_plan_tiepdan").value = "";
-  document.getElementById("bc_plan_vanthu").value = "";
+  bc_tuan.value = "";
+  bc_done.value = "";
+  bc_notdone.value = "";
+  bc_plan.value = "";
 
   document.getElementById("baoCaoTuanModal").style.display="block";
 }
@@ -2705,27 +2581,37 @@ function newBaoCaoTuan(){
 // ===== LƯU =====
 function saveBaoCaoTuan(){
 
+  console.log("EDIT ID:", currentEditId);
+
   let isEdit = currentEditId != null;
 
-  let tuan = document.getElementById("bc_tuan").value.trim();
-
-  let done_tiepdan = document.getElementById("bc_done_tiepdan").value.trim();
-  let done_vanthu = document.getElementById("bc_done_vanthu").value.trim();
-
-  let notdone_tiepdan = document.getElementById("bc_notdone_tiepdan").value.trim();
-  let notdone_vanthu = document.getElementById("bc_notdone_vanthu").value.trim();
-
-  let plan_tiepdan = document.getElementById("bc_plan_tiepdan").value.trim();
-  let plan_vanthu = document.getElementById("bc_plan_vanthu").value.trim();
+  // 👉 LẤY DOM ĐÚNG CÁCH
+  let tuanEl = document.getElementById("bc_tuan");
+  let doneEl = document.getElementById("bc_done");
+  let notdoneEl = document.getElementById("bc_notdone");
+  let planEl = document.getElementById("bc_plan");
 
   // ===== VALIDATE =====
-  if(!tuan){
-    alert("⚠ Nhập tuần báo cáo");
+  if(!tuanEl.value.trim()){
+    alert("⚠ Nhập tuần báo cáo (từ ngày - đến ngày)");
+    tuanEl.focus();
+    return;
+  }
+  if(!doneEl.value.trim()){
+    alert("⚠ Nhập nhiệm vụ đã thực hiện");
+    doneEl.focus();
     return;
   }
 
-  if(!done_tiepdan && !done_vanthu){
-    alert("⚠ Nhập ít nhất 1 nội dung đã làm");
+  if(!notdoneEl.value.trim()){
+    alert("⚠ Nhập nhiệm vụ chưa thực hiện");
+    notdoneEl.focus();
+    return;
+  }
+
+  if(!planEl.value.trim()){
+    alert("⚠ Nhập kế hoạch");
+    planEl.focus();
     return;
   }
 
@@ -2733,17 +2619,10 @@ function saveBaoCaoTuan(){
     action: isEdit ? "updateBaoCaoTuan" : "addBaoCaoTuan",
     id: isEdit ? currentEditId : Date.now(),
     username: currentUser,
-    tuan: tuan,
-
-    hoanthanh_tiepdan: done_tiepdan,
-    hoanthanh_vanthu: done_vanthu,
-
-    chuahoanthanh_tiepdan: notdone_tiepdan,
-    chuahoanthanh_vanthu: notdone_vanthu,
-
-    kehoach_tiepdan: plan_tiepdan,
-    kehoach_vanthu: plan_vanthu,
-
+    tuan: tuanEl.value,
+    hoanthanh: doneEl.value,
+    chuahoanthanh: notdoneEl.value,
+    kehoach: planEl.value,
     created: new Date().toISOString()
   };
 
@@ -2760,10 +2639,6 @@ function saveBaoCaoTuan(){
     closeBaoCaoTuan();
     loadBaoCaoTuan();
 
-  })
-  .catch(err=>{
-    console.error(err);
-    alert("❌ Lỗi khi lưu");
   });
 
 }
@@ -2774,14 +2649,9 @@ function editBaoCaoTuan(i){
   let c = baoCaoTuanList[i];
 
   bc_tuan.value = c.tuan;
-  bc_done_tiepdan.value = c.hoanthanh_tiepdan || "";
-  bc_done_vanthu.value = c.hoanthanh_vanthu || "";
-
-  bc_notdone_tiepdan.value = c.chuahoanthanh_tiepdan || "";
-  bc_notdone_vanthu.value = c.chuahoanthanh_vanthu || "";
-
-  bc_plan_tiepdan.value = c.kehoach_tiepdan || "";
-  bc_plan_vanthu.value = c.kehoach_vanthu || "";
+  bc_done.value = c.hoanthanh;
+  bc_notdone.value = c.chuahoanthanh;
+  bc_plan.value = c.kehoach;
 
   currentEditId = c.id; // 👈 BẮT BUỘC
   console.log("EDIT ID (khi bấm sửa):", currentEditId); // 👈 THÊM Ở ĐÂY
@@ -3576,48 +3446,6 @@ function formatDateVN(dateStr){
   let d = new Date(dateStr);
   return d.toLocaleDateString("vi-VN");
 }
-
-function printBaoCaoTuan(){
-
-  let content = document.querySelector("#pageBaoCaoTuan table").outerHTML;
-
-  let win = window.open("", "", "width=1000,height=700");
-
-  win.document.write(`
-    <html>
-    <head>
-      <title>In báo cáo tuần</title>
-      <style>
-        body{font-family:Arial;padding:20px;}
-        h2{text-align:center;margin-bottom:20px;}
-        table{width:100%;border-collapse:collapse;font-size:13px;}
-        th,td{border:1px solid #ccc;padding:6px;}
-        th{background:#f8d7da;}
-      </style>
-    </head>
-    <body>
-
-    <h2>BÁO CÁO TUẦN</h2>
-
-    ${content}
-
-    </body>
-    </html>
-  `);
-
-  win.document.close();
-  win.print();
-}
-
-function exportExcelBaoCaoTuan(){
-
-  let table = document.querySelector("#pageBaoCaoTuan table");
-
-  let wb = XLSX.utils.table_to_book(table);
-
-  XLSX.writeFile(wb,"baocao_tuan.xlsx");
-
-}
 </script>
 </head>
 <body>
@@ -3869,26 +3697,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
     <tbody id="tbodyBaoCaoTuan"></tbody>
   </table>
 
-  <div class="table-footer">
-
-  <div class="rows-control">
-    <span>Hiển thị</span>
-    <select id="rowsPerPageBaoCaoTuan" onchange="changeRowsPerPageBaoCaoTuan()">
-      <option value="5">5</option>
-      <option value="10" selected>10</option>
-      <option value="20">20</option>
-    </select>
-    <span>báo cáo / trang</span>
-  </div>
-  <!-- 👇 THÊM NÚT -->
-  <div>
-    <button class="btn-toolbar btn-print" onclick="printBaoCaoTuan()">🖨 In</button>
-    <button class="btn-toolbar btn-export" onclick="exportExcelBaoCaoTuan()">📥 Excel</button>
-  </div>
   <div id="paginationBaoCaoTuan"></div>
-
-</div>
-
 
 </div>
 <!-- ================= SỔ TIẾP CÔNG DÂN ================= -->
@@ -4450,41 +4259,20 @@ style="background:#198754;color:white;border:none;padding:7px 16px;border-radius
       <input id="bc_tuan">
     </div>
 
-    
-<!-- ===== CÔNG VIỆC ĐÃ LÀM ===== -->
-<div class="form-group">
-<label>Đã làm - Tiếp công dân, KNTC</label>
-<textarea id="bc_done_tiepdan" rows="6"></textarea>
-</div> 
+    <div class="form-group">
+      <label>Nhiệm vụ đã thực hiện</label>
+      <textarea id="bc_done" rows="6"></textarea>
+    </div>
 
-<div class="form-group">
-<label>Đã làm - Văn thư, lưu trữ</label>
-<textarea id="bc_done_vanthu" rows="6"></textarea>
-</div>
+    <div class="form-group">
+      <label>Nhiệm vụ chưa thực hiện</label>
+      <textarea id="bc_notdone" rows="6"></textarea>
+    </div>
 
-<!-- ===== CHƯA LÀM ===== -->
-<div class="form-group">
-<label>Chưa làm - Tiếp công dân, KNTC</label>
-<textarea id="bc_notdone_tiepdan" rows="6"></textarea>
-</div>
-
-<div class="form-group">
-<label>Chưa làm - Văn thư, lưu trữ</label>
-<textarea id="bc_notdone_vanthu" rows="6"></textarea>
-</div>
-
-<!-- ===== KẾ HOẠCH ===== -->
- <div class="form-group">
-<label>Kế hoạch - Tiếp công dân, KNTC</label>
-<textarea id="bc_plan_tiepdan" rows="6"></textarea>
-</div>
-
-<div class="form-group">
-<label>Kế hoạch - Văn thư, lưu trữ</label>
-<textarea id="bc_plan_vanthu" rows="6"></textarea>
-</div>
-
-
+    <div class="form-group">
+      <label>Kế hoạch thời gian tới</label>
+      <textarea id="bc_plan" rows="6"></textarea>
+    </div>
 
     <div class="popup-actions">
       <button class="btn-save" onclick="saveBaoCaoTuan()">💾 Lưu báo cáo</button>
