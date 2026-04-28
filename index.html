@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <meta charset="UTF-8">
 <title>HỆ THỐNG QUẢN LÝ ĐƠN THƯ</title>
 
@@ -1413,6 +1415,25 @@ let editIndex=-1;
 let currentEditId = null; // 👈 THÊM DÒNG NÀY
 
 const API_URL="https://script.google.com/macros/s/AKfycbweht-St8segRAjvJa3pUJF0RhvMCMCS3S8cL5m8daZgahHAT3HdkwmwbBjNKludlt1/exec";
+
+function parseLocalDate(str){
+  if(!str) return null;
+
+  // yyyy-MM-dd
+  if(str.includes("-")){
+    let [y,m,d] = str.split("-");
+    return new Date(y, m-1, d); // 🔥 QUAN TRỌNG
+  }
+
+  // dd/MM/yyyy
+  if(str.includes("/")){
+    let [d,m,y] = str.split("/");
+    return new Date(y, m-1, d);
+  }
+
+  return new Date(str);
+}
+
 function loadData(){
 cases.forEach(c=>{
   c.fullname = getFullName(c.owner);
@@ -1428,9 +1449,30 @@ return res.json();
   if(!Array.isArray(data)){
     cases=[];
   }else{
-    cases=data.sort((a,b)=>{
-      return new Date(b.ngayden) - new Date(a.ngayden);
-    });
+    cases = data.map(c => {
+  if(c.ngayden){
+
+  // ✅ nếu là dd/MM/yyyy → giữ nguyên
+  if(c.ngayden.includes("/")){
+    // không làm gì
+  }
+
+  // ✅ nếu là ISO hoặc yyyy-MM-dd
+  else if(c.ngayden.includes("-") || c.ngayden.includes("T")){
+    let d = new Date(c.ngayden);
+
+    let day = String(d.getDate()).padStart(2,'0');
+    let month = String(d.getMonth()+1).padStart(2,'0');
+    let year = d.getFullYear();
+
+    c.ngayden = `${day}/${month}/${year}`;
+  }
+
+}
+  return c;
+}).sort((a,b)=>{
+  return parseLocalDate(b.ngayden) - parseLocalDate(a.ngayden);
+});
   }
 
   filteredCases=[...cases];
@@ -1508,9 +1550,19 @@ loginPage.style.display="block";
 }
 
 function newCase(){
-document.getElementById("form").reset();
-editIndex=-1;
-document.getElementById("formModal").style.display="block";
+
+  document.getElementById("form").reset();
+  editIndex = -1;
+
+  // 🔥 THÊM ĐOẠN NÀY
+  let today = new Date();
+  let dd = String(today.getDate()).padStart(2,'0');
+  let mm = String(today.getMonth()+1).padStart(2,'0');
+  let yyyy = today.getFullYear();
+
+  document.getElementById("ngayden").value = `${dd}/${mm}/${yyyy}`;
+
+  document.getElementById("formModal").style.display="block";
 }
 
 function generateCode(type){
@@ -1599,11 +1651,11 @@ let loaiDonValue = document.getElementById("loaidon").value;
 let mahoso = (editIndex===-1)
 ? generateCode(loaiDonValue)
 : cases[editIndex].mahoso;
-
+let [day, m, y] = ngayden.value.split("/");
 let newData={
 action:(editIndex===-1)?"add":"update",
 mahoso,
-ngayden:ngayden.value,
+ngayden: `${day}/${m}/${y}`,
 nguondon:nguondon.value,
 linhvuc:linhvuc.value,
 soluong:soluong.value,
@@ -1684,11 +1736,12 @@ Object.keys(c).forEach(k=>{
 if(document.getElementById(k)){
 
 if(k==="ngayden" && c[k]){
-let d=new Date(c[k]);
- let iso = d.getFullYear() + "-" +
-            String(d.getMonth()+1).padStart(2,'0') + "-" +
-            String(d.getDate()).padStart(2,'0');
-document.getElementById(k).value=iso;
+if(c[k].includes("-")){
+    let [y,m,d] = c[k].split("-");
+    document.getElementById(k).value = `${d}/${m}/${y}`;
+  }else{
+    document.getElementById(k).value = c[k];
+  }
 }else{
 document.getElementById(k).value=c[k];
 }
@@ -1746,9 +1799,22 @@ ${buttons}
 }
 
 function formatDate(dateStr){
-if(!dateStr) return "";
-let d = new Date(dateStr);
-return d.toLocaleDateString("vi-VN");
+  if(!dateStr) return "";
+
+  // ✅ Nếu đã là dd/MM/yyyy → dùng luôn
+  if(dateStr.includes("/")){
+    return dateStr;
+  }
+
+  // ✅ Nếu là dạng yyyy-MM-dd hoặc ISO
+  let clean = dateStr.split("T")[0];
+
+  if(clean.includes("-")){
+    let [y,m,d] = clean.split("-");
+    return `${d}/${m}/${y}`;
+  }
+
+  return dateStr;
 }
 
 function viewCase(i){
@@ -1929,6 +1995,7 @@ Khác: ${k}
 `;
 }
 
+
 function applyFilter(){
 
 currentPage = 1;
@@ -1949,7 +2016,7 @@ let to = document.getElementById("toDate").value;
 
 filteredCases = cases.filter(c=>{
 
-let date = new Date(c.ngayden);
+let date = parseLocalDate(c.ngayden);
 
 let okMonth = !m || (date.getMonth()+1 == m);
 let okType = !t || c.loaidon === t;
@@ -1971,13 +2038,13 @@ let okNguoi = !nguoiFilter || tenNguoiXuLy.includes(nguoiFilter);
 let okDate = true;
 
 if(from && to){
-let d = new Date(date);
+let d = parseLocalDate(c.ngayden);
 d.setHours(0,0,0,0);
 
-let f = new Date(from);
+let f = parseLocalDate(from);
 f.setHours(0,0,0,0);
 
-let t = new Date(to);
+let t = parseLocalDate(to);
 t.setHours(23,59,59,999);
 
 okDate = d >= f && d <= t;
@@ -2136,6 +2203,15 @@ document.getElementById("dateTimeBox").innerHTML =
 }
 
 window.onload = function(){
+// 🔥 THÊM ĐOẠN NÀY
+flatpickr("#td_ngay", {
+  dateFormat: "d/m/Y"
+});
+
+// 🔥 THÊM DÒNG NÀY
+flatpickr("#ngayden", {
+  dateFormat: "d/m/Y"
+});
 
 loadUsers().then(()=>{
 
@@ -2205,6 +2281,13 @@ function openForm(){
 document.getElementById("formModal").style.display="block";
 
 document.getElementById("form").reset();
+// 🔥 TỰ ĐỘNG GÁN NGÀY HÔM NAY
+let today = new Date();
+let dd = String(today.getDate()).padStart(2,'0');
+let mm = String(today.getMonth()+1).padStart(2,'0');
+let yyyy = today.getFullYear();
+
+document.getElementById("ngayden").value = `${dd}/${mm}/${yyyy}`;
 
 editIndex=-1;
 setTimeout(setDefaultCongChuc, 50); // 👈 THÊM DÒNG NÀY Ở ĐÂY
@@ -2254,8 +2337,8 @@ return;
 
 let action = (editIndex === -1) ? "addTiepDan" : "updateTiepDan";
 
-let d = td_ngay.value.split("T")[0];
-let [y, m, day] = d.split("-");
+let [day, m, y] = td_ngay.value.split("/");
+
 let data = {
 
   action: action,
@@ -2529,13 +2612,13 @@ function newTiepDan(){
   editIndex = -1;
   currentEditId = null;
 
-  // 🔥 LẤY NGÀY HÔM NAY (CHUẨN KHÔNG LỆCH)
+  // 🔥 LẤY NGÀY HÔM NAY (ĐÚNG FORMAT flatpickr)
   let today = new Date();
   let yyyy = today.getFullYear();
   let mm = String(today.getMonth()+1).padStart(2,'0');
   let dd = String(today.getDate()).padStart(2,'0');
 
-  td_ngay.value = `${yyyy}-${mm}-${dd}`;
+  td_ngay.value = `${dd}/${mm}/${yyyy}`;
 
   document.getElementById("tiepDanModal").style.display="block";
 
