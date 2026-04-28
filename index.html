@@ -1246,6 +1246,39 @@ color:#666;
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
+function formatDateDisplaySafe(dateStr){
+  if(!dateStr) return "";
+
+  // Nếu đã là dd/MM/yyyy thì trả luôn
+  if(dateStr.includes("/")){
+    return dateStr;
+  }
+
+  // Nếu là dạng yyyy-MM-dd
+  let clean = dateStr.split("T")[0];
+
+  let [y,m,d] = clean.split("-");
+  return `${d}/${m}/${y}`;
+}
+function formatDateDisplay(dateStr){
+  if(!dateStr) return "";
+  let [y,m,d] = dateStr.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function formatDateInputSafe(dateStr){
+  if(!dateStr) return "";
+
+  // Nếu là dd/MM/yyyy → convert về yyyy-MM-dd để input date hiểu
+  if(dateStr.includes("/")){
+    let [d,m,y] = dateStr.split("/");
+    return `${y}-${m}-${d}`;
+  }
+
+  return dateStr.split("T")[0];
+}
+
+
 function exportExcel(){
 
 let table = document.querySelector("table");
@@ -1260,6 +1293,7 @@ let rowsPerPage = 10;
 let currentPageTiepDan = 1;
 let rowsPerPageTiepDan = 10;
 let tiepDanList = [];
+let filteredTiepDanList = [];
 
 function showPage(page){
 
@@ -1288,7 +1322,7 @@ document.getElementById("pageTitle").innerText="HỆ THỐNG QUẢN LÝ ĐƠN TH
 }
 
 if(page==="tiepdancu"){
-currentPage = 1; // 🔥 THÊM DÒNG NÀY
+currentPageTiepDan = 1; // 🔥 THÊM DÒNG NÀY
 
 document.getElementById("pageTiepDan").style.display="block";
 document.querySelectorAll(".sidebar a")[1].classList.add("active");
@@ -2220,6 +2254,8 @@ return;
 
 let action = (editIndex === -1) ? "addTiepDan" : "updateTiepDan";
 
+let d = td_ngay.value.split("T")[0];
+let [y, m, day] = d.split("-");
 let data = {
 
   action: action,
@@ -2228,8 +2264,8 @@ let data = {
 
   username: currentUser,
 
-  ngay: td_ngay.value,
- congchuc: td_congchuc.options[td_congchuc.selectedIndex].text,
+  ngay: `${day}/${m}/${y}`, // 🔥 FIX CHÍNH Ở ĐÂY
+  congchuc: td_congchuc.options[td_congchuc.selectedIndex].text,
   phong: td_phong.value,
   congdan: td_congdan.value,
   cccd: td_cccd.value,
@@ -2268,7 +2304,7 @@ tbody.innerHTML="";
 let start = (currentPageTiepDan - 1) * rowsPerPageTiepDan;
 let end = start + rowsPerPageTiepDan;
 
-let pageItems = tiepDanList.slice(start, end);
+let pageItems = filteredTiepDanList.slice(start, end);
 
 pageItems.forEach((c,i)=>{
 
@@ -2289,8 +2325,7 @@ if(currentRole==="Admin" || c.username === currentUser){
 
 let ngay = "";
 if(c.ngay){
-let d = new Date(c.ngay);
-ngay = d.toLocaleDateString("vi-VN");
+ngay = formatDateDisplaySafe(c.ngay);
 }
 
 tbody.innerHTML += `
@@ -2317,13 +2352,17 @@ tbody.innerHTML += `
 
 });
 
-renderPaginationTiepDan(tiepDanList.length);
-updateStatsTiepDan(tiepDanList); // 👈 THÊM DÒNG NÀY
+renderPaginationTiepDan(filteredTiepDanList.length);
+updateStatsTiepDan(filteredTiepDanList);
 }
 
 function renderPaginationTiepDan(totalRows){
 
 let totalPages = Math.ceil(totalRows / rowsPerPageTiepDan);
+if(totalPages <= 1){
+  document.getElementById("paginationTiepDan").innerHTML = "";
+  return;
+}
 
 let html="";
 
@@ -2404,8 +2443,7 @@ let realIndex = tiepDanList.indexOf(c);
 
 let ngay = "";
 if(c.ngay){
-let d = new Date(c.ngay);
-ngay = d.toLocaleDateString("vi-VN");
+  ngay = formatDateDisplaySafe(c.ngay);
 }
 
 tbody.innerHTML += `
@@ -2445,7 +2483,7 @@ let c = tiepDanList[i];
 // 👇 QUAN TRỌNG
 currentEditId = c.id;
 
-td_ngay.value = formatDateInput(c.ngay);
+td_ngay.value = formatDateInputSafe(c.ngay);
 td_congchuc.value = c.congchuc || "";
 td_phong.value = c.phong || "";
 td_congdan.value = c.congdan || "";
@@ -2486,17 +2524,22 @@ loadTiepDan();
 function newTiepDan(){
 
   let form = document.querySelector("#tiepDanModal form");
-
   form.reset();
 
   editIndex = -1;
+  currentEditId = null;
+
+  // 🔥 LẤY NGÀY HÔM NAY (CHUẨN KHÔNG LỆCH)
+  let today = new Date();
+  let yyyy = today.getFullYear();
+  let mm = String(today.getMonth()+1).padStart(2,'0');
+  let dd = String(today.getDate()).padStart(2,'0');
+
+  td_ngay.value = `${yyyy}-${mm}-${dd}`;
 
   document.getElementById("tiepDanModal").style.display="block";
 
-  // 🔥 QUAN TRỌNG
-  currentEditId = null;
   setTimeout(setDefaultCongChuc, 50);
-
 }
 
 function closeTiepDan(){
@@ -2512,10 +2555,42 @@ fetch(API_URL + "?action=getTiepDan")  // 👈 đổi sang GET
 .then(res => res.json())
 .then(data => {
 
-  tiepDanList = data.sort((a,b)=> new Date(b.ngay) - new Date(a.ngay));
+  tiepDanList = data.map(c => {
+  if(c.ngay){
 
-  displayTiepDan();
-  updateStatsTiepDan(tiepDanList);
+    if(c.ngay.includes("T")){
+      let d = new Date(c.ngay);
+
+      let day = String(d.getDate()).padStart(2,'0');
+      let month = String(d.getMonth()+1).padStart(2,'0');
+      let year = d.getFullYear();
+
+      c.ngay = `${day}/${month}/${year}`;
+    }
+
+  }
+  return c;
+}).sort((a,b)=>{
+
+  function parseDate(str){
+    if(!str) return 0;
+
+    if(str.includes("/")){
+      let [d,m,y] = str.split("/");
+      return new Date(`${y}-${m}-${d}`);
+    }
+
+    return new Date(str);
+  }
+
+  return parseDate(b.ngay) - parseDate(a.ngay);
+});
+
+// 🔥 THÊM DÒNG NÀY
+filteredTiepDanList = [...tiepDanList];
+
+displayTiepDan();
+updateStatsTiepDan(filteredTiepDanList);
 
 });
 }
@@ -2682,7 +2757,7 @@ function viewTiepDan(i){
 let c = tiepDanList[i];
 
 document.getElementById("v_ngay").innerText =
-c.ngay ? c.ngay.toString().substring(0,10) : "";
+  formatDateDisplaySafe(c.ngay);
 
 document.getElementById("v_congchuc").innerText = c.congchuc;
 document.getElementById("v_phong").innerText = c.phong || "";
@@ -2777,7 +2852,7 @@ let key = document.getElementById("searchTiepDan").value.toLowerCase();
 let from = document.getElementById("fromDateCitizen").value;
 let to = document.getElementById("toDateCitizen").value;
 
-let filtered = tiepDanList.filter(c=>{
+filteredTiepDanList = tiepDanList.filter(c=>{
 
 let okMonth = true;
 let okStaff = true;
@@ -2785,7 +2860,7 @@ let okKey = true;
 let okDate = true;
 
 if(month){
-let m = new Date(c.ngay).getMonth()+1;
+let m = parseInt(c.ngay.split("/")[1]);
 okMonth = m == month;
 }
 
@@ -2801,16 +2876,32 @@ okKey =
 
 if(from && to){
 
-let d = new Date(c.ngay);
-d.setHours(0,0,0,0);
+function convertToDate(str){
+  if(!str) return null;
 
-let f = new Date(from);
-f.setHours(0,0,0,0);
+  // nếu dd/MM/yyyy
+  if(str.includes("/")){
+    let [d,m,y] = str.split("/");
+    return new Date(`${y}-${m}-${d}`);
+  }
 
-let t = new Date(to);
-t.setHours(23,59,59,999);
+  // nếu yyyy-MM-dd
+  return new Date(str);
+}
 
-okDate = d >= f && d <= t;
+if(from && to){
+
+  let d = convertToDate(c.ngay);
+  let f = new Date(from);
+  let t = new Date(to);
+
+  // set giờ chuẩn
+  d.setHours(0,0,0,0);
+  f.setHours(0,0,0,0);
+  t.setHours(23,59,59,999);
+
+  okDate = d >= f && d <= t;
+}
 
 }
 
@@ -2818,9 +2909,9 @@ return okMonth && okStaff && okKey && okDate;
 
 });
 
-displayFilteredTiepDan(filtered);
+currentPageTiepDan = 1; // 🔥 rất quan trọng
 
-updateStatsTiepDan(filtered);
+displayTiepDan();
 
 }
 
@@ -2836,8 +2927,7 @@ let realIndex = tiepDanList.indexOf(c);
 
 let ngay = "";
 if(c.ngay){
-let d = new Date(c.ngay);
-ngay = d.toLocaleDateString("vi-VN");
+  ngay = formatDateDisplaySafe(c.ngay);
 }
 
 let buttons = `<button class="btn-view" onclick="viewTiepDan(${realIndex})">Xem</button>`;
@@ -2888,11 +2978,10 @@ document.getElementById("searchTiepDan").value="";
 document.getElementById("fromDateCitizen").value="";
 document.getElementById("toDateCitizen").value="";
 
-/* hiển thị lại toàn bộ dữ liệu */
-displayTiepDan();
+filteredTiepDanList = [...tiepDanList];
+currentPageTiepDan = 1;
 
-/* cập nhật lại thống kê */
-updateStatsTiepDan(tiepDanList);
+displayTiepDan();
 
 }
 
