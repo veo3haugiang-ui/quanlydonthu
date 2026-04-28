@@ -1419,19 +1419,19 @@ const API_URL="https://script.google.com/macros/s/AKfycbweht-St8segRAjvJa3pUJF0R
 function parseLocalDate(str){
   if(!str) return null;
 
-  // yyyy-MM-dd
-  if(str.includes("-")){
-    let [y,m,d] = str.split("-");
-    return new Date(y, m-1, d); // 🔥 QUAN TRỌNG
-  }
-
   // dd/MM/yyyy
   if(str.includes("/")){
     let [d,m,y] = str.split("/");
     return new Date(y, m-1, d);
   }
 
-  return new Date(str);
+  // yyyy-MM-dd hoặc ISO
+  if(str.includes("-")){
+    let [y,m,d] = str.split("T")[0].split("-");
+    return new Date(y, m-1, d);
+  }
+
+  return null;
 }
 
 function loadData(){
@@ -3362,85 +3362,91 @@ function renderBaoCao(isClick = false){
 
   let list = [];
 
- // 👉 Nếu bấm nút mà chưa chọn ngày → chặn
+  // 👉 Nếu bấm nút mà chưa chọn ngày → chặn
   if(isClick && (!from || !to)){
     alert("Vui lòng chọn khoảng thời gian");
     return;
   }
 
+  // 🔥 HÀM PARSE NGÀY CHUẨN (FIX LỖI GỐC)
+  function parseDate(str){
+    if(!str) return null;
+
+    // dd/MM/yyyy
+    if(str.includes("/")){
+      let [d,m,y] = str.split("/");
+      return new Date(y, m-1, d);
+    }
+
+    // yyyy-MM-dd hoặc ISO
+    if(str.includes("-")){
+      let [y,m,d] = str.split("T")[0].split("-");
+      return new Date(y, m-1, d);
+    }
+
+    return null;
+  }
+
   // 👉 Nếu có chọn ngày → lọc
   if(from && to){
 
-    let f = new Date(from);
-    let t = new Date(to);
+    let f = parseDate(from);
+    let t = parseDate(to);
+
+    f.setHours(0,0,0,0);
     t.setHours(23,59,59,999);
 
     list = cases.filter(c=>{
-      let d = new Date(c.ngayden);
+
+      let d = parseDate(c.ngayden);
+      if(!d) return false;
+
+      d.setHours(0,0,0,0);
+
       return d >= f && d <= t;
     });
 
-}else{
-  // 👉 chưa chọn ngày → lấy toàn bộ
-  list = [...cases];
-}
-
+  }else{
+    // 👉 chưa chọn ngày → lấy toàn bộ
+    list = [...cases];
+  }
 
   // 🔥 TÍNH TOÁN
   let total = list.length;
 
-let done = list.filter(c => 
-  c.tinhtrang === "Đã xử lý"
-).length;
+  let done = list.filter(c => c.tinhtrang === "Đã xử lý").length;
 
-let dangXuLy = list.filter(c => 
-  c.tinhtrang === "Đang xử lý"
-).length;
+  let dangXuLy = list.filter(c => c.tinhtrang === "Đang xử lý").length;
 
-let duDieuKien = list.filter(c => 
-  c.dieukien === "Đủ điều kiện xử lý"
-).length;
+  let duDieuKien = list.filter(c => c.dieukien === "Đủ điều kiện xử lý").length;
 
-let khongDu = list.filter(c => 
-  c.dieukien === "Không đủ điều kiện xử lý"
-).length;
+  let khongDu = list.filter(c => c.dieukien === "Không đủ điều kiện xử lý").length;
 
-let thuoc = list.filter(c => 
-  c.coquan === "Thuộc thẩm quyền giải quyết"
-).length;
+  let thuoc = list.filter(c => c.coquan === "Thuộc thẩm quyền giải quyết").length;
 
-let khongThuoc = list.filter(c => 
-  c.coquan === "Không thuộc thẩm quyền giải quyết"
-).length;
+  let khongThuoc = list.filter(c => c.coquan === "Không thuộc thẩm quyền giải quyết").length;
 
-let khieuNai = list.filter(c => 
-  c.loaidon === "Khiếu nại"
-).length;
+  let khieuNai = list.filter(c => c.loaidon === "Khiếu nại").length;
 
-let toCao = list.filter(c => 
-  c.loaidon === "Tố cáo"
-).length;
+  let toCao = list.filter(c => c.loaidon === "Tố cáo").length;
 
-let kienNghi = list.filter(c => 
-  c.loaidon === "Phản ánh - Kiến nghị"
-).length;
+  let kienNghi = list.filter(c => c.loaidon === "Phản ánh - Kiến nghị").length;
 
-let hoaGiai = list.filter(c => 
-  c.loaidon === "Hòa giải"
-).length;
+  let hoaGiai = list.filter(c => c.loaidon === "Hòa giải").length;
 
-let khac = list.filter(c => 
-  c.loaidon === "Khác"
-).length;
+  let khac = list.filter(c => c.loaidon === "Khác").length;
 
-
+  // 🔥 FIX HIỂN THỊ NGÀY (TRÁNH undefined)
+  let titleDate = (from && to)
+    ? `📊 Báo cáo từ ngày ${formatDateVN(from)} đến ngày ${formatDateVN(to)}`
+    : "📊 Báo cáo toàn bộ hồ sơ";
 
   // 🔥 RENDER
   document.getElementById("baoCaoContent").innerHTML = `
     <div class="report-box">
 
       <div class="report-title">
-        📊 Báo cáo từ ngày ${formatDateVN(from)} đến ngày ${formatDateVN(to)}
+        ${titleDate}
       </div>
 
       <div class="report-grid">
@@ -3455,10 +3461,9 @@ let khac = list.filter(c =>
         </div>
 
         <div class="report-card">
-          <h4>Đang xử lý </h4>
+          <h4>Đang xử lý</h4>
           <span>${dangXuLy}</span>
         </div>
-
       </div>
 
       <div class="report-section">
@@ -3470,7 +3475,7 @@ let khac = list.filter(c =>
       </div>
 
       <div class="report-section">
-        <h3>2. Phần theo điều kiện</h3>
+        <h3>2. Phân theo điều kiện</h3>
         <div class="report-list">
           - Đủ điều kiện xử lý: <b>${duDieuKien}</b><br>
           - Không đủ điều kiện xử lý: <b>${khongDu}</b>
