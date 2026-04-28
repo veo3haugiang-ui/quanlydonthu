@@ -2566,7 +2566,20 @@ let c = tiepDanList[i];
 // 👇 QUAN TRỌNG
 currentEditId = c.id;
 
-td_ngay.value = formatDateInputSafe(c.ngay);
+if(c.ngay){
+
+  // nếu là yyyy-MM-dd hoặc ISO
+  if(c.ngay.includes("-")){
+    let [y,m,d] = c.ngay.split("T")[0].split("-");
+    td_ngay.value = `${d}/${m}/${y}`;
+  }
+
+  // nếu đã là dd/MM/yyyy
+  else if(c.ngay.includes("/")){
+    td_ngay.value = c.ngay;
+  }
+
+}
 td_congchuc.value = c.congchuc || "";
 td_phong.value = c.phong || "";
 td_congdan.value = c.congdan || "";
