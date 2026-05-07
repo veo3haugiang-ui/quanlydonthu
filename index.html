@@ -1567,22 +1567,41 @@ function newCase(){
 
 function generateCode(type){
 
-let year=new Date().getFullYear();
+  let year = new Date().getFullYear();
 
-let prefix={
-"Khiếu nại":"KN",
-"Tố cáo":"TC",
-"Phản ánh - Kiến nghị":"PA",
-"Hòa giải":"HG",
-"Khác":"K"
-}[type] || "HS";
+  let prefix = {
+    "Khiếu nại":"KN",
+    "Tố cáo":"TC",
+    "Phản ánh - Kiến nghị":"PA",
+    "Hòa giải":"HG",
+    "Khác":"K"
+  }[type] || "HS";
 
-let count = cases.filter(c =>
-c.mahoso && c.mahoso.startsWith(prefix)
-).length + 1;
+  // 🔥 LỌC ĐÚNG NĂM + PREFIX
+  let list = cases.filter(c => 
+    c.mahoso && 
+    c.mahoso.startsWith(prefix) &&
+    c.mahoso.endsWith(year)
+  );
 
-return prefix + String(count).padStart(2,'0') + "-" + year;
+  // 🔥 LẤY MAX
+  let max = 0;
 
+  list.forEach(c => {
+    let number = parseInt(c.mahoso.split("-")[0].replace(prefix,""));
+    if(number > max) max = number;
+  });
+
+  // 🔥 CHỐNG TRÙNG
+  let next = max + 1;
+  let code = "";
+
+  do {
+    code = prefix + String(next).padStart(2,'0') + "-" + year;
+    next++;
+  } while(cases.some(c => c.mahoso === code));
+
+  return code;
 }
 
 function addCase(){
@@ -2008,6 +2027,9 @@ let authority = document.getElementById("authorityFilter").value;
 let condition = document.getElementById("conditionFilter").value;
 let status = document.getElementById("statusFilter").value;
 
+let ketqua = document.getElementById("ketquaFilter").value;
+let linhvuc = document.getElementById("linhvucFilter").value;
+
 // 👇 THÊM Ở ĐÂY
 let nguoiXuLy = document.getElementById("filterNguoiXuLy").value;
 
@@ -2024,6 +2046,8 @@ let okType = !t || c.loaidon === t;
 let okAuthority = !authority || c.coquan === authority;
 let okCondition = !condition || c.dieukien === condition;
 let okStatus = !status || (c.tinhtrang || "").trim() === status;
+let okKetQua = !ketqua || (c.ketqua || "").trim() === ketqua;
+let okLinhVuc = !linhvuc || (c.linhvuc || "").trim() === linhvuc;
 
 let okKey =
 (c.mahoso||"").toLowerCase().includes(k) ||
@@ -2051,7 +2075,9 @@ okDate = d >= f && d <= t;
 }
 
 // 👇 SỬA DÒNG NÀY
-return okMonth && okType && okAuthority && okCondition && okStatus && okKey && okDate && okNguoi;
+return okMonth && okType && okAuthority && okCondition && okStatus 
+       && okKey && okDate && okNguoi 
+       && okKetQua && okLinhVuc;
 
 });
 
@@ -3770,6 +3796,27 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
           <option>Đang xử lý</option>
           <option>Đã xử lý</option>
         </select>
+        
+        <select id="ketquaFilter" onchange="applyFilter()">
+        <option value="">Kết quả xử lý</option>
+        <option value="Phúc đáp">Phúc đáp</option>
+        <option value="Hướng dẫn">Hướng dẫn</option>
+        <option value="Chuyển đơn">Chuyển đơn</option>
+        <option value="Báo cáo">Báo cáo</option>
+        <option value="Lưu đơn">Lưu đơn</option>
+        <option value="Khác">Khác</option>
+        </select>
+
+        <select id="linhvucFilter" onchange="applyFilter()">
+        <option value="">Lĩnh vực</option>
+        <option>Lao động - Việc làm</option>
+        <option>Công chức - Viên chức</option>
+        <option>Người có công</option>
+        <option>CCHC&CQĐP</option>
+        <option>Thi đua - Khen thưởng</option>
+        <option>Đất đai</option>
+        <option>Khác</option>
+        </select>
 
         <select id="filterNguoiXuLy" onchange="applyFilter()">
           <option value="">Người xử lý</option>
@@ -4049,7 +4096,15 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <div class="form-group">
 <label>Lĩnh vực <span style="color:red">*</span></label>
-<input id="linhvuc">
+<select id="linhvuc">
+<option value="">-- Chọn lĩnh vực --</option>
+<option>Lao động - Việc làm</option>
+<option>Công chức - Viên chức</option>
+<option>Người có công</option>
+<option>Cải cách hành chính và chính quyền địa phương</option>
+<option>Thi đua - Khen thưởng</option>
+<option>Đất đai</option>
+<option>Khác</option>
 </div>
 
 <div class="form-group">
@@ -4122,10 +4177,10 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <label>Kết quả xử lý đơn</label>
 <select id="ketqua">
 <option value="">-- Chọn kết quả --</option>
-<option>Văn bản phúc đáp</option>
-<option>Phiếu hướng dẫn</option>
-<option>Phiếu chuyển đơn</option>
-<option>Phiếu đề xuất</option>
+<option>Phúc đáp</option>
+<option>Hướng dẫn</option>
+<option>Chuyển đơn</option>
+<option>Báo cáo</option>
 <option>Lưu đơn</option>
 <option>Khác</option>
 </select>
