@@ -116,6 +116,23 @@ td button:hover{
     margin-top:20px;
 }
 
+.report-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:40px;
+  margin-top:20px;
+}
+
+.report-col{
+  min-width:0;
+}
+
+@media(max-width:1200px){
+  .report-layout{
+    grid-template-columns:1fr;
+  }
+}
+
 .report-section h3{
     font-size:16px;
     margin-bottom:10px;
@@ -1643,10 +1660,39 @@ soluong.focus();
 return;
 }
 
+
 if(!noidung.value.trim()){
 alert("⚠ Vui lòng nhập nội dung đơn");
 noidung.focus();
 return;
+}
+
+if(!coquan.value.trim()){
+alert("⚠ Vui lòng chon thẩm quyền giải quyết");
+coquan.focus();
+return;
+}
+
+if(!dieukien.value.trim()){
+alert("⚠ Vui lòng chon điều kiện xử lý");
+dieukien.focus();
+return;
+}
+
+if(!tinhtrang.value.trim()){
+  alert("⚠ Vui lòng chọn tình trạng xử lý đơn");
+  tinhtrang.focus();
+  return;
+}
+
+// 🔥 Nếu đã xử lý thì bắt buộc có kết quả xử lý
+if(
+  tinhtrang.value === "Đã xử lý" &&
+  !ketqua.value.trim()
+){
+  alert("⚠ Vui lòng chọn Kết quả xử lý");
+  ketqua.focus();
+  return;
 }
 
 if(dienthoai.value.trim() !== ""){
@@ -1695,8 +1741,6 @@ owner: currentUser.trim().toLowerCase(),
 created: Date.now(),
 history:[]
 };
-
-
 
 fetch(API_URL,{
 method:"POST",
@@ -1914,7 +1958,7 @@ modalBody.innerHTML = `
 </div>
 
 <div class="view-item">
-<div class="view-label">Điều kiện thụ lý</div>
+<div class="view-label">Điều kiện xử lý</div>
 <div class="view-value">${c.dieukien||""}</div>
 </div>
 
@@ -2097,6 +2141,8 @@ function resetFilter(){
   document.getElementById("authorityFilter").value="";
   document.getElementById("conditionFilter").value="";
   document.getElementById("statusFilter").value="";
+  document.getElementById("ketquaFilter").value = "";
+  document.getElementById("linhvucFilter").value = "";
 
   // 🔥 THÊM DÒNG NÀY
   document.getElementById("filterNguoiXuLy").value = "";
@@ -2973,6 +3019,7 @@ let key = document.getElementById("searchTiepDan").value.toLowerCase();
 
 let from = document.getElementById("fromDateCitizen").value;
 let to = document.getElementById("toDateCitizen").value;
+let dongNguoi = document.getElementById("filterDongNguoi").value;
 
 filteredTiepDanList = tiepDanList.filter(c=>{
 
@@ -2980,6 +3027,15 @@ let okMonth = true;
 let okStaff = true;
 let okKey = true;
 let okDate = true;
+let okDongNguoi = true;
+
+if(dongNguoi === "yes"){
+  okDongNguoi = Number(c.songuoi || 0) > 1;
+}
+
+if(dongNguoi === "no"){
+  okDongNguoi = Number(c.songuoi || 0) <= 1;
+}
 
 if(month){
 let m = parseInt(c.ngay.split("/")[1]);
@@ -3027,7 +3083,7 @@ if(from && to){
 
 }
 
-return okMonth && okStaff && okKey && okDate;
+return okMonth && okStaff && okKey && okDate && okDongNguoi;
 
 });
 
@@ -3095,6 +3151,7 @@ function resetFilterTiepDan(){
 document.getElementById("monthFilterTiepDan").value="";
 document.getElementById("staffFilterTiepDan").value="";
 document.getElementById("searchTiepDan").value="";
+// DONG NGUOI document.getElementById("filterDongNguoi").value = "";
 
 // ✅ THÊM 2 DÒNG NÀY
 document.getElementById("fromDateCitizen").value="";
@@ -3109,23 +3166,55 @@ displayTiepDan();
 
 function updateStatsTiepDan(list = tiepDanList){
 
-let total = list.length;
+  let total = list.length;
 
-let count = {};
+  // 🔥 Tổng số người tiếp
+  let tongSoNguoi = list.reduce((sum, c) => {
+    return sum + Number(c.songuoi || 0);
+  }, 0);
 
-list.forEach(c=>{
-  let name = c.congchuc || "Khác";
-  count[name] = (count[name] || 0) + 1;
-});
+  // 🔥 Danh sách đoàn đông người (>1 người)
+  let doanDongNguoi = list.filter(c => 
+    Number(c.songuoi || 0) > 1
+  );
 
-let text = `<b>📊 TỔNG LƯỢT TIẾP CÔNG DÂN: ${total}</b><br>`;
+  // 🔥 Tổng số đoàn đông người
+  let tongDoanDongNguoi = doanDongNguoi.length;
 
-for(let name in count){
-  text += `${name}: ${count[name]} | `;
-}
+  // 🔥 Tổng số người trong đoàn đông người
+  let tongNguoiDoanDong = doanDongNguoi.reduce((sum, c) => {
+    return sum + Number(c.songuoi || 0);
+  }, 0);
 
-document.getElementById("statsTiepDan").innerHTML = text;
+  // 🔥 Thống kê công chức tiếp
+  let count = {};
 
+  list.forEach(c=>{
+    let name = c.congchuc || "Khác";
+    count[name] = (count[name] || 0) + 1;
+  });
+
+  // 🔥 Hiển thị
+  let text = `
+    <b>
+      📊 TỔNG LƯỢT TIẾP CÔNG DÂN: ${total}
+    </b><br>
+
+    Tổng số người tiếp: <b>${tongSoNguoi}</b> |
+
+    Tổng số đoàn đông người: <b>${tongDoanDongNguoi}</b> |
+
+    Tổng số người trong đoàn đông người:
+    <b>${tongNguoiDoanDong}</b>
+
+    <br><br>
+  `;
+
+  for(let name in count){
+    text += `${name}: ${count[name]} | `;
+  }
+
+  document.getElementById("statsTiepDan").innerHTML = text;
 }
 
 function resetFilterCitizen(){
@@ -3505,34 +3594,112 @@ function renderBaoCao(isClick = false){
         </div>
       </div>
 
-      <div class="report-section">
-        <h3>1. Phân loại thẩm quyền</h3>
-        <div class="report-list">
-          - Thuộc thẩm quyền: <b>${thuoc}</b><br>
-          - Không thuộc thẩm quyền: <b>${khongThuoc}</b>
-        </div>
-      </div>
+     <div class="report-layout">
 
-      <div class="report-section">
-        <h3>2. Phân theo điều kiện</h3>
-        <div class="report-list">
-          - Đủ điều kiện xử lý: <b>${duDieuKien}</b><br>
-          - Không đủ điều kiện xử lý: <b>${khongDu}</b>
-        </div>
-      </div>
+  <!-- CỘT 1 -->
+  <div class="report-col">
 
-      <div class="report-section">
-        <h3>3. Phân loại đơn</h3>
-        <div class="report-list">
-          - Khiếu nại: <b>${khieuNai}</b><br>
-          - Tố cáo: <b>${toCao}</b><br>
-          - Kiến nghị, phản ánh: <b>${kienNghi}</b><br>
-          - Hòa giải: <b>${hoaGiai}</b><br>
-          - Khác: <b>${khac}</b>
-        </div>
-      </div>
+    <div class="report-section">
+      <h3>1. Phân loại thẩm quyền</h3>
 
+      <div class="report-list">
+        - Thuộc thẩm quyền: <b>${thuoc}</b><br>
+        - Không thuộc thẩm quyền: <b>${khongThuoc}</b>
+      </div>
     </div>
+
+    <div class="report-section">
+      <h3>2. Phân loại đơn</h3>
+
+      <div class="report-list">
+        - Khiếu nại: <b>${khieuNai}</b><br>
+        - Tố cáo: <b>${toCao}</b><br>
+        - Kiến nghị, phản ánh: <b>${kienNghi}</b><br>
+        - Hòa giải: <b>${hoaGiai}</b><br>
+        - Khác: <b>${khac}</b>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- CỘT 2 -->
+  <div class="report-col">
+
+    <div class="report-section">
+      <h3>3. Phân theo điều kiện</h3>
+
+      <div class="report-list">
+        - Đủ điều kiện xử lý: <b>${duDieuKien}</b><br>
+        - Không đủ điều kiện xử lý: <b>${khongDu}</b>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <h3>4. Phân loại kết quả xử lý</h3>
+
+      <div class="report-list">
+        - Phúc đáp:
+        <b>${list.filter(c => c.ketqua === "Phúc đáp").length}</b><br>
+
+        - Hướng dẫn:
+        <b>${list.filter(c => c.ketqua === "Hướng dẫn").length}</b><br>
+
+        - Chuyển đơn:
+        <b>${list.filter(c => c.ketqua === "Chuyển đơn").length}</b><br>
+
+        - Báo cáo:
+        <b>${list.filter(c => c.ketqua === "Báo cáo").length}</b><br>
+
+        - Lưu đơn:
+        <b>${list.filter(c => c.ketqua === "Lưu đơn").length}</b><br>
+
+        - Khác:
+        <b>${list.filter(c => c.ketqua === "Khác").length}</b>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- CỘT 3 -->
+  <div class="report-col">
+
+    <div class="report-section">
+      <h3>5. Phân loại lĩnh vực</h3>
+
+      <div class="report-list">
+
+        - Lao động - Việc làm:
+        <b>${list.filter(c => c.linhvuc === "Lao động - Việc làm").length}</b><br>
+
+        - Công chức - Viên chức:
+        <b>${list.filter(c => c.linhvuc === "Công chức - Viên chức").length}</b><br>
+
+        - Người có công:
+        <b>${list.filter(c => c.linhvuc === "Người có công").length}</b><br>
+
+        - Cải cách hành chính và chính quyền địa phương:
+        <b>${list.filter(c => c.linhvuc === "CCHC&CQĐP").length}</b><br>
+
+        - Tổ chức - Biên chế:
+        <b>${list.filter(c => c.linhvuc === "Tổ chức - Biên chế").length}</b><br>
+        - Thi đua - Khen thưởng:
+        <b>${list.filter(c => c.linhvuc === "Thi đua - Khen thưởng").length}</b><br>
+
+
+        - Đất đai:
+        <b>${list.filter(c => c.linhvuc === "Đất đai").length}</b><br>
+
+        - Khác:
+        <b>${list.filter(c => c.linhvuc === "Khác").length}</b>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
   `;
 }
 
@@ -3813,6 +3980,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
         <option>Công chức - Viên chức</option>
         <option>Người có công</option>
         <option>CCHC&CQĐP</option>
+        <option>Tổ chức - Biên chế</option>
         <option>Thi đua - Khen thưởng</option>
         <option>Đất đai</option>
         <option>Khác</option>
@@ -3974,6 +4142,13 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
         <input type="date" id="fromDateCitizen" onchange="applyFilterTiepDan()">
         <input type="date" id="toDateCitizen" onchange="applyFilterTiepDan()">
 
+        <select id="filterDongNguoi" onchange="applyFilterTiepDan()">
+        <option value="">Tìm theo đoàn</option>
+        <option value="yes">Đoàn đông người</option>
+        <option value="no">Không phải đoàn đông người</option>
+        </select>
+        
+
         <button class="btn-reset" onclick="resetFilterTiepDan()">⟲ Reset</button>
       </div>
     </div>
@@ -4102,9 +4277,11 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option>Công chức - Viên chức</option>
 <option>Người có công</option>
 <option>Cải cách hành chính và chính quyền địa phương</option>
+<option>Tổ chức - Biên chế</option>
 <option>Thi đua - Khen thưởng</option>
 <option>Đất đai</option>
 <option>Khác</option>
+</select>
 </div>
 
 <div class="form-group">
@@ -4147,7 +4324,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <div class="section-title">Xử lý hồ sơ</div>
 
 <div class="form-group">
-<label>Thẩm quyền giải quyết</label>
+<label>Thẩm quyền giải quyết <span style="color:red">*</span></label>
 <select id="coquan">
 <option value="">-- Chọn thẩm quyền giải quyết --</option>
 <option>Thuộc thẩm quyền giải quyết</option>
@@ -4156,7 +4333,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </div>
 
 <div class="form-group">
-<label>Điều kiện thụ lý</label>
+<label>Điều kiện xử lý <span style="color:red">*</span></label>
 <select id="dieukien">
 <option value="">-- Chọn điều kiện --</option>
 <option>Đủ điều kiện xử lý</option>
@@ -4165,7 +4342,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </div>
 
 <div class="form-group">
-<label>Tình trạng xử lý đơn</label>
+<label>Tình trạng xử lý đơn <span style="color:red">*</span></label>
 <select id="tinhtrang">
 <option value="">-- Chọn tình trạng --</option>
 <option>Đang xử lý</option>
