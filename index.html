@@ -1436,6 +1436,40 @@ if(page==="users"){
 
 }
 
+function reloadDonThuPage(){
+
+  currentPage = 1;
+
+  // reset tìm kiếm
+  searchInput.value = "";
+
+  // reset filter
+  monthFilter.value = "";
+  typeFilter.value = "";
+
+  document.getElementById("authorityFilter").value = "";
+  document.getElementById("conditionFilter").value = "";
+  document.getElementById("statusFilter").value = "";
+  document.getElementById("ketquaFilter").value = "";
+  document.getElementById("linhvucFilter").value = "";
+
+  document.getElementById("filterNguoiXuLy").value = "";
+  document.getElementById("filterSoanThao").value = "";
+
+  document.getElementById("fromDate").value = "";
+  document.getElementById("toDate").value = "";
+
+  document.getElementById("fromNgayXuLy").value = "";
+  document.getElementById("toNgayXuLy").value = "";
+
+  // load lại dữ liệu
+  loadData();
+
+  // mở trang đơn thư
+  showPage("donthu");
+
+}
+
 window.addEventListener("error", function(e){
 console.error("Lỗi JS:", e.message);
 });
@@ -1826,7 +1860,9 @@ ngayden: `${day1}/${m1}/${y1}`,
 nguondon:nguondon.value,
 linhvuc:linhvuc.value,
 soluong:soluong.value,
-hoten:hoten.value,
+hoten: hoten.value.trim() === ""
+  ? "Đơn nặc danh"
+  : hoten.value.trim(),
 diachi:diachi.value,
 dienthoai:dienthoai.value,
 noidung:noidung.value,
@@ -4138,7 +4174,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <div class="sidebar-title">MENU HỆ THỐNG</div>
 
-<a href="#" class="active" onclick="showPage('donthu')">
+<a href="#" class="active" onclick="reloadDonThuPage()">
 📚 Quản lý đơn thư
 </a>
 
