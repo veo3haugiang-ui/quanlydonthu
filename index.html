@@ -159,6 +159,16 @@ width:100%;
   text-overflow: ellipsis;
 }
 
+.clamp-name{
+  display:-webkit-box;
+  -webkit-line-clamp:2;   /* hiện tối đa 2 dòng */
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.4;
+  max-height:40px;
+}
+
 .table-header{
 display:flex;
 justify-content:space-between;
@@ -1260,6 +1270,13 @@ font-size:13px;
 margin-bottom:20px;
 color:#666;
 }
+
+input:disabled,
+select:disabled{
+  background:#eeeeee;
+  color:#666;
+  cursor:not-allowed;
+}
 </style>
 
 
@@ -1431,7 +1448,7 @@ let cases=[];
 let editIndex=-1;
 let currentEditId = null; // 👈 THÊM DÒNG NÀY
 
-const API_URL="https://script.google.com/macros/s/AKfycbweht-St8segRAjvJa3pUJF0RhvMCMCS3S8cL5m8daZgahHAT3HdkwmwbBjNKludlt1/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbywmz_f_zw-pZv5HVneKTfVQwvsDrlX_KWjNO_dWdnrs8ob6gL365UfFZmFxw2gFKjQ/exec";
 
 function parseLocalDate(str){
   if(!str) return null;
@@ -1486,7 +1503,29 @@ return res.json();
   }
 
 }
+
+if(c.ngayxuly){
+
+  // Nếu đã là dd/MM/yyyy
+  if(c.ngayxuly.includes("/")){
+    // giữ nguyên
+  }
+
+  // Nếu là ISO hoặc yyyy-MM-dd
+  else if(c.ngayxuly.includes("-") || c.ngayxuly.includes("T")){
+
+    let clean = c.ngayxuly.split("T")[0];
+
+    let [y,m,d] = clean.split("-");
+
+    c.ngayxuly = `${d}/${m}/${y}`;
+  }
+
+}
   return c;
+
+  // ===== NGÀY XỬ LÝ =====
+
 }).sort((a,b)=>{
   return parseLocalDate(b.ngayden) - parseLocalDate(a.ngayden);
 });
@@ -1695,6 +1734,61 @@ if(
   return;
 }
 
+// 🔥 Nếu đã xử lý thì bắt buộc có ngày hoàn thành
+if(
+  tinhtrang.value === "Đã xử lý" &&
+  !ngayxuly.value.trim()
+){
+  alert("⚠ Vui lòng nhập Ngày hoàn thành xử lý đơn");
+  ngayxuly.focus();
+  return;
+}
+
+// 🔥 Ngày hoàn thành phải sau ngày tiếp nhận
+if(
+  tinhtrang.value === "Đã xử lý" &&
+  ngayxuly.value.trim() !== ""
+){
+
+  // ===== ngày tiếp nhận =====
+  let [d1, m1, y1] = ngayden.value.split("/");
+
+  const ngayNhan = new Date(
+    Number(y1),
+    Number(m1) - 1,
+    Number(d1)
+  );
+
+  // ===== ngày hoàn thành =====
+  let [d2, m2, y2] = ngayxuly.value.split("/");
+
+  const ngayHoanThanh = new Date(
+    Number(y2),
+    Number(m2) - 1,
+    Number(d2)
+  );
+
+  // ===== kiểm tra =====
+  if(ngayHoanThanh < ngayNhan){
+
+    alert("⚠ Ngày hoàn thành phải sau hoặc bằng ngày tiếp nhận");
+
+    ngayxuly.focus();
+
+    return;
+  }
+}
+
+// 🔥 Bắt buộc nhập người tham mưu soạn thảo
+if(!soanthao.value.trim()){
+
+  alert("⚠ Vui lòng nhập Người tham mưu soạn thảo");
+
+  soanthao.focus();
+
+  return;
+}
+
 if(dienthoai.value.trim() !== ""){
 
 if(isNaN(dienthoai.value)){
@@ -1716,11 +1810,19 @@ let loaiDonValue = document.getElementById("loaidon").value;
 let mahoso = (editIndex===-1)
 ? generateCode(loaiDonValue)
 : cases[editIndex].mahoso;
-let [day, m, y] = ngayden.value.split("/");
+// 🔥 ngày nhận đơn
+let [day1, m1, y1] = ngayden.value.split("/");
+
+// 🔥 ngày xử lý
+let day2="", m2="", y2="";
+
+if(ngayxuly.value){
+  [day2, m2, y2] = ngayxuly.value.split("/");
+}
 let newData={
 action:(editIndex===-1)?"add":"update",
 mahoso,
-ngayden: `${day}/${m}/${y}`,
+ngayden: `${day1}/${m1}/${y1}`,
 nguondon:nguondon.value,
 linhvuc:linhvuc.value,
 soluong:soluong.value,
@@ -1739,6 +1841,7 @@ loaidon: loaiDonValue,   // ✅ CHUẨN
 dieukien:dieukien.value,
 owner: currentUser.trim().toLowerCase(),
 created: Date.now(),
+ngayxuly: day2 ? `${day2}/${m2}/${y2}` : "",
 history:[]
 };
 
@@ -1798,15 +1901,30 @@ let c = cases[i];
 Object.keys(c).forEach(k=>{
 if(document.getElementById(k)){
 
-if(k==="ngayden" && c[k]){
-if(c[k].includes("-")){
-    let [y,m,d] = c[k].split("-");
+if((k==="ngayden" || k==="ngayxuly") && c[k]){
+
+  // nếu là ISO hoặc yyyy-MM-dd
+  if(c[k].includes("-")){
+
+    let clean = c[k].split("T")[0];
+
+    let [y,m,d] = clean.split("-");
+
     document.getElementById(k).value = `${d}/${m}/${y}`;
-  }else{
-    document.getElementById(k).value = c[k];
+
   }
+
+  // nếu đã là dd/MM/yyyy
+  else{
+
+    document.getElementById(k).value = c[k];
+
+  }
+
 }else{
-document.getElementById(k).value=c[k];
+
+  document.getElementById(k).value = c[k];
+
 }
 
 }
@@ -1816,6 +1934,7 @@ editIndex=i;
 
 /* MỞ POPUP */
 document.getElementById("formModal").style.display="block";
+toggleXuLyFields();
 
 }
 
@@ -1996,6 +2115,11 @@ ${c.tinhtrang||""}
 </div>
 
 <div class="view-item">
+<div class="view-label">Ngày hoàn thành xử lý đơn</div>
+<div class="view-value">${c.ngayxuly}</div>
+</div>
+
+<div class="view-item">
 <div class="view-label">Số ký hiệu văn bản</div>
 <div class="view-value">${c.sokyhieu||""}</div>
 </div>
@@ -2076,9 +2200,12 @@ let linhvuc = document.getElementById("linhvucFilter").value;
 
 // 👇 THÊM Ở ĐÂY
 let nguoiXuLy = document.getElementById("filterNguoiXuLy").value;
+let nguoiSoanThao = document.getElementById("filterSoanThao").value;
 
 let from = document.getElementById("fromDate").value;
 let to = document.getElementById("toDate").value;
+let fromXuLy = document.getElementById("fromNgayXuLy").value;
+let toXuLy = document.getElementById("toNgayXuLy").value;
 
 filteredCases = cases.filter(c=>{
 
@@ -2102,6 +2229,25 @@ let tenNguoiXuLy = (c.fullname || getFullName(c.owner) || "").toString().trim().
 let nguoiFilter = (nguoiXuLy || "").toString().trim().toLowerCase();
 
 let okNguoi = !nguoiFilter || tenNguoiXuLy.includes(nguoiFilter);
+// ===== NGƯỜI THAM MƯU =====
+
+
+let tenSoanThao = String(c.soanthao || "")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase()
+  .trim();
+
+let filterSoanThao = String(nguoiSoanThao || "")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase()
+  .trim();
+
+let okSoanThao =
+  filterSoanThao === "" ||
+  tenSoanThao.includes(filterSoanThao);
+
 
 let okDate = true;
 
@@ -2118,10 +2264,34 @@ t.setHours(23,59,59,999);
 okDate = d >= f && d <= t;
 }
 
+
+let okNgayXuLy = true;
+
+// Nếu có lọc ngày hoàn thành
+if(fromXuLy && toXuLy){
+
+  // Hồ sơ chưa có ngày hoàn thành => loại
+  if(!c.ngayxuly){
+    okNgayXuLy = false;
+  }else{
+
+    let d = parseLocalDate(c.ngayxuly);
+    d.setHours(0,0,0,0);
+
+    let f = parseLocalDate(fromXuLy);
+    f.setHours(0,0,0,0);
+
+    let t = parseLocalDate(toXuLy);
+    t.setHours(23,59,59,999);
+
+    okNgayXuLy = d >= f && d <= t;
+  }
+}
+
 // 👇 SỬA DÒNG NÀY
 return okMonth && okType && okAuthority && okCondition && okStatus 
        && okKey && okDate && okNguoi 
-       && okKetQua && okLinhVuc;
+       && okKetQua && okLinhVuc && okNgayXuLy && okSoanThao;
 
 });
 
@@ -2143,10 +2313,14 @@ function resetFilter(){
   document.getElementById("statusFilter").value="";
   document.getElementById("ketquaFilter").value = "";
   document.getElementById("linhvucFilter").value = "";
+  document.getElementById("fromNgayXuLy").value="";
+  document.getElementById("toNgayXuLy").value="";
 
   // 🔥 THÊM DÒNG NÀY
   document.getElementById("filterNguoiXuLy").value = "";
+  document.getElementById("filterSoanThao").value = "";
 
+  
   filteredCases = [...cases];
 
   displayFiltered(filteredCases);
@@ -2184,15 +2358,38 @@ buttons+=`<button class="btn-delete" onclick="deleteCase(${realIndex})">Xóa</bu
 tbody.innerHTML+=`
 <tr>
 <td>${start+i+1}</td>
-<td>${c.mahoso}</td>
+
 <td>${formatDate(c.ngayden)}</td>
-<td>${c.hoten}</td>
-<td>${c.loaidon}</td>
-<td>${c.coquan}</td>
-<td>${c.dieukien}</td>
-<td>${c.tinhtrang}</td>
-<td>${c.fullname || c.owner}</td>
-<td>${buttons}</td>
+
+<td>
+  <div class="clamp-name">
+    ${
+      (c.hoten || "").length > 30
+      ? (c.hoten || "").substring(0,30) + "..."
+      : (c.hoten || "")
+    }
+  </div>
+</td>
+
+<td>${c.loaidon || ""}</td>
+
+<td>${c.coquan || ""}</td>
+
+<td>${c.dieukien || ""}</td>
+
+<td>${c.tinhtrang || ""}</td>
+
+<td>${c.fullname || c.owner || ""}</td>
+
+<td>${c.soanthao || ""}</td>
+
+<td>${c.ngayxuly || ""}</td>
+
+<td>
+  <div class="action-buttons">
+    ${buttons}
+  </div>
+</td>
 </tr>
 `;
 });
@@ -2285,6 +2482,27 @@ flatpickr("#ngayden", {
   dateFormat: "d/m/Y"
 });
 
+// 🔥 THÊM DÒNG NÀY
+flatpickr("#ngayxuly", {
+  dateFormat: "d/m/Y"
+});
+
+flatpickr("#fromDate", {
+  dateFormat: "d/m/Y"
+});
+
+flatpickr("#toDate", {
+  dateFormat: "d/m/Y"
+});
+
+flatpickr("#fromNgayXuLy", {
+  dateFormat: "d/m/Y"
+});
+
+flatpickr("#toNgayXuLy", {
+  dateFormat: "d/m/Y"
+});
+
 loadUsers().then(()=>{
 
 
@@ -2297,6 +2515,10 @@ tbody = document.getElementById("tbody");
 
   setInterval(updateDateTime,1000);
   updateDateTime();
+
+  document
+.getElementById("filterSoanThao")
+.addEventListener("input", applyFilter);
 
 let savedUser = localStorage.getItem("loginUser");
 let loginTime = localStorage.getItem("loginTime");
@@ -2333,6 +2555,10 @@ tbody = document.getElementById("tbody");
 setInterval(updateDateTime,1000);
 updateDateTime();
 
+document
+.getElementById("tinhtrang")
+.addEventListener("change", toggleXuLyFields);
+
 }
 
 function toggleForm(){
@@ -2362,7 +2588,45 @@ let yyyy = today.getFullYear();
 document.getElementById("ngayden").value = `${dd}/${mm}/${yyyy}`;
 
 editIndex=-1;
+toggleXuLyFields();
 setTimeout(setDefaultCongChuc, 50); // 👈 THÊM DÒNG NÀY Ở ĐÂY
+
+}
+
+function toggleXuLyFields(){
+
+  let tinhtrang = document.getElementById("tinhtrang").value;
+
+  let ketqua = document.getElementById("ketqua");
+  let ngayxuly = document.getElementById("ngayxuly");
+  let sokyhieu = document.getElementById("sokyhieu");
+  let kyduyet = document.getElementById("kyduyet");
+
+  // Nếu đang xử lý
+  if(tinhtrang === "Đang xử lý"){
+
+    ketqua.disabled = true;
+    ngayxuly.disabled = true;
+    sokyhieu.disabled = true;
+    kyduyet.disabled = true;
+
+    // xóa dữ liệu
+    ketqua.value = "";
+    ngayxuly.value = "";
+    sokyhieu.value = "";
+    kyduyet.value = "";
+
+  }
+
+  // Nếu đã xử lý
+  else if(tinhtrang === "Đã xử lý"){
+
+    ketqua.disabled = false;
+    ngayxuly.disabled = false;
+    sokyhieu.disabled = false;
+    kyduyet.disabled = false;
+
+  }
 
 }
 
@@ -3825,9 +4089,20 @@ function searchBaoCaoTuan(){
 }
 
 function formatDateVN(dateStr){
+
   if(!dateStr) return "";
-  let d = new Date(dateStr);
-  return d.toLocaleDateString("vi-VN");
+
+  // nếu đã là dd/MM/yyyy
+  if(dateStr.includes("/")){
+    return dateStr;
+  }
+
+  // nếu là ISO hoặc yyyy-MM-dd
+  let clean = dateStr.split("T")[0];
+
+  let [y,m,d] = clean.split("-");
+
+  return `${d}/${m}/${y}`;
 }
 </script>
 </head>
@@ -3917,9 +4192,9 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
       <div class="search-bar">
         <input id="searchInput" placeholder="🔍 Tìm mã HS, họ tên..." oninput="applyFilter()">
 
-        <input type="date" id="fromDate" onchange="applyFilter()">
+        <input type="date" id="fromDate" placeholder="Từ ngày nhận đơn"onchange="applyFilter()">
         <span class="date-arrow">→</span>
-        <input type="date" id="toDate" onchange="applyFilter()">
+        <input type="date" id="toDate" placeholder="Đến ngày nhận đơn"onchange="applyFilter()">
 
         <select id="monthFilter" onchange="applyFilter()">
           <option value="">Tháng</option>
@@ -3994,6 +4269,25 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
           <option>Nguyễn Thế Long</option>
         </select>
 
+        <input
+  type="text"
+  id="filterSoanThao"
+  class="form-control"
+  placeholder="Tìm người tham mưu..."
+>
+
+        <input type="text"
+       id="fromNgayXuLy"
+       placeholder="Từ ngày hoàn thành"
+       onchange="applyFilter()">
+
+<span class="date-arrow">→</span>
+
+<input type="text"
+       id="toNgayXuLy"
+       placeholder="Đến ngày hoàn thành"
+       onchange="applyFilter()">
+
         <button class="btn-reset" onclick="resetFilter()">⟳ Reset</button>
       </div>
     </div>
@@ -4008,14 +4302,15 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
         <thead>
           <tr>
             <th>STT</th>
-            <th>Mã HS</th>
-            <th>Ngày gửi đơn</th>
+            <th>Ngày nhận đơn</th>
             <th>Họ tên người gửi đơn</th>
             <th>Loại đơn</th>
             <th>Thẩm quyền giải quyết</th>
             <th>Điều kiện xử lý</th>
             <th>Tình trạng xử lý</th>
             <th>Người xử lý</th>
+            <th>Người tham mưu</th>
+            <th>Ngày hoàn thành</th>
             <th>Thao tác</th>
           </tr>
         </thead>
@@ -4248,7 +4543,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <div class="section-title">Thông tin hồ sơ</div>
 
 <div class="form-group">
-<label>Ngày gửi <span style="color:red">*</span></label>
+<label>Ngày nhận đơn <span style="color:red">*</span></label>
 <input type="date" id="ngayden">
 </div>
 
@@ -4364,6 +4659,11 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </div>
 
 <div class="form-group">
+<label>Ngày hoàn thành xử lý đơn</label>
+<input type="date" id="ngayxuly">
+</div>
+
+<div class="form-group">
 <label>Số ký hiệu</label>
 <input id="sokyhieu">
 </div>
@@ -4374,7 +4674,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 </div>
 
 <div class="form-group">
-<label>Người tham mưu soạn thảo</label>
+<label>Người tham mưu soạn thảo<span style="color:red">*</span></label>
 <input id="soanthao">
 </div>
 
