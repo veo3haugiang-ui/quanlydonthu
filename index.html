@@ -3330,11 +3330,11 @@ let okDate = true;
 let okDongNguoi = true;
 
 if(dongNguoi === "yes"){
-  okDongNguoi = Number(c.songuoi || 0) > 1;
+  okDongNguoi = Number(c.songuoi || 0) >= 5;
 }
 
 if(dongNguoi === "no"){
-  okDongNguoi = Number(c.songuoi || 0) <= 1;
+  okDongNguoi = Number(c.songuoi || 0) < 5;
 }
 
 if(month){
