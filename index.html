@@ -3473,9 +3473,9 @@ function updateStatsTiepDan(list = tiepDanList){
     return sum + Number(c.songuoi || 0);
   }, 0);
 
-  // 🔥 Danh sách đoàn đông người (>1 người)
+  // 🔥 Danh sách đoàn đông người (>=5 người)
   let doanDongNguoi = list.filter(c => 
-    Number(c.songuoi || 0) > 1
+     Number(c.songuoi || 0) >= 5
   );
 
   // 🔥 Tổng số đoàn đông người
