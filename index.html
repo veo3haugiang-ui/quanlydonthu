@@ -1813,12 +1813,39 @@ if(
   }
 }
 
-// 🔥 Bắt buộc nhập người tham mưu soạn thảo
-if(!soanthao.value.trim()){
+// ===== NGƯỜI THAM MƯU =====
+
+let soanThaoValue = "";
+
+if(document.getElementById("soanthaoSelect").value === "Khác"){
+
+  soanThaoValue =
+    document.getElementById("soanthaoKhac")
+    .value
+    .trim();
+
+}else{
+
+  soanThaoValue =
+    document.getElementById("soanthaoSelect")
+    .value
+    .trim();
+}
+
+// 🔥 kiểm tra bắt buộc nhập
+if(!soanThaoValue){
 
   alert("⚠ Vui lòng nhập Người tham mưu soạn thảo");
 
-  soanthao.focus();
+  if(document.getElementById("soanthaoSelect").value === "Khác"){
+
+    document.getElementById("soanthaoKhac").focus();
+
+  }else{
+
+    document.getElementById("soanthaoSelect").focus();
+
+  }
 
   return;
 }
@@ -1870,13 +1897,19 @@ coquan:coquan.value,
 ketqua:ketqua.value,
 sokyhieu:sokyhieu.value,
 kyduyet:kyduyet.value,
-soanthao:soanthao.value,
+soanthao: soanThaoValue,
 ghichu:ghichu.value,
 tinhtrang:tinhtrang.value,
 loaidon: loaiDonValue,   // ✅ CHUẨN
 dieukien:dieukien.value,
-owner: currentUser.trim().toLowerCase(),
-created: Date.now(),
+owner:
+  editIndex === -1
+    ? currentUser.trim().toLowerCase()
+    : cases[editIndex].owner,
+created:
+  editIndex === -1
+    ? Date.now()
+    : cases[editIndex].created,
 ngayxuly: day2 ? `${day2}/${m2}/${y2}` : "",
 history:[]
 };
@@ -1899,6 +1932,41 @@ function deleteCase(i){
 if(currentRole==="Phó Giám đốc" || currentRole==="Admin"){
 alert("Lãnh đạo không được xóa");
 return;
+}
+
+let c = cases[i];
+
+let loginFullname = (
+  localStorage.getItem("loginFullname") || ""
+).trim().toLowerCase();
+
+let nguoiThamMuu = (
+  c.soanthao || ""
+).trim().toLowerCase();
+
+// 🔥 nếu là owner hoặc admin/lãnh đạo
+// => được xóa
+
+let laOwner =
+  c.owner === currentUser;
+
+let laAdmin =
+  currentRole === "Admin" ||
+  currentRole === "Phó Giám đốc";
+
+// 🔥 nếu KHÔNG phải owner/admin
+// nhưng là người tham mưu
+// => không được xóa
+
+if(!laOwner && !laAdmin){
+
+  if(loginFullname === nguoiThamMuu){
+
+    alert("Người tham mưu không được xóa hồ sơ");
+
+    return;
+  }
+
 }
 
 if(cases[i].owner!==currentUser){
@@ -1927,15 +1995,67 @@ loadData();
 
 function editCase(i){
 
-if(currentRole!=="Phó Giám đốc" && cases[i].owner!==currentUser){
-alert("Không có quyền sửa");
-return;
-}
-
 let c = cases[i];
+
+// 👇 fullname tài khoản đang đăng nhập
+let loginFullname = (
+  localStorage.getItem("loginFullname") || ""
+).trim().toLowerCase();
+
+// 👇 người tham mưu của hồ sơ
+let nguoiThamMuu = (
+  c.soanthao || ""
+).trim().toLowerCase();
+
+// 👇 kiểm tra quyền
+let laNguoiThamMuu =
+  loginFullname === nguoiThamMuu;
+
+// 👇 quyền sửa
+let coQuyenSua =
+  currentRole === "Phó Giám đốc" ||
+  currentRole === "Admin" ||
+  c.owner === currentUser ||
+  laNguoiThamMuu;
+
+if(!coQuyenSua){
+  alert("Không có quyền sửa");
+  return;
+}
 
 Object.keys(c).forEach(k=>{
 if(document.getElementById(k)){
+
+  // ===== LOAD NGƯỜI THAM MƯU =====
+
+if(k === "soanthao"){
+
+  let select = document.getElementById("soanthaoSelect");
+
+  let inputKhac = document.getElementById("soanthaoKhac");
+
+  let options = Array.from(select.options).map(o=>o.value);
+
+  if(options.includes(c[k])){
+
+    select.value = c[k];
+
+    inputKhac.style.display = "none";
+
+    inputKhac.value = "";
+
+  }else{
+
+    select.value = "Khác";
+
+    inputKhac.style.display = "block";
+
+    inputKhac.value = c[k];
+
+  }
+
+  return;
+}
 
 if((k==="ngayden" || k==="ngayxuly") && c[k]){
 
@@ -1970,7 +2090,94 @@ editIndex=i;
 
 /* MỞ POPUP */
 document.getElementById("formModal").style.display="block";
+
 toggleXuLyFields();
+
+
+// ===============================
+// PHÂN QUYỀN
+// ===============================
+
+// 👇 nếu là người xử lý hồ sơ hoặc Admin/Lãnh đạo
+// => được toàn quyền
+
+if(
+
+  c.owner === currentUser ||
+
+  currentRole === "Admin" ||
+
+  currentRole === "Phó Giám đốc"
+
+){
+
+  document
+  .querySelectorAll(
+    "#formModal input, #formModal select, #formModal textarea"
+  )
+  .forEach(el=>{
+
+    el.disabled = false;
+
+  });
+
+}
+
+// 👇 chỉ là người tham mưu
+// => chỉ được sửa vài field
+
+else if(laNguoiThamMuu){
+
+  let allowFields = [
+
+    "tinhtrang",
+    "ketqua",
+    "ngayxuly",
+    "sokyhieu",
+    "kyduyet",
+    "ghichu"
+
+  ];
+
+  // khóa toàn bộ
+  document
+  .querySelectorAll(
+    "#formModal input, #formModal select, #formModal textarea"
+  )
+  .forEach(el=>{
+
+    el.disabled = true;
+
+  });
+
+  // mở field được phép sửa
+  allowFields.forEach(id=>{
+
+    let el = document.getElementById(id);
+
+    if(el){
+
+      el.disabled = false;
+
+    }
+
+  });
+
+}
+else{
+
+  // 👇 các quyền khác thì mở toàn bộ
+  document
+  .querySelectorAll(
+    "#formModal input, #formModal select, #formModal textarea"
+  )
+  .forEach(el=>{
+
+    el.disabled = false;
+
+  });
+
+}
 
 }
 
@@ -2381,7 +2588,23 @@ let buttons=`<button class="btn-view" onclick="viewCase(${realIndex})">Xem</butt
 
 if(c.tinhtrang!=="Đã giải quyết"){
 
-if(currentRole==="Phó Giám đốc" || currentRole==="Admin" || c.owner===currentUser){
+let loginFullname = (
+  localStorage.getItem("loginFullname") || ""
+).trim().toLowerCase();
+
+let nguoiThamMuu = (
+  c.soanthao || ""
+).trim().toLowerCase();
+
+let laNguoiThamMuu =
+  loginFullname === nguoiThamMuu;
+
+if(
+  currentRole==="Phó Giám đốc" ||
+  currentRole==="Admin" ||
+  c.owner===currentUser ||
+  laNguoiThamMuu
+){
 buttons+=`<button class="btn-edit" onclick="editCase(${realIndex})">Sửa</button>`;
 }
 
@@ -2615,6 +2838,18 @@ function openForm(){
 document.getElementById("formModal").style.display="block";
 
 document.getElementById("form").reset();
+
+// 🔥 MỞ LẠI TOÀN BỘ FIELD KHI THÊM MỚI
+
+document
+.querySelectorAll(
+  "#formModal input, #formModal select, #formModal textarea"
+)
+.forEach(el=>{
+
+  el.disabled = false;
+
+});
 // 🔥 TỰ ĐỘNG GÁN NGÀY HÔM NAY
 let today = new Date();
 let dd = String(today.getDate()).padStart(2,'0');
@@ -2626,6 +2861,12 @@ document.getElementById("ngayden").value = `${dd}/${mm}/${yyyy}`;
 editIndex=-1;
 toggleXuLyFields();
 setTimeout(setDefaultCongChuc, 50); // 👈 THÊM DÒNG NÀY Ở ĐÂY
+
+document.getElementById("soanthaoSelect").value = "";
+
+document.getElementById("soanthaoKhac").value = "";
+
+document.getElementById("soanthaoKhac").style.display = "none";
 
 }
 
@@ -2669,6 +2910,17 @@ function toggleXuLyFields(){
 function closeForm(){
 
 document.getElementById("formModal").style.display="none";
+
+// 🔥 reset khóa field
+document
+.querySelectorAll(
+  "#formModal input, #formModal select, #formModal textarea"
+)
+.forEach(el=>{
+
+  el.disabled = false;
+
+});
 
 }
 
@@ -3473,7 +3725,7 @@ function updateStatsTiepDan(list = tiepDanList){
     return sum + Number(c.songuoi || 0);
   }, 0);
 
-  // 🔥 Danh sách đoàn đông người (>=5 người)
+  // 🔥 Danh sách đoàn đông người (>= 5 người)
   let doanDongNguoi = list.filter(c => 
      Number(c.songuoi || 0) >= 5
   );
@@ -4140,6 +4392,28 @@ function formatDateVN(dateStr){
 
   return `${d}/${m}/${y}`;
 }
+
+function toggleSoanThaoKhac(){
+
+let value =
+document.getElementById("soanthaoSelect").value;
+
+let inputKhac =
+document.getElementById("soanthaoKhac");
+
+if(value === "Khác"){
+
+  inputKhac.style.display = "block";
+
+}else{
+
+  inputKhac.style.display = "none";
+
+  inputKhac.value = "";
+
+}
+
+}
 </script>
 </head>
 <body>
@@ -4690,6 +4964,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <option>Chuyển đơn</option>
 <option>Báo cáo</option>
 <option>Lưu đơn</option>
+<option>Thụ lý giải quyết</option>
 <option>Khác</option>
 </select>
 </div>
@@ -4711,7 +4986,40 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 
 <div class="form-group">
 <label>Người tham mưu soạn thảo<span style="color:red">*</span></label>
-<input id="soanthao">
+<select id="soanthaoSelect" onchange="toggleSoanThaoKhac()">
+
+<option value="">-- Chọn người tham mưu --</option>
+
+<option value="Nguyễn Thị Nhi">
+Nguyễn Thị Nhi
+</option>
+
+<option value="Lâm Tố Trinh">
+Lâm Tố Trinh
+</option>
+
+<option value="Trịnh Thị Bích Phượng">
+Trịnh Thị Bích Phượng
+</option>
+
+<option value="Nguyễn Thế Long">
+Nguyễn Thế Long
+</option>
+
+<option value="Khác">
+Khác
+</option>
+
+</select>
+
+<!-- ô nhập khi chọn Khác -->
+
+<input
+type="text"
+id="soanthaoKhac"
+placeholder="Nhập họ tên người tham mưu"
+style="display:none;margin-top:5px;"
+>
 </div>
 
 <div class="form-group">
@@ -4827,6 +5135,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <select id="td_xuly">
 <option value="">-- Chọn --</option>
 <option>Hướng dẫn chung</option>
+<option>Giải đáp thắc mắc</option>
 <option>Thụ lý để giải quyết</option>
 <option>Trả lại đơn và hướng dẫn</option>
 <option>Chuyển đơn đến cơ quan, tổ chức có thẩm quyền</option>
