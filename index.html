@@ -2726,7 +2726,20 @@ tbody.innerHTML+=`
 
 <td>${c.dieukien || ""}</td>
 
-<td>${c.tinhtrang || ""}</td>
+<td
+  style="
+    color:
+      ${c.tinhtrang === 'Đang xử lý'
+        ? '#dc3545'
+        : 'inherit'};
+    font-weight:
+      ${c.tinhtrang === 'Đang xử lý'
+        ? 'bold'
+        : 'normal'};
+  "
+>
+  ${c.tinhtrang || ""}
+</td>
 
 <td>${c.fullname || c.owner || ""}</td>
 
@@ -2907,6 +2920,90 @@ updateDateTime();
 document
 .getElementById("tinhtrang")
 .addEventListener("change", toggleXuLyFields);
+
+// =====================================
+// AUTO RELOAD + AUTO LOGOUT
+// =====================================
+
+// 🔥 thời gian không thao tác
+const RELOAD_TIME = 15 * 60 * 1000; // 15 phút
+const LOGOUT_TIME = 30 * 60 * 1000; // 30 phút
+
+let lastActivity = Date.now();
+
+
+// =====================================
+// CẬP NHẬT THỜI GIAN HOẠT ĐỘNG
+// =====================================
+
+function updateActivity(){
+
+  lastActivity = Date.now();
+
+}
+
+
+// =====================================
+// THEO DÕI THAO TÁC NGƯỜI DÙNG
+// =====================================
+
+[
+  "click",
+  "mousemove",
+  "keydown",
+  "scroll",
+  "touchstart"
+].forEach(event=>{
+
+  document.addEventListener(
+    event,
+    updateActivity
+  );
+
+});
+
+
+// =====================================
+// KIỂM TRA TỰ ĐỘNG
+// =====================================
+
+setInterval(()=>{
+
+  let now = Date.now();
+
+  let idleTime = now - lastActivity;
+
+
+  // 🔥 30 phút không thao tác => logout
+  if(idleTime >= LOGOUT_TIME){
+
+    alert(
+      "⚠ Phiên đăng nhập đã hết hạn do không hoạt động."
+    );
+
+    // xóa đăng nhập
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentRole");
+    localStorage.removeItem("loginFullname");
+
+    location.reload();
+
+    return;
+  }
+
+
+  // 🔥 15 phút không thao tác
+if(idleTime >= RELOAD_TIME){
+
+  console.log("🔄 Tự động cập nhật dữ liệu...");
+
+  loadData();
+
+  lastActivity = Date.now();
+
+}
+
+}, 60000); // kiểm tra mỗi 1 phút
 
 }
 
