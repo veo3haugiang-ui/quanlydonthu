@@ -1482,7 +1482,7 @@ let cases=[];
 let editIndex=-1;
 let currentEditId = null; // 👈 THÊM DÒNG NÀY
 
-const API_URL="https://script.google.com/macros/s/AKfycbywmz_f_zw-pZv5HVneKTfVQwvsDrlX_KWjNO_dWdnrs8ob6gL365UfFZmFxw2gFKjQ/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbzLXA6ixRrKsDRS-shKs2ZtdT881LK-_VR8vIC3KC4EbS3uCFLmPYeobscTVXc0gyTp/exec";
 
 function parseLocalDate(str){
   if(!str) return null;
@@ -1956,7 +1956,7 @@ loadData();
 
 function deleteCase(i){
 
-if(currentRole==="Phó Giám đốc" || currentRole==="Admin"){
+if(currentRole==="Ban Giám đốc" || currentRole==="Admin"){
 alert("Lãnh đạo không được xóa");
 return;
 }
@@ -1979,7 +1979,7 @@ let laOwner =
 
 let laAdmin =
   currentRole === "Admin" ||
-  currentRole === "Phó Giám đốc";
+  currentRole === "Ban Giám đốc";
 
 // 🔥 nếu KHÔNG phải owner/admin
 // nhưng là người tham mưu
@@ -2040,7 +2040,8 @@ let laNguoiThamMuu =
 
 // 👇 quyền sửa
 let coQuyenSua =
-  currentRole === "Phó Giám đốc" ||
+  currentRole === "Ban Giám đốc" ||
+  currentRole === "Lãnh đạo phòng" ||
   currentRole === "Admin" ||
   c.owner === currentUser ||
   laNguoiThamMuu;
@@ -2197,7 +2198,9 @@ if(
 
   currentRole === "Admin" ||
 
-  currentRole === "Phó Giám đốc"
+  currentRole === "Ban Giám đốc" ||
+
+  currentRole === "Lãnh đạo phòng"
 
 ){
 
@@ -2285,7 +2288,7 @@ let fullName = users[ownerKey]
 let buttons=`<button class="btn-view" onclick="viewCase(${i})">Xem</button>`;
 
 if(c.tinhtrang!=="Đã xử lý"){
-if(currentRole==="Phó Giám đốc" || c.owner===currentUser){
+if(currentRole==="Ban Giám đốc" || c.owner===currentUser){
 buttons+=`<button class="btn-edit" onclick="editCase(${i})">Sửa</button>`;
 }
 if(c.owner===currentUser || currentRole==="Admin"){
@@ -2690,7 +2693,8 @@ let laNguoiThamMuu =
   loginFullname === nguoiThamMuu;
 
 if(
-  currentRole==="Phó Giám đốc" ||
+  currentRole==="Ban Giám đốc" ||
+  currentRole==="Lãnh đạo phòng" ||
   currentRole==="Admin" ||
   c.owner===currentUser ||
   laNguoiThamMuu
@@ -3209,7 +3213,7 @@ let congChuc = (c.congchuc || "").trim().toLowerCase();
 
 let buttons = `<button class="btn-view" onclick="viewTiepDan(${realIndex})">Xem</button>`;
 
-if(currentRole==="Phó Giám đốc" || currentRole==="Admin" || c.username === currentUser){
+if(currentRole==="Ban Giám đốc" || currentRole==="Admin" || c.username === currentUser){
   buttons += `<button class="btn-edit" onclick="editTiepDan(${realIndex})">Sửa</button>`;
 }
 
@@ -3849,7 +3853,7 @@ if(c.ngay){
 
 let buttons = `<button class="btn-view" onclick="viewTiepDan(${realIndex})">Xem</button>`;
 
-if(currentRole==="Phó Giám đốc" || currentRole==="Admin" || c.username === currentUser){
+if(currentRole==="Ban Giám đốc" || currentRole==="Admin" || c.username === currentUser){
   buttons += `<button class="btn-edit" onclick="editTiepDan(${realIndex})">Sửa</button>`;
 }
 
@@ -4085,17 +4089,65 @@ alert("Không có quyền");
 let u = prompt("Tài khoản:");
 let p = prompt("Mật khẩu:");
 let name = prompt("Họ tên:");
-let role = prompt("Vai trò:");
+let roleChoice = prompt(
+
+`Chọn loại tài khoản:
+
+1. Admin
+2. Ban Giám đốc
+3. Lãnh đạo phòng
+4. Chuyên viên`
+
+);
+
+let role = "";
+
+if(roleChoice === "1"){
+
+  role = "Admin";
+
+}else if(roleChoice === "2"){
+
+  role = "Ban Giám đốc";
+
+}else if(roleChoice === "3"){
+
+  role = "Lãnh đạo phòng";
+
+}else{
+
+  role = "Chuyên viên";
+
+}
 
 if(!u || !p) return;
 
-users[u] = {
-pass:p,
-fullname:name,
-role:role
-};
+fetch(API_URL,{
+  method:"POST",
+  body:JSON.stringify({
+    action:"addUser",
+    username:u,
+    password:p,
+    fullname:name,
+    role:role
+  })
+})
+.then(res=>res.json())
+.then(data=>{
 
-renderUsers();
+  if(data.success){
+
+    alert("✅ Đã thêm tài khoản");
+
+    loadUsers();
+
+  }else{
+
+    alert(data.message || "Không thêm được");
+
+  }
+
+});
 
 }
 
@@ -4106,31 +4158,88 @@ if(currentRole !== "Admin"){
   return;
 }
 
-if(confirm("Xóa tài khoản?")){
-delete users[u];
-renderUsers();
-}
+if(!confirm("Xóa tài khoản?")) return;
+
+fetch(API_URL,{
+  method:"POST",
+  body:JSON.stringify({
+    action:"deleteUser",
+    username:u
+  })
+})
+.then(res=>res.json())
+.then(data=>{
+
+  if(data.success){
+
+    alert("✅ Đã xóa");
+
+    loadUsers();
+
+  }else{
+
+    alert(data.message || "Không xóa được");
+
+  }
+
+});
 
 }
 
 function editUser(u){
-    if(currentRole !== "Admin"){
+
+if(currentRole !== "Admin"){
   alert("Không có quyền");
   return;
 }
 
-let name = prompt("Họ tên:", users[u].fullname);
-let role = prompt("Vai trò:", users[u].role);
-let pass = prompt("Mật khẩu mới:", users[u].pass);
+let name = prompt(
+  "Họ tên:",
+  users[u].fullname
+);
 
-users[u].fullname = name;
-users[u].role = role;
+if(name===null) return;
 
-if(pass){
-  users[u].pass = pass;
-}
+let role = prompt(
+  "Vai trò:",
+  users[u].role
+);
 
-renderUsers();
+if(role===null) return;
+
+let pass = prompt(
+  "Mật khẩu mới:",
+  users[u].pass
+);
+
+if(pass===null) return;
+
+fetch(API_URL,{
+  method:"POST",
+  body:JSON.stringify({
+    action:"editUser",
+    username:u,
+    fullname:name,
+    role:role,
+    password:pass
+  })
+})
+.then(res=>res.json())
+.then(data=>{
+
+  if(data.success){
+
+    alert("✅ Đã cập nhật");
+
+    loadUsers();
+
+  }else{
+
+    alert(data.message || "Không cập nhật được");
+
+  }
+
+});
 
 }
 
