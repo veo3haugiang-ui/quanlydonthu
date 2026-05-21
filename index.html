@@ -6,6 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <meta charset="UTF-8">
 <title>HỆ THỐNG QUẢN LÝ ĐƠN THƯ</title>
+<link rel="icon" type="image/png" href="web.png">
 
 <style>
 /* Nút trong cột thao tác */
@@ -1282,6 +1283,27 @@ select:disabled{
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
+
+function toggleCongChucKhac(){
+
+  let select = document.getElementById("td_congchuc");
+
+  let inputKhac =
+    document.getElementById("td_congchuc_khac");
+
+  if(select.value === "Khác"){
+
+    inputKhac.style.display = "block";
+
+  }else{
+
+    inputKhac.style.display = "none";
+
+    inputKhac.value = "";
+
+  }
+
+}
 function formatDateDisplaySafe(dateStr){
   if(!dateStr) return "";
 
@@ -1482,7 +1504,7 @@ let cases=[];
 let editIndex=-1;
 let currentEditId = null; // 👈 THÊM DÒNG NÀY
 
-const API_URL="https://script.google.com/macros/s/AKfycbzLXA6ixRrKsDRS-shKs2ZtdT881LK-_VR8vIC3KC4EbS3uCFLmPYeobscTVXc0gyTp/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbw4R8w3Z7beupEE_Kxp4Qz7065BIygP20LKdRlx5FHW37S9TuRq3UB-KF7c_ZRXnC0b/exec";
 
 function parseLocalDate(str){
   if(!str) return null;
@@ -2664,6 +2686,23 @@ function resetFilter(){
 
 }
 
+function toggleAdvancedSearch(){
+
+  let box =
+    document.getElementById("advancedSearch");
+
+  if(box.style.display === "none"){
+
+    box.style.display = "flex";
+
+  }else{
+
+    box.style.display = "none";
+
+  }
+
+}
+
 function displayFiltered(list){
 
 tbody.innerHTML="";
@@ -2869,13 +2908,14 @@ flatpickr("#toNgayXuLy", {
   dateFormat: "d/m/Y"
 });
 
-loadUsers().then(()=>{
+loadUsers();
 
+setTimeout(()=>{
 
   loadData();
   loadTiepDan();
 
-});
+},500);
 
 tbody = document.getElementById("tbody");
 
@@ -3022,6 +3062,58 @@ window.scrollTo(0,0);
 form.style.display="none";
 }
 
+document
+.getElementById("searchInput")
+.addEventListener("input", applyFilter);
+
+document
+.getElementById("fromDate")
+.addEventListener("change", applyFilter);
+
+document
+.getElementById("toDate")
+.addEventListener("change", applyFilter);
+
+document
+.getElementById("typeFilter")
+.addEventListener("change", applyFilter);
+
+document
+.getElementById("authorityFilter")
+.addEventListener("change", applyFilter);
+
+document
+.getElementById("statusFilter")
+.addEventListener("change", applyFilter);
+
+document
+.getElementById("conditionFilter")
+.addEventListener("change", applyFilter);
+
+document
+.getElementById("ketquaFilter")
+.addEventListener("change", applyFilter);
+
+document
+.getElementById("linhvucFilter")
+.addEventListener("change", applyFilter);
+
+document
+.getElementById("filterNguoiXuLy")
+.addEventListener("input", applyFilter);
+
+document
+.getElementById("filterSoanThao")
+.addEventListener("input", applyFilter);
+
+document
+.getElementById("fromNgayXuLy")
+.addEventListener("change", applyFilter);
+
+document
+.getElementById("toNgayXuLy")
+.addEventListener("change", applyFilter);
+
 }
 
 function openForm(){
@@ -3138,12 +3230,57 @@ td_congdan.focus();
 return;
 }
 
+// ===== KIỂM TRA SỐ NGƯỜI =====
+
+if(!td_songuoi.value.trim()){
+
+  alert("⚠ Vui lòng nhập Số người");
+
+  td_songuoi.focus();
+
+  return;
+}
+
+// phải là số
+if(isNaN(td_songuoi.value)){
+
+  alert("⚠ Số người phải là số");
+
+  td_songuoi.focus();
+
+  return;
+}
+
+// phải lớn hơn 0
+if(Number(td_songuoi.value) <= 0){
+
+  alert("⚠ Số người phải lớn hơn 0");
+
+  td_songuoi.focus();
+
+  return;
+}
+
 if(!td_noidung.value.trim()){
 alert("⚠ Vui lòng nhập Nội dung vụ việc");
 td_noidung.focus();
 return;
 
 }
+
+
+
+// ===== KIỂM TRA HƯỚNG XỬ LÝ =====
+
+if(!td_xuly.value){
+
+  alert("⚠ Vui lòng chọn Hướng xử lý");
+
+  td_xuly.focus();
+
+  return;
+}
+
 if(!td_ghichu.value.trim()){
 alert("⚠ Vui lòng nhập Nội dung ghi chú kết quả xử lý trong ngày");
 td_ghichu.focus();
@@ -3154,6 +3291,44 @@ let action = (editIndex === -1) ? "addTiepDan" : "updateTiepDan";
 
 let [day, m, y] = td_ngay.value.split("/");
 
+// ===== LẤY GIÁ TRỊ CÔNG CHỨC TIẾP =====
+
+let congChucValue = "";
+
+if(
+  document.getElementById("td_congchuc").value === "Khác"
+){
+if(
+  !document
+    .getElementById("td_congchuc_khac")
+    .value
+    .trim()
+){
+
+  alert("⚠ Vui lòng nhập tên công chức tiếp");
+
+  document
+    .getElementById("td_congchuc_khac")
+    .focus();
+
+  return;
+}
+
+  congChucValue =
+    document
+      .getElementById("td_congchuc_khac")
+      .value
+      .trim();
+
+}else{
+
+  congChucValue =
+    document
+      .getElementById("td_congchuc")
+      .value;
+
+}
+
 let data = {
 
   action: action,
@@ -3163,7 +3338,7 @@ let data = {
   username: currentUser,
 
   ngay: `${day}/${m}/${y}`, // 🔥 FIX CHÍNH Ở ĐÂY
-  congchuc: td_congchuc.options[td_congchuc.selectedIndex].text,
+  congchuc: congChucValue,
   phong: td_phong.value,
   congdan: td_congdan.value,
   cccd: td_cccd.value,
@@ -3785,8 +3960,60 @@ let m = parseInt(c.ngay.split("/")[1]);
 okMonth = m == month;
 }
 
+// ===== DANH SÁCH CÔNG CHỨC CỐ ĐỊNH =====
+
+const dsCongChucMacDinh = [
+
+  "Nguyễn Thị Nhi",
+
+  "Lâm Tô Trinh",
+
+  "Trịnh Thị Bích Phượng",
+
+  "Nguyễn Thế Long"
+
+];
+
+// ===== LỌC CÔNG CHỨC =====
+
 if(staff){
-  okStaff = c.congchuc === staff;
+
+  // chọn KHÁC
+  if(staff === "Khác"){
+
+    // chuẩn hóa text
+let tenCongChuc = (c.congchuc || "")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase()
+  .trim();
+
+// danh sách chuẩn hóa
+let dsChuanHoa =
+  dsCongChucMacDinh.map(x =>
+
+    x.normalize("NFD")
+     .replace(/[\u0300-\u036f]/g, "")
+     .toLowerCase()
+     .trim()
+
+  );
+
+// chỉ hiện người KHÔNG nằm trong danh sách
+okStaff =
+  !dsChuanHoa.includes(tenCongChuc);
+
+  }
+
+  // chọn tên cụ thể
+  else{
+
+    okStaff =
+      (c.congchuc || "").trim()
+      === staff;
+
+  }
+
 }
 
 if(key){
@@ -4186,60 +4413,97 @@ fetch(API_URL,{
 
 }
 
-function editUser(u){
+function editUser(username){
 
-if(currentRole !== "Admin"){
-  alert("Không có quyền");
-  return;
+  let u =
+    users[
+      username.trim().toLowerCase()
+    ];
+
+  if(!u){
+    alert("Không tìm thấy tài khoản");
+    return;
+  }
+
+  let name =
+    prompt("Họ tên:", u.fullname);
+
+  if(name === null) return;
+
+  let role =
+    prompt("Vai trò:", u.role);
+
+  if(role === null) return;
+
+  let pass =
+    prompt("Mật khẩu:", u.password);
+
+  if(pass === null) return;
+
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"editUser",
+      username:u.username,
+      fullname:name,
+      role:role,
+      password:pass
+    })
+  })
+  .then(res=>res.json())
+  .then(r=>{
+
+    if(r.success){
+
+      alert("Đã cập nhật");
+
+      loadUsers();
+
+    }else{
+
+      alert("Lỗi cập nhật");
+
+    }
+
+  });
+
 }
 
-let name = prompt(
-  "Họ tên:",
-  users[u].fullname
-);
+function togglePass(username){
 
-if(name===null) return;
+  let key =
+    username.trim().toLowerCase();
 
-let role = prompt(
-  "Vai trò:",
-  users[u].role
-);
+  let el =
+    document.getElementById(
+      "pass_" + username
+    );
 
-if(role===null) return;
+  // lấy user đúng
+  let user = users[key];
 
-let pass = prompt(
-  "Mật khẩu mới:",
-  users[u].pass
-);
+  // không có dữ liệu
+  if(!user){
+    alert("Không tìm thấy mật khẩu");
+    return;
+  }
 
-if(pass===null) return;
+  // đang ẩn
+  if(
+    el.innerText === "******" ||
+    el.innerText === "......"
+  ){
 
-fetch(API_URL,{
-  method:"POST",
-  body:JSON.stringify({
-    action:"editUser",
-    username:u,
-    fullname:name,
-    role:role,
-    password:pass
-  })
-})
-.then(res=>res.json())
-.then(data=>{
-
-  if(data.success){
-
-    alert("✅ Đã cập nhật");
-
-    loadUsers();
-
-  }else{
-
-    alert(data.message || "Không cập nhật được");
+    el.innerText = user.password;
 
   }
 
-});
+  // đang hiện
+  else{
+
+    el.innerText = "******";
+
+  }
 
 }
 
@@ -4259,42 +4523,94 @@ function applyRoleUI(){
 
 }
 
-function togglePass(u){
-
-  let el = document.getElementById("pass_"+u);
-
-  if(el.innerText === "••••••"){
-    el.innerText = users[u].pass;
-  }else{
-    el.innerText = "••••••";
-  }
-
-}
-
 
 function loadUsers(){
 
-  return fetch(API_URL + "?action=getUsers")
-  .then(res=>res.json())
-  .then(data=>{
+fetch(API_URL,{
+  method:"POST",
+  body:JSON.stringify({
+    action:"getUsers"
+  })
+})
+.then(res=>res.json())
+.then(data=>{
 
-    users = {};
+  let tbody =
+    document.getElementById("userTable");
 
-    data.forEach(u=>{ 
-      users[u.username.trim().toLowerCase()] = {
-        pass: u.password,
-        role: u.role,
-        fullname: u.fullname
-      };
-    });
+  tbody.innerHTML = "";
 
-    renderUsers();
+  users = {};
 
-    // 🔥 THÊM 2 DÒNG NÀY
-    loadNguoiXuLyFilter();
-    loadCongChucDropdown();
+  data.forEach((u,i)=>{
+
+    users[
+      u.username.trim().toLowerCase()
+    ] = u;
+
+   tbody.innerHTML += `
+<tr>
+
+  <td>${u.username}</td>
+
+  <td>${u.fullname}</td>
+
+  <td>${u.role}</td>
+
+  <td>
+
+<span id="pass_${u.username.trim().toLowerCase()}">
+******
+</span>
+
+<button
+class="btn-eye"
+onclick="togglePass('${u.username.trim().toLowerCase()}')"
+style="
+margin-left:5px;
+border:none;
+background:none;
+cursor:pointer;
+font-size:16px;
+">
+👁
+</button>
+
+</td>
+
+  <td>
+
+    <button
+      class="btn-edit"
+      onclick="editUser('${u.username}')">
+      Sửa
+    </button>
+
+    <button
+      class="btn-delete"
+      onclick="deleteUser('${u.username}')">
+      Xóa
+    </button>
+
+  </td>
+
+</tr>
+`;
 
   });
+
+});
+}
+
+function output(data){
+
+  return ContentService
+    .createTextOutput(
+      JSON.stringify(data)
+    )
+    .setMimeType(
+      ContentService.MimeType.JSON
+    );
 
 }
 
@@ -4796,14 +5112,126 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
       <div class="stats" id="statsBox"></div>
 
       <div class="search-bar">
-        <input id="searchInput" placeholder="🔍 Tìm mã HS, họ tên..." oninput="applyFilter()">
 
-        <input type="date" id="fromDate" placeholder="Từ ngày nhận đơn"onchange="applyFilter()">
+  <!-- Tìm kiếm -->
+  <input id="searchInput" placeholder="🔍 Tìm mã HS, họ tên..." oninput="applyFilter()">
+
+  <!-- Từ ngày đến ngày-->
+ <input type="date" id="fromDate" placeholder="Từ ngày nhận đơn"onchange="applyFilter()">
         <span class="date-arrow">→</span>
         <input type="date" id="toDate" placeholder="Đến ngày nhận đơn"onchange="applyFilter()">
 
-        <select id="monthFilter" onchange="applyFilter()">
-          <option value="">Tháng</option>
+  <!-- Điều kiện xử lý -->
+ <select id="conditionFilter" onchange="applyFilter()">
+          <option value="">Điều kiện xử lý</option>
+          <option>Đủ điều kiện xử lý</option>
+          <option>Không đủ điều kiện xử lý</option>
+        </select>
+
+  <!-- Thẩm quyền -->
+   <select id="authorityFilter" onchange="applyFilter()">
+          <option value="">Thẩm quyền giải quyết</option>
+          <option>Thuộc thẩm quyền giải quyết</option>
+          <option>Không thuộc thẩm quyền giải quyết</option>
+        </select>
+
+  <!-- Tình trạng -->
+  <select id="statusFilter" onchange="applyFilter()">
+          <option value="">Tình trạng</option>
+          <option>Đang xử lý</option>
+          <option>Đã xử lý</option>
+        </select>
+
+ 
+
+  <!-- Nút nâng cao -->
+  <button
+    type="button"
+    class="btn-report"
+    onclick="toggleAdvancedSearch()"
+  >
+    🔍 Nâng cao
+  </button>
+
+  <!-- Reset -->
+  <button class="btn-reset" onclick="resetFilter()">⟳ Reset</button>
+
+</div>
+
+<div
+  id="advancedSearch"
+  class="search-bar"
+  style="display:none; margin-top:10px;"
+>
+
+<!-- Loại đơn -->
+  <select id="typeFilter" onchange="applyFilter()">
+          <option value="">Loại đơn</option>
+          <option>Khiếu nại</option>
+          <option>Tố cáo</option>
+          <option>Phản ánh - Kiến nghị</option>
+          <option>Hòa giải</option>
+          <option>Khác</option>
+        </select>
+
+ <!-- Lĩnh vực -->
+  <select id="linhvucFilter" onchange="applyFilter()">
+        <option value="">Lĩnh vực</option>
+        <option>Lao động - Việc làm</option>
+        <option>Công chức - Viên chức</option>
+        <option>Người có công</option>
+        <option>CCHC&CQĐP</option>
+        <option>Tổ chức - Biên chế</option>
+        <option>Thi đua - Khen thưởng</option>
+        <option>Đất đai</option>
+        <option>Khác</option>
+        </select>
+
+
+  <!-- Kết quả -->
+  <select id="ketquaFilter" onchange="applyFilter()">
+        <option value="">Kết quả xử lý</option>
+        <option value="Phúc đáp">Phúc đáp</option>
+        <option value="Hướng dẫn">Hướng dẫn</option>
+        <option value="Chuyển đơn">Chuyển đơn</option>
+        <option value="Báo cáo">Báo cáo</option>
+        <option value="Lưu đơn">Lưu đơn</option>
+        <option value="Khác">Khác</option>
+        </select>
+
+  <!-- Từ ngày hoàn thành đến ngày hoàn thành -->
+  <input type="text"
+       id="fromNgayXuLy"
+       placeholder="Từ ngày hoàn thành"
+       onchange="applyFilter()">
+
+<span class="date-arrow">→</span>
+
+<input type="text"
+       id="toNgayXuLy"
+       placeholder="Đến ngày hoàn thành"
+       onchange="applyFilter()">
+
+  <!-- Người xử lý -->
+  <select id="filterNguoiXuLy" onchange="applyFilter()">
+          <option value="">Người xử lý</option>
+          <option>Nguyễn Thị Nhi</option>
+          <option>Lâm Tố Trinh</option>
+          <option>Trịnh Thị Bích Phượng</option>
+          <option>Nguyễn Thế Long</option>
+        </select>
+
+  <!-- Người tham mưu -->
+ <input
+  type="text"
+  id="filterSoanThao"
+  class="form-control"
+  placeholder="Tìm người tham mưu..."
+>
+
+ <!-- Tìm theo tháng-->
+  <select id="monthFilter" onchange="applyFilter()">
+          <option value="">Tìm theo tháng</option>
           <option value="1">Tháng 1</option>
           <option value="2">Tháng 2</option>
           <option value="3">Tháng 3</option>
@@ -4818,84 +5246,8 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
           <option value="12">Tháng 12</option>
         </select>
 
-        <select id="typeFilter" onchange="applyFilter()">
-          <option value="">Loại đơn</option>
-          <option>Khiếu nại</option>
-          <option>Tố cáo</option>
-          <option>Phản ánh - Kiến nghị</option>
-          <option>Hòa giải</option>
-          <option>Khác</option>
-        </select>
 
-        <select id="authorityFilter" onchange="applyFilter()">
-          <option value="">Thẩm quyền</option>
-          <option>Thuộc thẩm quyền giải quyết</option>
-          <option>Không thuộc thẩm quyền giải quyết</option>
-        </select>
-
-        <select id="conditionFilter" onchange="applyFilter()">
-          <option value="">Điều kiện xử lý</option>
-          <option>Đủ điều kiện xử lý</option>
-          <option>Không đủ điều kiện xử lý</option>
-        </select>
-
-        <select id="statusFilter" onchange="applyFilter()">
-          <option value="">Tình trạng</option>
-          <option>Đang xử lý</option>
-          <option>Đã xử lý</option>
-        </select>
-        
-        <select id="ketquaFilter" onchange="applyFilter()">
-        <option value="">Kết quả xử lý</option>
-        <option value="Phúc đáp">Phúc đáp</option>
-        <option value="Hướng dẫn">Hướng dẫn</option>
-        <option value="Chuyển đơn">Chuyển đơn</option>
-        <option value="Báo cáo">Báo cáo</option>
-        <option value="Lưu đơn">Lưu đơn</option>
-        <option value="Khác">Khác</option>
-        </select>
-
-        <select id="linhvucFilter" onchange="applyFilter()">
-        <option value="">Lĩnh vực</option>
-        <option>Lao động - Việc làm</option>
-        <option>Công chức - Viên chức</option>
-        <option>Người có công</option>
-        <option>CCHC&CQĐP</option>
-        <option>Tổ chức - Biên chế</option>
-        <option>Thi đua - Khen thưởng</option>
-        <option>Đất đai</option>
-        <option>Khác</option>
-        </select>
-
-        <select id="filterNguoiXuLy" onchange="applyFilter()">
-          <option value="">Người xử lý</option>
-          <option>Nguyễn Thị Nhi</option>
-          <option>Lâm Tố Trinh</option>
-          <option>Trịnh Thị Bích Phượng</option>
-          <option>Nguyễn Thế Long</option>
-        </select>
-
-        <input
-  type="text"
-  id="filterSoanThao"
-  class="form-control"
-  placeholder="Tìm người tham mưu..."
->
-
-        <input type="text"
-       id="fromNgayXuLy"
-       placeholder="Từ ngày hoàn thành"
-       onchange="applyFilter()">
-
-<span class="date-arrow">→</span>
-
-<input type="text"
-       id="toNgayXuLy"
-       placeholder="Đến ngày hoàn thành"
-       onchange="applyFilter()">
-
-        <button class="btn-reset" onclick="resetFilter()">⟳ Reset</button>
-      </div>
+</div>
     </div>
 
     <div class="table-toolbar">
@@ -5022,6 +5374,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
           <option>Lâm Tố Trinh</option>
           <option>Trịnh Thị Bích Phượng</option>
           <option>Nguyễn Thế Long</option>
+          <option>Khác</option>
         </select>
 
         <select id="monthFilterTiepDan" onchange="applyFilterTiepDan()">
@@ -5354,13 +5707,24 @@ style="display:none;margin-top:5px;"
 
 <div class="form-group">
 <label>Công chức tiếp <span style="color:red">*</span></label>
-<select id="td_congchuc">
+<select
+  id="td_congchuc"
+  onchange="toggleCongChucKhac()"
+>
 <option value="">-- Chọn công chức tiếp --</option>
 <option value="Nguyễn Thị Nhi">Nguyễn Thị Nhi</option>
 <option value="Lâm Tố Trinh">Lâm Tố Trinh</option>
 <option value="Trịnh Thị Bích Phượng">Trịnh Thị Bích Phượng</option>
 <option value="Nguyễn Thế Long">Nguyễn Thế Long</option>
+<option value="Khác">Khác</option>
 </select>
+<!-- THÊM Ô NHẬP NÀY NGAY BÊN DƯỚI -->
+<input
+  type="text"
+  id="td_congchuc_khac"
+  placeholder="Nhập tên công chức tiếp..."
+  style="display:none;margin-top:8px;"
+>
 </div>
 
 <div class="form-group form-full">
@@ -5389,7 +5753,7 @@ style="display:none;margin-top:5px;"
 </div>
 
 <div class="form-group">
-<label>Số người</label>
+<label>Số người<span style="color:red">*</span></label>
 <input id="td_songuoi">
 </div>
 
@@ -5427,7 +5791,7 @@ style="display:none;margin-top:5px;"
 </div>
 
 <div class="form-group">
-<label>Hướng xử lý</label>
+<label>Hướng xử lý<span style="color:red">*</span></label>
 <select id="td_xuly">
 <option value="">-- Chọn --</option>
 <option>Hướng dẫn chung</option>
