@@ -41,6 +41,156 @@ td button:hover{
   opacity: 0.85;
 }
 
+.btn-create-report{
+
+background:#ffe082;
+
+color:#7a5200;
+
+height:42px;
+
+padding:0 18px;
+
+border:none;
+
+border-radius:10px;
+
+font-weight:600;
+
+cursor:pointer;
+
+box-shadow:
+0 2px 8px rgba(255,224,130,0.45);
+
+transition:0.2s;
+
+}
+
+.btn-create-report:hover{
+
+background:#ffd54f;
+
+transform:translateY(-1px);
+
+}
+
+.btn-print-report{
+
+background:#90caf9;
+
+color:#0d47a1;
+
+height:42px;
+
+padding:0 18px;
+
+border:none;
+
+border-radius:10px;
+
+font-weight:600;
+
+cursor:pointer;
+
+box-shadow:
+0 2px 8px rgba(144,202,249,0.45);
+
+transition:0.2s;
+
+}
+
+.btn-excel-report{
+
+background:#81c784;
+
+color:#1b5e20;
+
+height:42px;
+
+padding:0 18px;
+
+border:none;
+
+border-radius:10px;
+
+font-weight:600;
+
+cursor:pointer;
+
+box-shadow:
+0 2px 8px rgba(129,199,132,0.45);
+
+transition:0.2s;
+
+}
+
+.btn-excel-report:hover{
+
+background:#66bb6a;
+
+transform:translateY(-1px);
+
+}
+
+.btn-print-report:hover{
+
+background:#64b5f6;
+
+transform:translateY(-1px);
+
+}
+
+.close-report-btn{
+
+background:#ef9a9a;
+
+color:#7f0000;
+
+width:40px;
+
+height:40px;
+
+border:none;
+
+border-radius:10px;
+
+font-size:20px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+box-shadow:
+0 2px 8px rgba(239,154,154,0.4);
+
+transition:0.2s;
+
+flex-shrink:0;
+
+}
+
+.close-report-btn:hover{
+
+background:#e57373;
+
+transform:translateY(-1px);
+
+}
+
+.close-report-btn:hover{
+
+background:#e57373;
+
+transform:translateY(-1px);
+
+}
+
 .btn-report{
   display: inline-flex;
   align-items: center;
@@ -780,6 +930,381 @@ max-height:90%;
 overflow:auto;
 box-shadow:0 25px 60px rgba(0,0,0,0.35);
 animation:fadeIn .25s ease;
+
+/* =========================
+   BÁO CÁO TIẾP DÂN ĐẸP
+========================= */
+
+.report-modal{
+
+  width:95%;
+  max-width:1500px;
+
+  height:92vh;
+
+  padding:0;
+
+  overflow:hidden;
+
+  border-radius:18px;
+
+  background:#f4f6f9;
+
+}
+
+/* HEADER */
+
+.report-header{
+
+  background:linear-gradient(135deg,#a51d2d,#c62828);
+
+  color:white;
+
+  padding:22px 28px;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+}
+
+.report-header h2{
+
+  margin:0;
+
+  font-size:30px;
+
+  font-weight:700;
+
+}
+
+.report-header p{
+
+  margin:5px 0 0;
+
+  opacity:0.9;
+
+  font-size:14px;
+
+}
+
+/* BODY */
+
+.report-body{
+
+  padding:22px;
+
+  overflow:auto;
+
+  height:calc(92vh - 90px);
+
+}
+
+/* TOOLBAR */
+
+.report-toolbar{
+
+  background:white;
+
+  border-radius:14px;
+
+  padding:18px;
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:15px;
+
+  align-items:end;
+
+  margin-bottom:18px;
+
+  box-shadow:0 2px 10px rgba(0,0,0,0.06);
+
+}
+
+.report-filter{
+
+  display:flex;
+
+  flex-direction:column;
+
+  min-width:180px;
+
+}
+
+.report-filter label{
+
+  font-size:13px;
+
+  font-weight:600;
+
+  margin-bottom:6px;
+
+  color:#444;
+
+}
+
+.report-filter input{
+
+  height:40px;
+
+  border:1px solid #ddd;
+
+  border-radius:8px;
+
+  padding:0 12px;
+
+  background:#fafafa;
+
+}
+
+/* BUTTON */
+
+.btn-report-create{
+
+  height:42px;
+
+  padding:0 22px;
+
+  border:none;
+
+  border-radius:10px;
+
+  background:#198754;
+
+  color:white;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:0.2s;
+
+}
+
+.btn-report-create:hover{
+
+  transform:translateY(-1px);
+
+  opacity:0.92;
+
+}
+
+.btn-report-print{
+
+  background:#0d6efd;
+}
+
+/* THỐNG KÊ */
+
+.report-summary{
+
+  display:grid;
+
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+  gap:15px;
+
+  margin-bottom:18px;
+
+}
+
+.summary-card{
+
+  background:white;
+
+  border-radius:14px;
+
+  padding:18px;
+
+  box-shadow:0 2px 10px rgba(0,0,0,0.06);
+
+  border-left:5px solid #c62828;
+
+}
+
+.summary-card h4{
+
+  margin:0 0 10px;
+
+  font-size:14px;
+
+  color:#666;
+
+}
+
+.summary-card span{
+
+  font-size:28px;
+
+  font-weight:700;
+
+  color:#111;
+
+}
+
+/* TABLE */
+
+.report-table-wrap{
+
+  background:white;
+
+  border-radius:14px;
+
+  overflow:auto;
+
+  box-shadow:0 2px 10px rgba(0,0,0,0.06);
+
+}
+
+.report-table{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+  min-width:1600px;
+
+}
+
+.report-table th{
+
+  background:#fbe9eb;
+
+  color:#7a1522;
+
+  font-size:13px;
+
+  font-weight:700;
+
+  padding:12px 10px;
+
+  border:1px solid #ead1d5;
+
+  text-align:center;
+
+  position:sticky;
+
+  top:0;
+
+  z-index:5;
+
+}
+
+.report-table td{
+
+  border:1px solid #eee;
+
+  padding:10px;
+
+  font-size:13px;
+
+  vertical-align:top;
+
+  line-height:1.5;
+
+}
+
+.report-table tbody tr:nth-child(even){
+
+  background:#fafafa;
+
+}
+
+.report-table tbody tr:hover{
+
+  background:#eef5ff;
+
+}
+
+/* CỘT */
+
+.report-table td:nth-child(1),
+.report-table td:nth-child(2){
+
+  text-align:center;
+
+  font-weight:600;
+
+}
+
+/* BADGE */
+
+.badge-khong{
+
+  background:#f1f3f5;
+
+  color:#666;
+
+  padding:3px 8px;
+
+  border-radius:20px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+}
+
+.badge-co{
+
+  background:#d4edda;
+
+  color:#155724;
+
+  padding:3px 8px;
+
+  border-radius:20px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+}
+
+/* CLOSE */
+
+.report-close{
+
+  background:white;
+
+  color:#c62828;
+
+  border:none;
+
+  border-radius:8px;
+
+  width:40px;
+
+  height:40px;
+
+  font-size:20px;
+
+  cursor:pointer;
+
+  font-weight:bold;
+
+}
+
+/* SCROLLBAR */
+
+.report-table-wrap::-webkit-scrollbar{
+
+  height:10px;
+
+}
+
+.report-table-wrap::-webkit-scrollbar-thumb{
+
+  background:#ccc;
+
+  border-radius:10px;
+
+}
 }
 
 @keyframes fadeIn{
@@ -2877,6 +3402,14 @@ document.getElementById("dateTimeBox").innerHTML =
 }
 
 window.onload = function(){
+
+flatpickr("#bc_from", {
+  dateFormat: "d/m/Y"
+});
+
+flatpickr("#bc_to", {
+  dateFormat: "d/m/Y"
+});
 // 🔥 THÊM ĐOẠN NÀY
 flatpickr("#td_ngay", {
   dateFormat: "d/m/Y"
@@ -3050,6 +3583,7 @@ if(idleTime >= RELOAD_TIME){
 }, 60000); // kiểm tra mỗi 1 phút
 
 }
+
 
 function toggleForm(){
 
@@ -5026,6 +5560,403 @@ if(value === "Khác"){
 }
 
 }
+
+function openBaoCaoTiepDan(){
+
+  document.getElementById(
+    "baoCaoTiepDanModal"
+  ).style.display = "block";
+
+}
+
+function closeBaoCaoTiepDan(){
+
+  document.getElementById(
+    "baoCaoTiepDanModal"
+  ).style.display = "none";
+
+}
+
+function generateBaoCaoTiepDan(){
+
+let from =
+document.getElementById("bc_from").value;
+
+let to =
+document.getElementById("bc_to").value;
+
+if(!from || !to){
+
+  alert("⚠ Chọn đầy đủ ngày");
+
+  return;
+}
+
+
+// =========================
+// DANH SÁCH NGÀY LỄ
+// =========================
+
+const holidays = [
+
+  "01/01",
+  "30/04",
+  "01/05",
+  "02/09"
+
+];
+
+
+// =========================
+// CONVERT DATE
+// =========================
+
+function parseDateVN(str){
+
+  let [d,m,y] = str.split("/");
+
+  return new Date(y,m-1,d);
+
+}
+
+let start = parseDateVN(from);
+
+let end = parseDateVN(to);
+
+
+// =========================
+// HTML
+// =========================
+
+let html = `
+
+
+<div class="table-scroll">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>STT</th>
+
+<th>Ngày tiếp</th>
+
+<th>Họ tên - địa chỉ</th>
+
+<th>CCCD</th>
+
+<th>Nội dung</th>
+
+<th>Số người</th>
+
+<th>Cơ quan giải quyết</th>
+
+<th>Thụ lý để giải quyết</th>
+
+<th>Trả lại đơn và hướng dẫn</th>
+
+<th>Chuyển đơn đến cơ quan, tổ chức, đơn vị có thẩm quyền</th>
+
+<th>Theo dõi kết quả giải quyết</th>
+
+<th>Người tiếp</th>
+
+<th>Ghi chú</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+`;
+
+let stt = 1;
+
+
+// =========================
+// DUYỆT TỪNG NGÀY
+// =========================
+
+for(
+  let d = new Date(start);
+  d <= end;
+  d.setDate(d.getDate()+1)
+){
+
+  let day =
+    String(d.getDate()).padStart(2,'0');
+
+  let month =
+    String(d.getMonth()+1).padStart(2,'0');
+
+  let year =
+    d.getFullYear();
+
+  let ngay =
+    `${day}/${month}/${year}`;
+
+
+  // =========================
+  // BỎ THỨ 7/CN
+  // =========================
+
+  let thu = d.getDay();
+
+  if(thu === 0 || thu === 6){
+    continue;
+  }
+
+
+  // =========================
+  // BỎ NGÀY LỄ
+  // =========================
+
+  let mmdd = `${day}/${month}`;
+
+  if(holidays.includes(mmdd)){
+    continue;
+  }
+
+
+  // =========================
+  // LỌC DỮ LIỆU
+  // =========================
+
+  let list =
+    tiepDanList.filter(x=>{
+
+      return x.ngay === ngay;
+
+    });
+
+
+  // =========================
+  // KHÔNG CÓ TIẾP DÂN
+  // =========================
+
+  if(list.length === 0){
+
+    html += `
+
+    <tr>
+
+<td>${stt++}</td>
+
+<td>${ngay}</td>
+
+<td>Không phát sinh công dân đến làm việc</td>
+
+<td>Không</td>
+
+<td>Không phát sinh</td>
+
+<td>Không</td>
+
+<td>Không</td>
+
+<td>Không</td>
+
+<td>Không</td>
+
+<td>Không</td>
+
+<td>Không phát sinh</td>
+
+<td></td>
+
+<td></td>
+
+</tr>
+
+    `;
+
+  }
+
+
+  // =========================
+  // CÓ TIẾP DÂN
+  // =========================
+
+  else{
+
+    list.forEach(item=>{
+
+     html += `
+
+<tr>
+
+<td>${stt++}</td>
+
+<td>${item.ngay || ""}</td>
+
+<td>${item.congdan || ""}</td>
+
+<td>${item.cccd || ""}</td>
+
+<td>${item.noidung || ""}</td>
+
+<td>${item.songuoi || ""}</td>
+
+<td>${item.coquan || ""}</td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+
+<td>${item.xuly || ""}</td>
+
+<td>${item.congchuc || ""}</td>
+
+<td>${item.ghichu || ""}</td>
+
+</tr>
+
+`;
+
+    });
+
+  }
+
+}
+
+html += `
+</tbody>
+</table>
+</div>
+`;
+
+document.getElementById(
+  "baoCaoTiepDanContent"
+).innerHTML = html;
+
+}
+function printBaoCaoTiepDan(){
+
+  let content =
+    document.getElementById(
+      "baoCaoTiepDanContent"
+    ).innerHTML;
+
+  let win = window.open("");
+
+  win.document.write(`
+
+    <html>
+
+    <head>
+
+    <title>Báo cáo tiếp công dân</title>
+
+    <style>
+
+      table{
+        width:100%;
+        border-collapse:collapse;
+        font-size:12px;
+      }
+
+      th,td{
+        border:1px solid #000;
+        padding:5px;
+      }
+
+      th{
+        background:#eee;
+      }
+
+    </style>
+
+    </head>
+
+    <body>
+
+    <h2 style="text-align:center;">
+      BÁO CÁO TIẾP CÔNG DÂN
+    </h2>
+
+    ${content}
+
+    </body>
+
+    </html>
+
+  `);
+
+  win.document.close();
+
+  win.print();
+
+}
+
+function exportBaoCaoExcel(){
+
+let table =
+document.querySelector(
+"#baoCaoTiepDanContent table"
+);
+
+if(!table){
+
+alert("⚠ Chưa có dữ liệu báo cáo");
+
+return;
+}
+
+// tạo workbook
+let wb = XLSX.utils.book_new();
+
+// chuyển table thành sheet
+let ws =
+XLSX.utils.table_to_sheet(table);
+
+// chỉnh độ rộng cột
+ws["!cols"] = [
+
+{wch:6},
+{wch:12},
+{wch:35},
+{wch:18},
+{wch:45},
+{wch:15},
+{wch:18},
+{wch:18},
+{wch:22},
+{wch:20},
+{wch:18},
+{wch:35}
+
+];
+
+// thêm sheet
+XLSX.utils.book_append_sheet(
+wb,
+ws,
+"Bao cao tiep dan"
+);
+
+// tên file
+let tuNgay =
+document.getElementById("bc_from").value;
+
+let denNgay =
+document.getElementById("bc_to").value;
+
+let fileName =
+`Bao_cao_tiep_dan_${tuNgay}_${denNgay}.xlsx`;
+
+// xuất file
+XLSX.writeFile(
+wb,
+fileName
+);
+
+}
+
 </script>
 </head>
 <body>
@@ -5404,6 +6335,12 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
         
 
         <button class="btn-reset" onclick="resetFilterTiepDan()">⟲ Reset</button>
+        <button
+  class="btn-report"
+  onclick="openBaoCaoTiepDan()"
+>
+📄 Báo cáo tiếp công dân
+</button>
       </div>
     </div>
 
@@ -5411,6 +6348,8 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
       <h3>Danh sách tiếp công dân</h3>
       <button class="btn-add" onclick="newTiepDan()">➕ Nhập mới tiếp công dân</button>
     </div>
+
+
 
     <div class="table-scroll">
       <table>
@@ -6006,6 +6945,110 @@ style="background:#198754;color:white;border:none;padding:7px 16px;border-radius
     </div>
 
   </div>
+</div>
+
+<!-- ========================= -->
+<!-- POPUP BÁO CÁO TIẾP DÂN -->
+<!-- ========================= -->
+
+<div
+  id="baoCaoTiepDanModal"
+  class="modal"
+>
+
+<div class="modal-content report-modal">
+
+<!-- HEADER -->
+
+<div class="report-top">
+
+<div class="report-title-box">
+
+<button
+class="close-report-btn"
+onclick="closeBaoCaoTiepDan()"
+>
+✕
+</button>
+<div>
+
+<div class="report-title">
+📄 BÁO CÁO TIẾP CÔNG DÂN
+</div>
+
+
+
+</div>
+
+</div>
+
+
+
+</div>
+
+<!-- TOOLBAR -->
+
+<div class="report-filter-box">
+
+<div class="filter-group">
+
+<label>Từ ngày</label>
+
+<input
+type="text"
+id="bc_from"
+>
+
+</div>
+
+<div class="filter-group">
+
+<label>Đến ngày</label>
+
+<input
+type="text"
+id="bc_to"
+>
+
+</div>
+
+<div class="report-actions">
+
+<button
+class="btn-create-report"
+onclick="generateBaoCaoTiepDan()"
+>
+📑 Tạo báo cáo
+</button>
+
+<button
+class="btn-print-report"
+onclick="printBaoCaoTiepDan()"
+>
+🖨 In báo cáo
+</button>
+<button
+class="btn-excel-report"
+onclick="exportBaoCaoExcel()"
+>
+📊 Xuất Excel
+</button>
+
+
+</div>
+
+</div>
+
+
+
+<!-- BẢNG -->
+
+<div class="report-table-wrap">
+
+<div id="baoCaoTiepDanContent"></div>
+
+</div>
+
 </div>
 
 </body>
