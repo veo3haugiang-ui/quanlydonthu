@@ -1806,7 +1806,7 @@ select:disabled{
 </style>
 
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
 <script>
 
 function toggleCongChucKhac(){
@@ -1877,6 +1877,7 @@ let currentPageTiepDan = 1;
 let rowsPerPageTiepDan = 10;
 let tiepDanList = [];
 let filteredTiepDanList = [];
+let filteredBaoCao = [];
 
 function showPage(page){
 
@@ -4245,6 +4246,7 @@ function displayBaoCaoTuan(){
       buttons += `<button onclick="editBaoCaoTuan(${i})">Sửa</button>`;
       buttons += `<button onclick="deleteBaoCaoTuan('${c.id}')">Xóa</button>`;
     }
+    
 
     tbody.innerHTML += `
       <tr>
@@ -5571,9 +5573,33 @@ function openBaoCaoTiepDan(){
 
 function closeBaoCaoTiepDan(){
 
-  document.getElementById(
-    "baoCaoTiepDanModal"
-  ).style.display = "none";
+// đóng popup
+document.getElementById(
+"baoCaoTiepDanModal"
+).style.display = "none";
+
+// reset ngày
+document.getElementById("bc_from").value = "";
+
+document.getElementById("bc_to").value = "";
+
+// xóa bảng báo cáo
+document.getElementById(
+"baoCaoTiepDanContent"
+).innerHTML = "";
+
+// reset thống kê
+document.getElementById(
+"sumNgay"
+).innerText = "0";
+
+document.getElementById(
+"sumTiep"
+).innerText = "0";
+
+document.getElementById(
+"sumKhong"
+).innerText = "0";
 
 }
 
@@ -5830,6 +5856,71 @@ html += `
 </div>
 `;
 
+// LƯU DỮ LIỆU BÁO CÁO
+filteredBaoCao = [];
+
+// duyệt lại dữ liệu theo ngày
+for(
+  let d = new Date(start);
+  d <= end;
+  d.setDate(d.getDate()+1)
+){
+
+  let day =
+    String(d.getDate()).padStart(2,'0');
+
+  let month =
+    String(d.getMonth()+1).padStart(2,'0');
+
+  let year =
+    d.getFullYear();
+
+  let ngay =
+    `${day}/${month}/${year}`;
+
+  let thu = d.getDay();
+
+  if(thu === 0 || thu === 6){
+    continue;
+  }
+
+  let mmdd = `${day}/${month}`;
+
+  if(holidays.includes(mmdd)){
+    continue;
+  }
+
+  let list =
+    tiepDanList.filter(x=>{
+
+      return x.ngay === ngay;
+
+    });
+
+  if(list.length === 0){
+
+    filteredBaoCao.push({
+
+      ngay: ngay,
+      congdan: "Không phát sinh công dân đến làm việc",
+      cccd: "Không",
+      noidung: "Không phát sinh",
+      songuoi: "Không",
+      coquan: "Không",
+      xuly: "Không phát sinh",
+      congchuc: "",
+      ghichu: ""
+
+    });
+
+  }else{
+
+    filteredBaoCao.push(...list);
+
+  }
+
+}
+
 document.getElementById(
   "baoCaoTiepDanContent"
 ).innerHTML = html;
@@ -5895,64 +5986,591 @@ function printBaoCaoTiepDan(){
 
 function exportBaoCaoExcel(){
 
-let table =
-document.querySelector(
-"#baoCaoTiepDanContent table"
-);
-
-if(!table){
+if(filteredBaoCao.length === 0){
 
 alert("⚠ Chưa có dữ liệu báo cáo");
 
 return;
+
 }
 
-// tạo workbook
 let wb = XLSX.utils.book_new();
 
-// chuyển table thành sheet
-let ws =
-XLSX.utils.table_to_sheet(table);
+let data = [];
 
-// chỉnh độ rộng cột
-ws["!cols"] = [
 
-{wch:6},
-{wch:12},
-{wch:35},
-{wch:18},
-{wch:45},
-{wch:15},
-{wch:18},
-{wch:18},
-{wch:22},
-{wch:20},
-{wch:18},
-{wch:35}
+// =========================
+// HEADER
+// =========================
+
+data.push([
+"",
+"UBND THÀNH PHỐ CẦN THƠ",
+"",
+"",
+"",
+"",
+"",
+"CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"
+]);
+
+data.push([
+"",
+"SỞ NỘI VỤ",
+"",
+"",
+"",
+"",
+"",
+"Độc lập - Tự do - Hạnh phúc"
+]);
+
+data.push([]);
+
+let from =
+document.getElementById("bc_from").value;
+
+let [d,m,y] = from.split("/");
+
+data.push([
+"",
+"",
+"",
+`SỔ TIẾP CÔNG DÂN THÁNG ${m} NĂM ${y}`
+]);
+
+data.push([]);
+
+
+// =========================
+// HEADER TABLE
+// =========================
+
+data.push([
+
+"STT",
+
+"Ngày tiếp",
+
+"Họ và tên - địa chỉ",
+
+"CMND/Hộ chiếu của công dân",
+
+"Nội dung vụ việc",
+
+"Phân loại đơn/số người",
+
+"Cơ quan đã giải quyết",
+
+"Hướng xử lý",
+
+"",
+
+"",
+
+"Theo dõi kết quả giải quyết",
+
+"Ký tên",
+
+"Người tiếp",
+
+"Ghi chú (Nội dung xử lý)"
+
+]);
+
+data.push([
+
+"",
+
+"",
+
+"",
+
+"",
+
+"",
+
+"",
+
+"",
+
+"Thụ lý để giải quyết",
+
+"Trả lại đơn và hướng dẫn",
+
+"Chuyển đơn đến cơ quan, tổ chức đơn vị có thẩm quyền",
+
+"",
+
+"",
+
+"",
+
+""
+
+]);
+
+
+// =========================
+// DATA
+// =========================
+
+filteredBaoCao.forEach((c,index)=>{
+
+data.push([
+
+index + 1,
+
+c.ngay || "",
+
+c.congdan || "",
+
+c.cccd || "",
+
+c.noidung || "",
+
+c.songuoi || "",
+
+c.coquan || "",
+
+c.xuly === "Thụ lý để giải quyết"
+? "✓" : "Không",
+
+c.xuly === "Trả lại đơn và hướng dẫn"
+? "✓" : "Không",
+
+c.xuly === "Chuyển đơn"
+? "✓" : "Không",
+
+c.theodoi || "",
+
+"",
+
+c.congchuc || "",
+
+c.ghichu || ""
+
+]);
+
+});
+
+
+// =========================
+// TẠO SHEET
+// =========================
+
+let ws = XLSX.utils.aoa_to_sheet(data);
+
+
+// =========================
+// MERGE
+// =========================
+
+ws["!merges"] = [
+
+{
+s:{r:0,c:1},
+e:{r:0,c:4}
+},
+
+{
+s:{r:0,c:7},
+e:{r:0,c:12}
+},
+
+{
+s:{r:1,c:1},
+e:{r:1,c:4}
+},
+
+{
+s:{r:1,c:7},
+e:{r:1,c:12}
+},
+
+{
+s:{r:3,c:3},
+e:{r:3,c:9}
+},
+
+// HƯỚNG XỬ LÝ
+{
+s:{r:5,c:7},
+e:{r:5,c:9}
+},
+
+// merge dọc
+{
+s:{r:5,c:0},
+e:{r:6,c:0}
+},
+
+{
+s:{r:5,c:1},
+e:{r:6,c:1}
+},
+
+{
+s:{r:5,c:2},
+e:{r:6,c:2}
+},
+
+{
+s:{r:5,c:3},
+e:{r:6,c:3}
+},
+
+{
+s:{r:5,c:4},
+e:{r:6,c:4}
+},
+
+{
+s:{r:5,c:5},
+e:{r:6,c:5}
+},
+
+{
+s:{r:5,c:6},
+e:{r:6,c:6}
+},
+
+{
+s:{r:5,c:10},
+e:{r:6,c:10}
+},
+
+{
+s:{r:5,c:11},
+e:{r:6,c:11}
+},
+
+{
+s:{r:5,c:12},
+e:{r:6,c:12}
+},
+
+{
+s:{r:5,c:13},
+e:{r:6,c:13}
+}
 
 ];
 
-// thêm sheet
+
+// =========================
+// WIDTH
+// =========================
+
+ws["!cols"] = [
+
+{wch:6},   // STT
+{wch:14},  // Ngày
+{wch:40},  // Họ tên
+{wch:22},  // CCCD
+{wch:45},  // Nội dung
+{wch:18},  // Phân loại
+{wch:18},  // CQ giải quyết
+{wch:15},  // Thụ lý
+{wch:18},  // Trả lại
+{wch:28},  // Chuyển đơn
+{wch:20},  // Theo dõi
+{wch:10},  // Ký tên
+{wch:28},  // Người tiếp
+{wch:40}   // Ghi chú
+
+];
+
+
+// =========================
+// ROW HEIGHT
+// =========================
+
+ws["!rows"] = [
+
+{hpx:28},
+{hpx:28},
+{hpx:15},
+{hpx:38},
+{hpx:10},
+
+{hpx:38},
+{hpx:65}
+
+];
+
+for(let i=7;i<data.length;i++){
+
+ws["!rows"][i] = {hpx:55};
+
+}
+
+
+// =========================
+// STYLE
+// =========================
+
+function setStyle(cell, type="normal"){
+
+if(!ws[cell]) return;
+
+let style = {
+
+font:{
+name:"Times New Roman",
+sz:12
+},
+
+alignment:{
+vertical:"center",
+horizontal:"center",
+wrapText:true
+},
+
+border:{
+top:{style:"thin", color:{rgb:"000000"}},
+bottom:{style:"thin", color:{rgb:"000000"}},
+left:{style:"thin", color:{rgb:"000000"}},
+right:{style:"thin", color:{rgb:"000000"}}
+}
+
+};
+
+
+// ======================
+// HEADER CƠ QUAN
+// ======================
+
+if(type === "header"){
+
+style.font = {
+name:"Times New Roman",
+bold:true,
+sz:14
+};
+
+style.alignment = {
+horizontal:"center",
+vertical:"center"
+};
+
+}
+
+
+// ======================
+// TITLE
+// ======================
+
+if(type === "title"){
+
+style.font = {
+name:"Times New Roman",
+bold:true,
+sz:16
+};
+
+style.alignment = {
+horizontal:"center",
+vertical:"center"
+};
+
+}
+
+
+// ======================
+// TABLE HEADER
+// ======================
+
+if(type === "tableHeader"){
+
+style.font = {
+name:"Times New Roman",
+bold:true,
+sz:12
+};
+
+style.fill = {
+fgColor:{rgb:"D9D9D9"}
+};
+
+style.alignment = {
+horizontal:"center",
+vertical:"center",
+wrapText:true
+};
+
+}
+
+
+// ======================
+// CONTENT LEFT
+// ======================
+
+if(type === "left"){
+
+style.alignment = {
+horizontal:"left",
+vertical:"center",
+wrapText:true
+};
+
+}
+
+ws[cell].s = style;
+
+}
+
+
+// ======================
+// STYLE TOÀN BỘ
+// ======================
+
+Object.keys(ws).forEach(cell=>{
+
+if(cell[0] === "!") return;
+
+setStyle(cell);
+
+});
+
+
+// ======================
+// HEADER
+// ======================
+
+["B1","H1","B2","H2"].forEach(c=>{
+
+setStyle(c,"header");
+
+});
+
+
+// ======================
+// TITLE
+// ======================
+
+setStyle("D4","title");
+
+
+// ======================
+// TABLE HEADER
+// ======================
+
+for(let c=0;c<=13;c++){
+
+let cell1 =
+XLSX.utils.encode_cell({r:5,c});
+
+let cell2 =
+XLSX.utils.encode_cell({r:6,c});
+
+setStyle(cell1,"tableHeader");
+setStyle(cell2,"tableHeader");
+
+}
+
+
+// ======================
+// CĂN TRÁI CÁC CỘT NỘI DUNG
+// ======================
+
+for(let r=7;r<data.length;r++){
+
+["C","E","N"].forEach(col=>{
+
+setStyle(col + (r+1),"left");
+
+});
+
+}
+
+
+// title lớn
+["B1","H1","B2","H2","D4"].forEach(c=>{
+
+if(ws[c]){
+
+ws[c].s = {
+
+font:{
+name:"Times New Roman",
+bold:true,
+sz:18
+},
+
+alignment:{
+horizontal:"center",
+vertical:"center"
+}
+
+};
+
+}
+
+});
+
+
+// HEADER TABLE BOLD
+for(let c=0;c<=13;c++){
+
+let cell1 =
+XLSX.utils.encode_cell({r:5,c});
+
+let cell2 =
+XLSX.utils.encode_cell({r:6,c});
+
+[cell1,cell2].forEach(cell=>{
+
+if(ws[cell]){
+
+ws[cell].s = {
+
+font:{
+name:"Times New Roman",
+bold:true,
+sz:12
+},
+
+alignment:{
+horizontal:"center",
+vertical:"center",
+wrapText:true
+},
+
+border:{
+top:{style:"thin"},
+bottom:{style:"thin"},
+left:{style:"thin"},
+right:{style:"thin"}
+}
+
+};
+
+}
+
+});
+
+}
+
+
+// =========================
+// APPEND
+// =========================
+
 XLSX.utils.book_append_sheet(
 wb,
 ws,
-"Bao cao tiep dan"
+"So tiep cong dan"
 );
 
-// tên file
-let tuNgay =
-document.getElementById("bc_from").value;
 
-let denNgay =
-document.getElementById("bc_to").value;
+// =========================
+// EXPORT
+// =========================
 
-let fileName =
-`Bao_cao_tiep_dan_${tuNgay}_${denNgay}.xlsx`;
-
-// xuất file
 XLSX.writeFile(
 wb,
-fileName
+"So_theo_doi_tiep_cong_dan.xlsx"
 );
 
 }
