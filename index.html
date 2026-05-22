@@ -66,6 +66,26 @@ transition:0.2s;
 
 }
 
+.btn-excel{
+
+background:#2e7d32;
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:6px;
+cursor:pointer;
+font-size:13px;
+font-weight:bold;
+margin-top:4px;
+
+}
+
+.btn-excel:hover{
+
+background:#1b5e20;
+
+}
+
 .btn-create-report:hover{
 
 background:#ffd54f;
@@ -4243,9 +4263,19 @@ function displayBaoCaoTuan(){
     let buttons = `<button onclick="viewBaoCaoTuan(${i})">Xem</button>`;
 
     if(currentRole==="Admin" || c.username===currentUser){
-      buttons += `<button onclick="editBaoCaoTuan(${i})">Sửa</button>`;
-      buttons += `<button onclick="deleteBaoCaoTuan('${c.id}')">Xóa</button>`;
-    }
+  buttons += `<button onclick="editBaoCaoTuan(${i})">Sửa</button>`;
+  buttons += `<button onclick="deleteBaoCaoTuan('${c.id}')">Xóa</button>`;
+}
+
+// ai cũng được xuất Excel
+buttons += `
+<button
+class="btn-excel"
+onclick="exportBaoCaoTuanExcel(${i})"
+>
+📗 Excel
+</button>
+`;
     
 
     tbody.innerHTML += `
@@ -6572,6 +6602,209 @@ XLSX.writeFile(
 wb,
 "So_theo_doi_tiep_cong_dan.xlsx"
 );
+
+}
+
+function exportBaoCaoTuanExcel(index){
+
+  let c = baoCaoTuanList[index];
+
+  if(!c){
+    alert("Không tìm thấy dữ liệu báo cáo");
+    return;
+  }
+
+  let wb = XLSX.utils.book_new();
+
+  let data = [];
+
+  // ===== TITLE =====
+
+  data.push([
+    "",
+    "BÁO CÁO KẾT QUẢ THỰC HIỆN NHIỆM VỤ " + (c.tuan || "")
+  ]);
+
+  data.push([]);
+
+  // ===== HEADER =====
+
+  data.push([
+    "STT",
+    "ĐƠN VỊ",
+    "NHIỆM VỤ ĐÃ HOÀN THÀNH",
+    "NHIỆM VỤ CHƯA HOÀN THÀNH\n(Lý do cụ thể)",
+    "KẾ HOẠCH TUẦN TIẾP THEO"
+  ]);
+
+  // ===== DATA =====
+
+  data.push([
+    "1",
+    "Tiếp công dân, giải quyết KNTC",
+    c.hoanthanh || "",
+    c.chuahoanthanh || "",
+    c.kehoach || ""
+  ]);
+
+  let ws = XLSX.utils.aoa_to_sheet(data);
+
+  // ===== MERGE =====
+
+  ws["!merges"] = [
+
+    {
+      s:{r:0,c:1},
+      e:{r:0,c:4}
+    }
+
+  ];
+
+  // ===== WIDTH =====
+
+  ws["!cols"] = [
+
+    {wch:6},
+    {wch:28},
+    {wch:60},
+    {wch:45},
+    {wch:55}
+
+  ];
+
+  // ===== ROW HEIGHT =====
+
+  ws["!rows"] = [
+
+    {hpt:35},
+    {hpt:10},
+    {hpt:45},
+    {hpt:120}
+
+  ];
+
+  // ===== STYLE =====
+
+  function borderAll(){
+
+    return {
+      top:{style:"thin"},
+      bottom:{style:"thin"},
+      left:{style:"thin"},
+      right:{style:"thin"}
+    };
+
+  }
+
+  Object.keys(ws).forEach(cell=>{
+
+    if(cell[0] === "!") return;
+
+    ws[cell].s = {
+
+      font:{
+        name:"Times New Roman",
+        sz:13
+      },
+
+      alignment:{
+        vertical:"center",
+        horizontal:"left",
+        wrapText:true
+      },
+
+      border:borderAll()
+
+    };
+
+  });
+
+  // ===== TITLE =====
+
+  if(ws["B1"]){
+
+    ws["B1"].s = {
+
+      font:{
+        name:"Times New Roman",
+        sz:16,
+        bold:true
+      },
+
+      alignment:{
+        horizontal:"center",
+        vertical:"center"
+      }
+
+    };
+
+  }
+
+  // ===== HEADER TABLE =====
+
+  ["A3","B3","C3","D3","E3"].forEach(cell=>{
+
+    if(ws[cell]){
+
+      ws[cell].s = {
+
+        font:{
+          name:"Times New Roman",
+          sz:14,
+          bold:true
+        },
+
+        alignment:{
+          horizontal:"center",
+          vertical:"center",
+          wrapText:true
+        },
+
+        border:borderAll()
+
+      };
+
+    }
+
+  });
+
+  // ===== CĂN GIỮA =====
+
+  ["A4","B4"].forEach(cell=>{
+
+    if(ws[cell]){
+
+      ws[cell].s = {
+
+        font:{
+          name:"Times New Roman",
+          sz:13
+        },
+
+        alignment:{
+          horizontal:"center",
+          vertical:"center",
+          wrapText:true
+        },
+
+        border:borderAll()
+
+      };
+
+    }
+
+  });
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    ws,
+    "Bao cao tuan"
+  );
+
+  XLSX.writeFile(
+    wb,
+    "BAO_CAO_TUAN.xlsx"
+  );
 
 }
 
