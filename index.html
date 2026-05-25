@@ -5384,6 +5384,9 @@ function renderBaoCao(isClick = false){
         - Lưu đơn:
         <b>${list.filter(c => c.ketqua === "Lưu đơn").length}</b><br>
 
+        - Thụ lý giải quyết:
+        <b>${list.filter(c => c.ketqua === "Thụ lý giải quyết").length}</b><br>
+
         - Khác:
         <b>${list.filter(c => c.ketqua === "Khác").length}</b>
       </div>
@@ -6978,6 +6981,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
         <option value="Chuyển đơn">Chuyển đơn</option>
         <option value="Báo cáo">Báo cáo</option>
         <option value="Lưu đơn">Lưu đơn</option>
+        <option value="Thụ lý giải quyết">Thụ lý giải quyết</option>
         <option value="Khác">Khác</option>
         </select>
 
@@ -7584,7 +7588,7 @@ style="display:none;margin-top:5px;"
 <label>Hướng xử lý<span style="color:red">*</span></label>
 <select id="td_xuly">
 <option value="">-- Chọn --</option>
-<option>Hướng dẫn chung</option>
+<option>Hướng dẫn</option>
 <option>Giải đáp thắc mắc</option>
 <option>Thụ lý để giải quyết</option>
 <option>Trả lại đơn và hướng dẫn</option>
