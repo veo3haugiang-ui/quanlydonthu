@@ -9,6 +9,142 @@
 <link rel="icon" type="image/png" href="web.png">
 
 <style>
+.baocao-sheet{
+
+  font-family:"Times New Roman",serif;
+  background:white;
+  padding:20px;
+  color:black;
+
+}
+
+.sheet-header{
+
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:20px;
+  font-size:20px;
+  text-align:center;
+
+}
+
+.left-head{
+  width:40%;
+}
+
+.right-head{
+  width:40%;
+}
+
+.sheet-title{
+
+  text-align:center;
+  margin-bottom:20px;
+  font-size:26px;
+  font-weight:bold;
+
+}
+
+.mau-bao-cao{
+
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-family:"Times New Roman",serif;
+  font-size:15px;
+
+}
+
+.mau-bao-cao th,
+.mau-bao-cao td{
+
+  border:1.5px solid black;
+  padding:6px;
+  vertical-align:top;
+  word-wrap:break-word;
+
+}
+
+.mau-bao-cao thead th{
+
+  background:white;
+  text-align:center;
+  font-weight:bold;
+
+}
+
+.mau-bao-cao tbody td{
+
+  line-height:1.4;
+
+}
+
+.mau-bao-cao td:nth-child(1){
+  width:50px;
+  text-align:center;
+}
+
+.mau-bao-cao td:nth-child(2){
+  width:90px;
+  text-align:center;
+}
+
+.mau-bao-cao td:nth-child(3){
+  width:90px;
+}
+
+.mau-bao-cao td:nth-child(4){
+  width:80px;
+}
+
+.mau-bao-cao td:nth-child(5){
+  width:100px;
+}
+
+.mau-bao-cao td:nth-child(6){
+  width:240px;
+}
+
+.mau-bao-cao td:nth-child(7){
+  width:320px;
+}
+
+.mau-bao-cao td:nth-child(8){
+  width:120px;
+}
+
+.mau-bao-cao td:nth-child(9){
+  width:120px;
+}
+
+.mau-bao-cao td:nth-child(10){
+  width:120px;
+}
+
+.mau-bao-cao td:nth-child(11){
+  width:120px;
+}
+
+.mau-bao-cao td:nth-child(12){
+  width:150px;
+}
+
+.mau-bao-cao td:nth-child(13){
+  width:140px;
+}
+
+.mau-bao-cao td:nth-child(14){
+  width:160px;
+}
+
+.mau-bao-cao td:nth-child(15){
+  width:90px;
+}
+
+.mau-bao-cao td:nth-child(16){
+  width:180px;
+}
+
 /* Nút trong cột thao tác */
 td button{
   font-weight: 600;          /* 👈 làm chữ đậm */
@@ -64,6 +200,11 @@ box-shadow:
 
 transition:0.2s;
 
+}
+
+.btn-export-excel{
+  background:#7cc576;
+  color:#fff;
 }
 
 .btn-excel{
@@ -209,6 +350,19 @@ background:#e57373;
 
 transform:translateY(-1px);
 
+}
+
+.mau-bao-cao-tcd thead th{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #f4d6d6;
+}
+
+.table-wrapper{
+    max-height: 600px;
+    overflow: auto;
+    border: 1px solid #ddd;
 }
 
 .btn-report{
@@ -950,6 +1104,7 @@ max-height:90%;
 overflow:auto;
 box-shadow:0 25px 60px rgba(0,0,0,0.35);
 animation:fadeIn .25s ease;
+}
 
 /* =========================
    BÁO CÁO TIẾP DÂN ĐẸP
@@ -957,18 +1112,21 @@ animation:fadeIn .25s ease;
 
 .report-modal{
 
-  width:95%;
-  max-width:1500px;
+  width:95% !important;
+
+  max-width:1600px;
 
   height:92vh;
 
-  padding:0;
+  background:#fff;
+
+  border-radius:14px;
+
+  display:flex;
+
+  flex-direction:column;
 
   overflow:hidden;
-
-  border-radius:18px;
-
-  background:#f4f6f9;
 
 }
 
@@ -1171,13 +1329,68 @@ animation:fadeIn .25s ease;
 
 .report-table-wrap{
 
-  background:white;
-
-  border-radius:14px;
+  flex:1;
 
   overflow:auto;
 
-  box-shadow:0 2px 10px rgba(0,0,0,0.06);
+  border:1px solid #ddd;
+
+  border-radius:10px;
+
+  background:#fff;
+
+  margin-top:10px;
+
+}
+
+.report-table-wrap table{
+
+  min-width:1800px;
+
+  border-collapse:collapse;
+
+}
+
+.report-table-wrap thead th{
+
+  position:sticky;
+
+  top:0;
+
+  z-index:100;
+
+  background:#f3d6d6;
+
+  display:table-cell;
+
+}
+
+.report-table-wrap table{
+
+  border-collapse:collapse;
+
+  min-width:1800px;
+
+}
+
+.report-table-wrap th,
+.report-table-wrap td{
+
+  border:1px solid #ccc;
+
+  padding:6px;
+
+  vertical-align:top;
+
+}
+
+.report-table-wrap th{
+
+  background:#f1d1d1;
+
+  text-align:center;
+
+  font-weight:bold;
 
 }
 
@@ -1324,7 +1537,6 @@ animation:fadeIn .25s ease;
 
   border-radius:10px;
 
-}
 }
 
 @keyframes fadeIn{
@@ -1827,6 +2039,9 @@ select:disabled{
 
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
+<!-- THÊM 2 DÒNG NÀY -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
 <script>
 
 function toggleCongChucKhac(){
@@ -1898,6 +2113,7 @@ let rowsPerPageTiepDan = 10;
 let tiepDanList = [];
 let filteredTiepDanList = [];
 let filteredBaoCao = [];
+let filteredBaoCaoTiepDan = [];
 
 function showPage(page){
 
@@ -2043,12 +2259,12 @@ console.error("Lỗi JS:", e.message);
 });
 
 let users = {};
-
 let currentUser=null;
 let currentRole=null;
 let cases=[];
 let editIndex=-1;
 let currentEditId = null; // 👈 THÊM DÒNG NÀY
+let filteredBaoCaoDonThu = [];
 
 const API_URL="https://script.google.com/macros/s/AKfycbw4R8w3Z7beupEE_Kxp4Qz7065BIygP20LKdRlx5FHW37S9TuRq3UB-KF7c_ZRXnC0b/exec";
 
@@ -3347,6 +3563,7 @@ tbody.innerHTML+=`
 
 renderPagination(list.length);
 }
+
 
 function renderPagination(totalRows){
 
@@ -5682,6 +5899,129 @@ let start = parseDateVN(from);
 
 let end = parseDateVN(to);
 
+// =======================
+// LỌC DỮ LIỆU THEO NGÀY
+// =======================
+
+let filteredBaoCaoTiepDan =
+tiepDanList.filter(c=>{
+
+    if(!c.ngay) return false;
+
+    let d = parseDateVN(c.ngay);
+
+    return d >= start && d <= end;
+
+});
+
+
+// =======================
+// THỐNG KÊ TIẾP DÂN
+// =======================
+
+let ngayKhongTiepSet = new Set();
+let ngayTiepSet = new Set();
+
+let soLuotTiep = 0;
+let tongSoNguoi = 0;
+
+filteredBaoCaoTiepDan.forEach(c=>{
+
+    let ngay =
+      String(c.ngay || c.ngaytiep || "")
+      .trim();
+
+    let noiDung =
+      String(c.noidung || "")
+      .toLowerCase()
+      .trim();
+
+    let soNguoi =
+parseInt(c.songuoi);
+
+if(isNaN(soNguoi) || soNguoi <= 0){
+
+    soNguoi = 1;
+
+}
+
+    // =========================
+    // KHÔNG PHÁT SINH
+    // =========================
+
+    if(noiDung.includes("không phát sinh")){
+
+        ngayKhongTiepSet.add(ngay);
+
+    }
+
+    // =========================
+    // CÓ TIẾP DÂN
+    // =========================
+
+    else{
+
+        ngayTiepSet.add(ngay);
+
+        soLuotTiep++;
+
+        if(!isNaN(soNguoi)){
+
+            tongSoNguoi += soNguoi;
+
+        }
+
+    }
+
+});
+
+
+// =========================
+// KẾT QUẢ
+// =========================
+
+// =========================
+// TỔNG SỐ NGÀY LÀM VIỆC
+// =========================
+
+let tongSoNgayLamViec = 0;
+
+// duyệt từ ngày bắt đầu đến ngày kết thúc
+for(
+  let d = new Date(start);
+  d <= end;
+  d.setDate(d.getDate() + 1)
+){
+
+  // thứ trong tuần
+  let thu = d.getDay();
+
+  // bỏ thứ 7 và chủ nhật
+  if(thu === 0 || thu === 6){
+    continue;
+  }
+
+  // kiểm tra ngày lễ
+  let day =
+    String(d.getDate()).padStart(2,'0');
+
+  let month =
+    String(d.getMonth()+1).padStart(2,'0');
+
+  let mmdd = `${day}/${month}`;
+
+  // bỏ ngày lễ
+  if(holidays.includes(mmdd)){
+    continue;
+  }
+
+  // tính là ngày làm việc
+  tongSoNgayLamViec++;
+}
+
+let soNgayTiep =
+ngayTiepSet.size;
+
 
 // =========================
 // HTML
@@ -5689,10 +6029,70 @@ let end = parseDateVN(to);
 
 let html = `
 
+<div class="report-summary">
 
-<div class="table-scroll">
+  <div class="summary-card">
+    <h4>Tổng số ngày làm việc</h4>
+    <span>${tongSoNgayLamViec}</span>
+  </div>
 
-<table>
+  <div class="summary-card">
+    <h4>Số ngày tiếp công dân</h4>
+    <span>${soNgayTiep}</span>
+  </div>
+
+  <div class="summary-card">
+    <h4>Số lượt tiếp công dân</h4>
+    <span>${soLuotTiep}</span>
+  </div>
+
+  <div class="summary-card">
+    <h4>Tổng số người tiếp</h4>
+    <span>${tongSoNguoi}</span>
+  </div>
+
+</div>
+
+<div class="baocao-sheet">
+
+    <!-- HEADER -->
+    <div class="sheet-header">
+
+        <div class="left-head">
+            <div>UBND THÀNH PHỐ CẦN THƠ</div>
+            <div><b>SỞ NỘI VỤ</b></div>
+        </div>
+
+        <div class="right-head">
+            <div><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b></div>
+            <div>Độc lập - Tự do - Hạnh phúc</div>
+        </div>
+
+    </div>
+
+    <!-- TIÊU ĐỀ -->
+    <div class="sheet-title">
+
+        <div>
+            <b>BÁO CÁO TIẾP CÔNG DÂN</b>
+        </div>
+
+        <div style="
+            font-size:20px;
+            margin-top:6px;
+            font-weight:bold;
+        ">
+            Từ ngày ${from} đến ngày ${to}
+        </div>
+
+       
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrapper">
+
+    <table class="mau-bao-cao-tcd">
 
 <thead>
 
@@ -5892,6 +6292,8 @@ html += `
 // LƯU DỮ LIỆU BÁO CÁO
 filteredBaoCao = [];
 
+
+
 // duyệt lại dữ liệu theo ngày
 for(
   let d = new Date(start);
@@ -6033,6 +6435,17 @@ let data = [];
 
 
 // =========================
+// LẤY NGÀY
+// =========================
+
+let from =
+document.getElementById("bc_from").value;
+
+let to =
+document.getElementById("bc_to").value;
+
+
+// =========================
 // HEADER
 // =========================
 
@@ -6060,16 +6473,18 @@ data.push([
 
 data.push([]);
 
-let from =
-document.getElementById("bc_from").value;
-
-let [d,m,y] = from.split("/");
+data.push([
+"",
+"",
+"",
+"SỔ TIẾP CÔNG DÂN"
+]);
 
 data.push([
 "",
 "",
 "",
-`SỔ TIẾP CÔNG DÂN THÁNG ${m} NĂM ${y}`
+`Từ ngày ${from} đến ngày ${to}`
 ]);
 
 data.push([]);
@@ -6221,71 +6636,78 @@ s:{r:1,c:7},
 e:{r:1,c:12}
 },
 
+// TITLE
 {
 s:{r:3,c:3},
 e:{r:3,c:9}
 },
 
+// TỪ NGÀY ĐẾN NGÀY
+{
+s:{r:4,c:3},
+e:{r:4,c:9}
+},
+
 // HƯỚNG XỬ LÝ
 {
-s:{r:5,c:7},
-e:{r:5,c:9}
+s:{r:6,c:7},
+e:{r:6,c:9}
 },
 
 // merge dọc
 {
-s:{r:5,c:0},
-e:{r:6,c:0}
+s:{r:6,c:0},
+e:{r:7,c:0}
 },
 
 {
-s:{r:5,c:1},
-e:{r:6,c:1}
+s:{r:6,c:1},
+e:{r:7,c:1}
 },
 
 {
-s:{r:5,c:2},
-e:{r:6,c:2}
+s:{r:6,c:2},
+e:{r:7,c:2}
 },
 
 {
-s:{r:5,c:3},
-e:{r:6,c:3}
+s:{r:6,c:3},
+e:{r:7,c:3}
 },
 
 {
-s:{r:5,c:4},
-e:{r:6,c:4}
+s:{r:6,c:4},
+e:{r:7,c:4}
 },
 
 {
-s:{r:5,c:5},
-e:{r:6,c:5}
+s:{r:6,c:5},
+e:{r:7,c:5}
 },
 
 {
-s:{r:5,c:6},
-e:{r:6,c:6}
+s:{r:6,c:6},
+e:{r:7,c:6}
 },
 
 {
-s:{r:5,c:10},
-e:{r:6,c:10}
+s:{r:6,c:10},
+e:{r:7,c:10}
 },
 
 {
-s:{r:5,c:11},
-e:{r:6,c:11}
+s:{r:6,c:11},
+e:{r:7,c:11}
 },
 
 {
-s:{r:5,c:12},
-e:{r:6,c:12}
+s:{r:6,c:12},
+e:{r:7,c:12}
 },
 
 {
-s:{r:5,c:13},
-e:{r:6,c:13}
+s:{r:6,c:13},
+e:{r:7,c:13}
 }
 
 ];
@@ -6297,20 +6719,20 @@ e:{r:6,c:13}
 
 ws["!cols"] = [
 
-{wch:6},   // STT
-{wch:14},  // Ngày
-{wch:40},  // Họ tên
-{wch:22},  // CCCD
-{wch:45},  // Nội dung
-{wch:18},  // Phân loại
-{wch:18},  // CQ giải quyết
-{wch:15},  // Thụ lý
-{wch:18},  // Trả lại
-{wch:28},  // Chuyển đơn
-{wch:20},  // Theo dõi
-{wch:10},  // Ký tên
-{wch:28},  // Người tiếp
-{wch:40}   // Ghi chú
+{wch:6},
+{wch:14},
+{wch:40},
+{wch:22},
+{wch:45},
+{wch:18},
+{wch:18},
+{wch:15},
+{wch:18},
+{wch:28},
+{wch:20},
+{wch:10},
+{wch:28},
+{wch:40}
 
 ];
 
@@ -6325,6 +6747,7 @@ ws["!rows"] = [
 {hpx:28},
 {hpx:15},
 {hpx:38},
+{hpx:30},
 {hpx:10},
 
 {hpx:38},
@@ -6332,7 +6755,7 @@ ws["!rows"] = [
 
 ];
 
-for(let i=7;i<data.length;i++){
+for(let i=8;i<data.length;i++){
 
 ws["!rows"][i] = {hpx:55};
 
@@ -6361,40 +6784,17 @@ wrapText:true
 },
 
 border:{
-top:{style:"thin", color:{rgb:"000000"}},
-bottom:{style:"thin", color:{rgb:"000000"}},
-left:{style:"thin", color:{rgb:"000000"}},
-right:{style:"thin", color:{rgb:"000000"}}
+top:{style:"thin"},
+bottom:{style:"thin"},
+left:{style:"thin"},
+right:{style:"thin"}
 }
 
 };
 
 
-// ======================
-// HEADER CƠ QUAN
-// ======================
-
+// HEADER
 if(type === "header"){
-
-style.font = {
-name:"Times New Roman",
-bold:true,
-sz:14
-};
-
-style.alignment = {
-horizontal:"center",
-vertical:"center"
-};
-
-}
-
-
-// ======================
-// TITLE
-// ======================
-
-if(type === "title"){
 
 style.font = {
 name:"Times New Roman",
@@ -6402,18 +6802,35 @@ bold:true,
 sz:16
 };
 
-style.alignment = {
-horizontal:"center",
-vertical:"center"
+}
+
+
+// TITLE
+if(type === "title"){
+
+style.font = {
+name:"Times New Roman",
+bold:true,
+sz:18
 };
 
 }
 
 
-// ======================
-// TABLE HEADER
-// ======================
+// SUBTITLE
+if(type === "subtitle"){
 
+style.font = {
+name:"Times New Roman",
+bold:true,
+italic:false,
+sz:13
+};
+
+}
+
+
+// TABLE HEADER
 if(type === "tableHeader"){
 
 style.font = {
@@ -6426,19 +6843,10 @@ style.fill = {
 fgColor:{rgb:"D9D9D9"}
 };
 
-style.alignment = {
-horizontal:"center",
-vertical:"center",
-wrapText:true
-};
-
 }
 
 
-// ======================
-// CONTENT LEFT
-// ======================
-
+// LEFT
 if(type === "left"){
 
 style.alignment = {
@@ -6454,9 +6862,9 @@ ws[cell].s = style;
 }
 
 
-// ======================
+// =========================
 // STYLE TOÀN BỘ
-// ======================
+// =========================
 
 Object.keys(ws).forEach(cell=>{
 
@@ -6467,10 +6875,7 @@ setStyle(cell);
 });
 
 
-// ======================
 // HEADER
-// ======================
-
 ["B1","H1","B2","H2"].forEach(c=>{
 
 setStyle(c,"header");
@@ -6478,24 +6883,22 @@ setStyle(c,"header");
 });
 
 
-// ======================
 // TITLE
-// ======================
-
 setStyle("D4","title");
 
 
-// ======================
-// TABLE HEADER
-// ======================
+// SUBTITLE
+setStyle("D5","subtitle");
 
+
+// TABLE HEADER
 for(let c=0;c<=13;c++){
 
 let cell1 =
-XLSX.utils.encode_cell({r:5,c});
+XLSX.utils.encode_cell({r:6,c});
 
 let cell2 =
-XLSX.utils.encode_cell({r:6,c});
+XLSX.utils.encode_cell({r:7,c});
 
 setStyle(cell1,"tableHeader");
 setStyle(cell2,"tableHeader");
@@ -6503,83 +6906,12 @@ setStyle(cell2,"tableHeader");
 }
 
 
-// ======================
-// CĂN TRÁI CÁC CỘT NỘI DUNG
-// ======================
-
-for(let r=7;r<data.length;r++){
+// CĂN TRÁI
+for(let r=8;r<data.length;r++){
 
 ["C","E","N"].forEach(col=>{
 
 setStyle(col + (r+1),"left");
-
-});
-
-}
-
-
-// title lớn
-["B1","H1","B2","H2","D4"].forEach(c=>{
-
-if(ws[c]){
-
-ws[c].s = {
-
-font:{
-name:"Times New Roman",
-bold:true,
-sz:18
-},
-
-alignment:{
-horizontal:"center",
-vertical:"center"
-}
-
-};
-
-}
-
-});
-
-
-// HEADER TABLE BOLD
-for(let c=0;c<=13;c++){
-
-let cell1 =
-XLSX.utils.encode_cell({r:5,c});
-
-let cell2 =
-XLSX.utils.encode_cell({r:6,c});
-
-[cell1,cell2].forEach(cell=>{
-
-if(ws[cell]){
-
-ws[cell].s = {
-
-font:{
-name:"Times New Roman",
-bold:true,
-sz:12
-},
-
-alignment:{
-horizontal:"center",
-vertical:"center",
-wrapText:true
-},
-
-border:{
-top:{style:"thin"},
-bottom:{style:"thin"},
-left:{style:"thin"},
-right:{style:"thin"}
-}
-
-};
-
-}
 
 });
 
@@ -6808,6 +7140,606 @@ function exportBaoCaoTuanExcel(index){
     wb,
     "BAO_CAO_TUAN.xlsx"
   );
+
+}
+
+function openBaoCaoDonThu(){
+
+  document.getElementById(
+    "baoCaoDonThuModal"
+  ).style.display = "flex";
+
+  // ===== TỪ NGÀY =====
+  if(!document.getElementById("bc_donthu_from")._flatpickr){
+
+    flatpickr("#bc_donthu_from",{
+      dateFormat:"d/m/Y",
+      allowInput:true
+    });
+
+  }
+
+  // ===== ĐẾN NGÀY =====
+  if(!document.getElementById("bc_donthu_to")._flatpickr){
+
+    flatpickr("#bc_donthu_to",{
+      dateFormat:"d/m/Y",
+      allowInput:true
+    });
+
+  }
+
+}
+
+function closeBaoCaoDonThu(){
+
+  document.getElementById(
+    "baoCaoDonThuModal"
+  ).style.display = "none";
+
+  document.getElementById(
+    "baoCaoDonThuContent"
+  ).innerHTML = "";
+
+}
+
+function generateBaoCaoDonThu(){
+
+let from =
+document.getElementById(
+"bc_donthu_from"
+).value;
+
+let to =
+document.getElementById(
+"bc_donthu_to"
+).value;
+
+if(!from || !to){
+
+  alert("⚠ Chọn đầy đủ ngày");
+
+  return;
+
+}
+
+function parseDateVN(str){
+
+  let [d,m,y] = str.split("/");
+
+  return new Date(y,m-1,d);
+
+}
+
+let start = parseDateVN(from);
+
+let end = parseDateVN(to);
+
+filteredBaoCaoDonThu =
+cases.filter(c=>{
+
+  if(!c.ngayden) return false;
+
+  let d = parseDateVN(c.ngayden);
+
+  return d >= start && d <= end;
+
+});
+
+
+// 🔥 PHẢI CÓ DÒNG NÀY
+let html = "";
+
+html += `
+
+<div class="baocao-sheet">
+
+  <!-- HEADER -->
+  <div class="sheet-header">
+
+    <div class="left-head">
+      <div>UBND THÀNH PHỐ CẦN THƠ</div>
+      <div><b>SỞ NỘI VỤ</b></div>
+    </div>
+
+    <div class="right-head">
+      <div><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b></div>
+      <div>Độc lập - Tự do - Hạnh phúc</div>
+    </div>
+
+  </div>
+
+  <!-- TITLE -->
+  <div class="sheet-title">
+
+    <div>
+      <b>SỔ TIẾP NHẬN VÀ THEO DÕI XỬ LÝ ĐƠN</b>
+    </div>
+
+    <div style="
+      font-size:20px;
+      margin-top:6px;
+      font-weight:bold;
+    ">
+      Từ ngày ${from} đến ngày ${to}
+    </div>
+
+  </div>
+
+  <!-- TABLE -->
+  <table class="mau-bao-cao">
+
+    <thead>
+
+      <tr>
+
+        <th rowspan="2">STT</th>
+
+        <th rowspan="2">
+          Ngày đến<br>
+          <span style="font-weight:normal">
+          (Bộ phận TCD)
+          </span>
+        </th>
+
+        <th rowspan="2">Nguồn đơn</th>
+
+        <th colspan="3">Phân loại đơn</th>
+
+        <th rowspan="2">
+          Họ và tên<br>
+          Địa chỉ
+        </th>
+
+        <th rowspan="2">Nội dung yêu cầu</th>
+
+        <th rowspan="2">Điều kiện xử lý</th>
+
+        <th rowspan="2">Thẩm quyền giải quyết</th>
+
+        <th rowspan="2">
+          CQ đã giải quyết<br>
+          (Hoặc theo dõi tiến trình)
+        </th>
+
+        <th rowspan="2">Kết quả xử lý</th>
+
+        <th rowspan="2">
+          Số ký hiệu VB,<br>ngày
+        </th>
+
+        <th rowspan="2">
+          Tác giả<br>(ký duyệt)
+        </th>
+
+        <th rowspan="2">
+          Người tham mưu,<br>
+          soạn thảo VB
+        </th>
+
+        <th rowspan="2">Tình trạng</th>
+
+        <th rowspan="2">Ghi chú</th>
+
+      </tr>
+
+      <tr>
+
+        <th>Loại đơn</th>
+
+        <th>Lĩnh vực/Bộ phận</th>
+
+        <th> Số lượng<br>
+          người đứng đơn
+        </th>
+
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+`;
+
+filteredBaoCaoDonThu.forEach((c,index)=>{
+
+html += `
+
+<tr>
+
+<td>${String(index+1).padStart(2,'0')}</td>
+
+<td>${c.ngayden || ""}</td>
+
+<td>${c.nguondon || ""}</td>
+
+<td>${c.loaidon || ""}</td>
+
+<td>${c.linhvuc || ""}</td>
+<td>${c.songuoi || "01"}</td>
+
+<td>
+  ${(c.hoten || "")}<br>
+  ${(c.diachi || "")}
+</td>
+
+<td>${c.noidung || ""}</td>
+
+<td>${c.dieukien || ""}</td>
+
+<td>${c.coquan || ""}</td>
+
+<td>Sở Nội vụ</td>
+
+<td>${c.ketqua || ""}</td>
+
+<td>${c.sokyhieu || ""}</td>
+
+<td>${c.kyduyet || ""}</td>
+
+<td>${c.soanthao || ""}</td>
+
+<td>${c.tinhtrang || ""}</td>
+
+<td>${c.ghichu || ""}</td>
+
+</tr>
+
+`;
+
+});
+
+html += `
+
+    </tbody>
+
+  </table>
+
+</div>
+
+`;
+
+document.getElementById(
+"baoCaoDonThuContent"
+).innerHTML = html;
+
+}
+
+function printBaoCaoDonThu(){
+
+let content =
+document.getElementById(
+"baoCaoDonThuContent"
+).innerHTML;
+
+let win = window.open("");
+
+win.document.write(`
+
+<html>
+
+<head>
+
+<title>Báo cáo đơn thư</title>
+
+<style>
+
+body{
+font-family:Times New Roman;
+padding:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+border:1px solid #000;
+padding:5px;
+font-size:13px;
+}
+
+th{
+background:#eee;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2 style="text-align:center">
+BÁO CÁO ĐƠN THƯ
+</h2>
+
+${content}
+
+</body>
+
+</html>
+
+`);
+
+win.document.close();
+
+win.print();
+
+}
+
+async function exportBaoCaoDonThuExcel(){
+
+if(filteredBaoCaoDonThu.length===0){
+
+  alert("⚠ Chưa có dữ liệu");
+
+  return;
+
+}
+
+const wb = new ExcelJS.Workbook();
+
+const ws = wb.addWorksheet("BAO CAO DON");
+
+
+/* =========================
+   COLUMN WIDTH
+========================= */
+
+ws.columns = [
+
+{width:6},   // STT
+{width:12},  // Ngày đến
+{width:12},  // Nguồn đơn
+{width:14},  // Loại đơn
+{width:14},  // Lĩnh vực
+{width:8},   // số lượng
+{width:32},  // họ tên
+{width:45},  // nội dung
+{width:18},  // điều kiện
+{width:18},  // thẩm quyền
+{width:16},  // cq giải quyết
+{width:16},  // kết quả
+{width:22},  // số ký hiệu
+{width:18},  // ký duyệt
+{width:22},  // tham mưu
+{width:14},  // tình trạng
+{width:28}   // ghi chú
+
+];
+
+
+/* =========================
+   HEADER
+========================= */
+
+ws.mergeCells("C1:G1");
+ws.getCell("C1").value =
+"UBND THÀNH PHỐ CẦN THƠ";
+
+ws.mergeCells("C2:G2");
+ws.getCell("C2").value =
+"SỞ NỘI VỤ";
+
+ws.mergeCells("L1:Q1");
+ws.getCell("L1").value =
+"CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM";
+
+ws.mergeCells("L2:Q2");
+ws.getCell("L2").value =
+"Độc lập - Tự do - Hạnh phúc";
+
+
+ws.mergeCells("G4:K4");
+ws.getCell("G4").value =
+"SỔ TIẾP NHẬN VÀ THEO DÕI XỬ LÝ ĐƠN";
+
+ws.mergeCells("G5:K5");
+ws.getCell("G5").value =
+`Từ ngày ${document.getElementById("bc_donthu_from").value}
+ đến ngày ${document.getElementById("bc_donthu_to").value}`;
+
+
+/* =========================
+   STYLE HEADER
+========================= */
+
+[
+"C1",
+"C2",
+"L1",
+"L2",
+"G4",
+"G5"
+].forEach(cell=>{
+
+ws.getCell(cell).font = {
+name:"Times New Roman",
+size:13,
+bold:true
+};
+
+ws.getCell(cell).alignment = {
+horizontal:"center",
+vertical:"middle"
+};
+
+});
+
+
+/* =========================
+   TABLE HEADER
+========================= */
+
+let row = 7;
+
+const headers = [
+
+"STT",
+"Ngày đến\n(Bộ phận TCD)",
+"Nguồn đơn",
+"Loại đơn\n(KN,TC,KNPA)",
+"Lĩnh vực/Bộ phận",
+"Số lượng\nngười đứng đơn",
+"Họ và tên\nĐịa chỉ",
+"Nội dung yêu cầu",
+"Điều kiện xử lý",
+"Thẩm quyền giải quyết",
+"CQ đã giải quyết\n(Hoặc theo dõi tiến trình)",
+"Kết quả xử lý",
+"Số ký hiệu VB,\nngày",
+"Tác giả\n(ký duyệt)",
+"Người tham mưu,\nsoạn thảo VB",
+"Tình trạng",
+"Ghi chú"
+
+];
+
+headers.forEach((h,i)=>{
+
+let c = ws.getCell(row,i+1);
+
+c.value = h;
+
+c.font = {
+name:"Times New Roman",
+bold:true,
+size:11
+};
+
+c.alignment = {
+horizontal:"center",
+vertical:"middle",
+wrapText:true
+};
+
+c.fill = {
+type:"pattern",
+pattern:"solid",
+fgColor:{argb:"D9D9D9"}
+};
+
+c.border = {
+
+top:{style:"thin"},
+left:{style:"thin"},
+bottom:{style:"thin"},
+right:{style:"thin"}
+
+};
+
+});
+
+
+ws.getRow(7).height = 60;
+
+
+/* =========================
+   DATA
+========================= */
+
+let startRow = 8;
+
+filteredBaoCaoDonThu.forEach((c,index)=>{
+
+let r = ws.getRow(startRow + index);
+
+r.values = [
+
+String(index+1).padStart(2,'0'),
+
+c.ngayden || "",
+
+c.nguondon || "",
+
+c.loaidon || "",
+
+c.linhvuc || "",
+
+c.songuoi || "01",
+
+`${c.hoten || ""}\n${c.diachi || ""}`,
+
+c.noidung || "",
+
+c.dieukien || "",
+
+c.coquan || "",
+
+"Sở Nội vụ",
+
+c.ketqua || "",
+
+c.sokyhieu || "",
+
+c.kyduyet || "",
+
+c.soanthao || "",
+
+c.tinhtrang || "",
+
+c.ghichu || ""
+
+];
+
+r.height = 120;
+
+r.eachCell((cell)=>{
+
+cell.font = {
+name:"Times New Roman",
+size:11
+};
+
+cell.alignment = {
+
+vertical:"middle",
+horizontal:"center",
+wrapText:true
+
+};
+
+cell.border = {
+
+top:{style:"thin"},
+left:{style:"thin"},
+bottom:{style:"thin"},
+right:{style:"thin"}
+
+};
+
+});
+
+});
+
+
+/* =========================
+   FREEZE HEADER
+========================= */
+
+ws.views = [
+{
+state:'frozen',
+ySplit:7
+}
+];
+
+
+/* =========================
+   EXPORT
+========================= */
+
+const buf =
+await wb.xlsx.writeBuffer();
+
+saveAs(
+
+new Blob([buf]),
+
+"BAO_CAO_DON_THU.xlsx"
+
+);
 
 }
 
@@ -7096,9 +8028,25 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
         <span>→</span>
         <input type="date" id="toDateBaoCao" onchange="onChangeDate()">
         <button id="btnBaoCao" class="btn-report" onclick="handleBaoCao()">Xem báo cáo</button>
+
+        
+
         <button class="btn-report" style="margin-left:10px;background:#0d6efd"
         onclick="showPage('baocaotuan')">
         📅 Báo cáo nhiệm vụ theo tuần
+        </button>
+        <button
+        class="btn-report" style="margin-left:10px;background:#0d6efd"
+        onclick="openBaoCaoTiepDan()"
+        >
+        📄 Báo cáo tiếp công dân
+        </button>
+
+        <button
+        class="btn-report" style="margin-left:10px;background:#0d6efd"
+        onclick="openBaoCaoDonThu()"
+        >
+        📊 Báo cáo đơn thư
         </button>
       </div>
 
@@ -7903,6 +8851,64 @@ onclick="exportBaoCaoExcel()"
 <div id="baoCaoTiepDanContent"></div>
 
 </div>
+
+</div>
+</div>
+
+<!-- ========================= -->
+<!-- MODAL BÁO CÁO ĐƠN THƯ -->
+<!-- ========================= -->
+
+<div id="baoCaoDonThuModal" class="modal">
+
+  <div class="modal-content report-modal">
+
+    <button
+      class="close-report-btn"
+      onclick="closeBaoCaoDonThu()"
+    >
+      ✕
+    </button>
+
+    <h2>📑 BÁO CÁO ĐƠN THƯ</h2>
+
+    <label>Từ ngày</label>
+    <input type="text" id="bc_donthu_from">
+
+    <label>Đến ngày</label>
+    <input type="text" id="bc_donthu_to">
+
+    <div class="report-actions">
+
+      <button
+      class="btn-create-report"
+      onclick="generateBaoCaoDonThu()"
+      >
+      📑 Tạo báo cáo
+      </button>
+
+      <button
+      class="btn-print-report"
+      onclick="printBaoCaoDonThu()"
+      >
+      🖨 In báo cáo
+      </button>
+
+      <button
+      class="btn-export-excel"
+      onclick="exportBaoCaoDonThuExcel()"
+      >
+      📊 Xuất Excel
+      </button>
+
+    </div>
+
+    <div
+    id="baoCaoDonThuContent"
+    class="report-table-wrap"
+    ></div>
+
+  </div>
 
 </div>
 
