@@ -5493,6 +5493,8 @@ function renderBaoCao(isClick = false){
 
   let dangXuLy = list.filter(c => c.tinhtrang === "Đang xử lý").length;
 
+  let tongDangXuLyHeThong = cases.filter(c => (c.tinhtrang || "").trim() === "Đang xử lý").length;
+
   let duDieuKien = list.filter(c => c.dieukien === "Đủ điều kiện xử lý").length;
 
   let khongDu = list.filter(c => c.dieukien === "Không đủ điều kiện xử lý").length;
@@ -5537,8 +5539,22 @@ function renderBaoCao(isClick = false){
 
         <div class="report-card">
           <h4>Đang xử lý</h4>
-          <span>${dangXuLy}</span>
+          <span>${dangXuLy}
+          ${
+    dangXuLy !== tongDangXuLyHeThong
+    ?
+    ` 
+          <div style="
+        font-size:13px;
+        color:#d32f2f;
+        margin-top:4px;">Trong tổng số đơn Đang xử lý </div> ${tongDangXuLyHeThong} 
+         `
+    :
+    ""
+}
+        </span>
         </div>
+         
       </div>
 
      <div class="report-layout">
