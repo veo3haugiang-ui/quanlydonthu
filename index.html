@@ -2148,6 +2148,7 @@ let filteredBaoCaoTiepDan = [];
 /* ===== THƯ VIỆN VĂN BẢN ===== */
 let vanBanList = [];
 let editVanBanId = null;
+let currentEditOwner = "";
 
 function loadVanBan(){
 
@@ -2196,6 +2197,17 @@ vanBanList
 )
 
 .forEach((v,index)=>{
+  let duocSuaXoa =
+
+currentRole==="Admin"
+
+||
+
+currentRole==="Ban Giám đốc"
+
+||
+
+(v.owner||"")===currentUser;
 
 html += `
 <tr
@@ -2217,26 +2229,28 @@ onclick="viewVanBan('${v.linkdrive}')">
 <button
 class="btn-view"
 onclick="event.stopPropagation();viewVanBan('${v.linkdrive}')">
-
 Xem
-
 </button>
 
+${
+duocSuaXoa
+?
+`
 <button
 class="btn-edit"
 onclick="event.stopPropagation();editVanBan('${v.id}')">
-
 Sửa
-
 </button>
 
 <button
 class="btn-delete"
 onclick="event.stopPropagation();deleteVanBan('${v.id}')">
-
 Xóa
-
 </button>
+`
+:
+""
+}
 
 </td>
 
@@ -2407,7 +2421,7 @@ let editIndex=-1;
 let currentEditId = null; // 👈 THÊM DÒNG NÀY
 let filteredBaoCaoDonThu = [];
 
-const API_URL="https://script.google.com/macros/s/AKfycby56W6VxNtYy7NzCMwSDhajy3yqGLi7JI9HbrXqgOBSopUF-mTdD1OV1QTEI_NOiSh1/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbympzK5nNP7t04PI7EIsGzXSyHJYV2ixH7wtn_AShxK2seO883eD8Z0PO6qzb1Qyuom/exec";
 
 function parseLocalDate(str){
   if(!str) return null;
@@ -8015,6 +8029,11 @@ action:action,
 
 id:editVanBanId,
 
+owner:
+editVanBanId
+? currentEditOwner
+: currentUser,
+
 sohieu:
 document.getElementById("vbSoHieu").value,
 
@@ -8127,6 +8146,28 @@ loadVanBan();
 }
 
 async function deleteVanBan(id){
+let vb =
+vanBanList.find(v=>v.id==id);
+
+if(
+
+currentRole!=="Admin"
+
+&&
+
+currentRole!=="Ban Giám đốc"
+
+&&
+
+vb.owner!==currentUser
+
+){
+
+alert("Bạn không có quyền xóa văn bản này");
+
+return;
+
+}
 
 if(!confirm("Bạn có chắc muốn xóa văn bản này?")){
   return;
@@ -8153,6 +8194,27 @@ let vb =
 vanBanList.find(
 v => String(v.id) === String(id)
 );
+currentEditOwner = vb.owner || "";
+
+if(
+
+currentRole!=="Admin"
+
+&&
+
+currentRole!=="Ban Giám đốc"
+
+&&
+
+vb.owner!==currentUser
+
+){
+
+alert("Bạn không có quyền sửa văn bản này");
+
+return;
+
+}
 
 if(!vb) return;
 
@@ -9550,8 +9612,10 @@ HOẶC
 <input
 type="file"
 id="vbFile"
-accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
-
+onclick="
+alert('⚠ Chức năng tải tệp đang được hoàn thiện. Vui lòng sử dụng Link Google Drive.');
+return false;
+">
 <div
 id="selectedFile"
 style="
