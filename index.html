@@ -2147,6 +2147,8 @@ let filteredBaoCaoTiepDan = [];
 
 /* ===== THƯ VIỆN VĂN BẢN ===== */
 let vanBanList = [];
+let vanBanPage = 1;
+let vanBanRowsPerPage = 10;
 let editVanBanId = null;
 let currentEditOwner = "";
 
@@ -2159,6 +2161,7 @@ fetch(API_URL+"?action=getVanBan")
 .then(data=>{
 
   vanBanList = data;
+  vanBanPage = 1;
 
   renderVanBan();
 
@@ -2166,17 +2169,26 @@ fetch(API_URL+"?action=getVanBan")
 
 }
 
+function changeVanBanRows(){
+
+  vanBanRowsPerPage =
+    Number(
+      document.getElementById("vanBanRows").value
+    );
+
+  vanBanPage = 1;
+
+  renderVanBan();
+
+}
+
 function renderVanBan(){
 
 let key =
-document.getElementById("searchVanBan")
-.value
+(document.getElementById("searchVanBan")?.value || "")
 .toLowerCase();
 
-let html = "";
-
-vanBanList
-.filter(v=>
+let ds = vanBanList.filter(v=>
 
 (v.tenvb||"")
 .toLowerCase()
@@ -2194,10 +2206,25 @@ vanBanList
 .toLowerCase()
 .includes(key)
 
-)
+);
 
-.forEach((v,index)=>{
-  let duocSuaXoa =
+let start =
+(vanBanPage - 1)
+*
+vanBanRowsPerPage;
+
+let end =
+start +
+vanBanRowsPerPage;
+
+let pageData =
+ds.slice(start,end);
+
+let html = "";
+
+pageData.forEach((v,index)=>{
+
+let duocSuaXoa =
 
 currentRole==="Admin"
 
@@ -2210,18 +2237,21 @@ currentRole==="Ban Giám đốc"
 (v.owner||"")===currentUser;
 
 html += `
+
 <tr
 style="cursor:pointer"
 onclick="viewVanBan('${v.linkdrive}')">
 
-<td>${index+1}</td>
+<td>${start + index + 1}</td>
 
-<td>${v.sohieu}</td>
+<td>${v.sohieu || ""}</td>
 
-<td>${v.tenvb}</td>
+<td>${v.tenvb || ""}</td>
 
-<td>${v.loaivb}</td>
-<td>${v.coquan}</td>
+<td>${v.loaivb || ""}</td>
+
+<td>${v.coquan || ""}</td>
+
 <td>${formatNgayVanBan(v.ngaybanhanh)}</td>
 
 <td>
@@ -2255,12 +2285,70 @@ Xóa
 </td>
 
 </tr>
+
 `;
 
 });
 
-document.getElementById("vanBanTable")
-.innerHTML = html;
+document.getElementById("vanBanTable").innerHTML = html;
+
+renderVanBanPagination(ds.length);
+
+}
+
+function changeVanBanRows(){
+
+vanBanRowsPerPage = Number(
+document.getElementById("vanBanRows").value
+);
+
+vanBanPage = 1;
+
+renderVanBan();
+
+}
+
+function renderVanBanPagination(totalRows){
+
+let totalPage =
+Math.ceil(
+totalRows /
+vanBanRowsPerPage
+);
+
+let html = "";
+
+if(totalPage <= 1){
+
+document.getElementById(
+"vanBanPagination"
+).innerHTML = "";
+
+return;
+
+}
+
+for(let i=1;i<=totalPage;i++){
+
+html += `
+<button
+class="
+page-btn
+${i===vanBanPage?'active':''}
+"
+onclick="
+vanBanPage=${i};
+renderVanBan();
+">
+${i}
+</button>
+`;
+
+}
+
+document.getElementById(
+"vanBanPagination"
+).innerHTML = html;
 
 }
 
@@ -2333,13 +2421,28 @@ if(page==="baocaotuan"){
 
 if(page==="vanban"){
 
-document.getElementById("pageVanBan").style.display="block";
+document.getElementById("pageVanBan")
+.style.display="block";
 
 document.querySelectorAll(".sidebar a")[3]
 .classList.add("active");
 
 document.getElementById("pageTitle")
 .innerText="THƯ VIỆN VĂN BẢN";
+
+/* RESET BỘ LỌC */
+
+vanBanPage = 1;
+
+if(document.getElementById("searchVanBan"))
+document.getElementById("searchVanBan").value = "";
+
+if(document.getElementById("vanBanRows"))
+document.getElementById("vanBanRows").value = "10";
+
+vanBanRowsPerPage = 10;
+
+/* TẢI LẠI DỮ LIỆU */
 
 loadVanBan();
 
@@ -8858,6 +8961,47 @@ onkeyup="renderVanBan()">
 <tbody id="vanBanTable"></tbody>
 
 </table>
+
+<!-- THÊM NGAY ĐÂY -->
+
+<div class="table-footer">
+
+ <div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:10px;
+">
+
+<div style="
+display:flex;
+align-items:center;
+gap:6px;
+">
+
+<span>Hiển thị</span>
+
+<select
+id="vanBanRows"
+onchange="changeVanBanRows()"
+style="
+width:80px;
+"
+>
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="50">50</option>
+</select>
+
+<span>văn bản/trang</span>
+
+</div>
+
+<div id="vanBanPagination"></div>
+
+</div>
+
+</div>
 <div id="viewerBox"
 style="
 margin-top:15px;
@@ -9593,11 +9737,11 @@ Thêm văn bản
 <label>Ngày ban hành<span style="color:red">*</span></label>
 <input type="date" id="vbNgay">
 
-<label>Link Google Drive <span style="color:red">*</span></label>
+<label>Link tài liệu <span style="color:red">*</span></label>
 
 <input
 id="vbLink"
-placeholder="Dán link Google Drive nếu đã có">
+placeholder="Dán link tài liệu hoặc hãy dùng link Google Drive nếu đã có">
 
 <div style="
 text-align:center;
