@@ -2072,6 +2072,7 @@ select:disabled{
 <!-- THÊM 2 DÒNG NÀY -->
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
 function toggleCongChucKhac(){
@@ -2522,6 +2523,10 @@ let currentRole=null;
 let cases=[];
 let editIndex=-1;
 let currentEditId = null; // 👈 THÊM DÒNG NÀY
+// ======================
+// NHẮC HẠN BÁO CÁO
+// ======================
+let baoCaoAlerts = [];
 let filteredBaoCaoDonThu = [];
 
 const API_URL="https://script.google.com/macros/s/AKfycbympzK5nNP7t04PI7EIsGzXSyHJYV2ixH7wtn_AShxK2seO883eD8Z0PO6qzb1Qyuom/exec";
@@ -2656,6 +2661,7 @@ localStorage.setItem("loginTime",Date.now());
 
 document.getElementById("loginPage").style.display="none";
 document.getElementById("mainPage").style.display="block";
+startBaoCaoCountdown();
 
 document.getElementById("welcomeBox").innerHTML =
 "👤 "+data.fullname+" | Vai trò: "+data.role;
@@ -5812,9 +5818,11 @@ if(from && to){
   document.getElementById("baoCaoContent").innerHTML = `
     <div class="report-box">
 
-      <div class="report-title">
-        ${titleDate}
-      </div>
+  <div id="countdownBaoCao"></div>
+
+  <div class="report-title">
+    ${titleDate}
+  </div>
 
       <div class="report-grid">
         <div class="report-card">
@@ -5975,6 +5983,9 @@ if(from && to){
 
 </div>
   `;
+ 
+  // THÊM DÒNG NÀY
+  startBaoCaoCountdown(); 
 }
 
 function handleBaoCao(){
@@ -8446,8 +8457,525 @@ async function fileToBase64(file){
 
 }
 
+function startBaoCaoCountdown(){
+
+  const box =
+    document.getElementById("countdownBaoCao");
+
+  if(!box) return;
+
+  function addAlert(arr,title,deadline){
+
+  const now = new Date();
+
+  const diff =
+    deadline.getTime() - now.getTime();
+
+  if(diff <= 0) return;
+
+  const days =
+    Math.floor(diff / 86400000);
+
+  if(days > 5) return;
+
+  const hours =
+    Math.floor(
+      (diff % 86400000) / 3600000
+    );
+
+  const mins =
+    Math.floor(
+      (diff % 3600000) / 60000
+    );
+
+  let bg = "linear-gradient(135deg,#fff3cd,#ffe69c)";
+  let border = "#ff9800";
+  let color = "#d35400";
+  let icon = "⏳";
+
+  if(days <= 3){
+    bg = "linear-gradient(135deg,#ffe5b4,#ffd699)";
+    border = "#ff5722";
+    color = "#c65d00";
+    icon = "⚠";
+  }
+
+  if(days <= 1){
+    bg = "linear-gradient(135deg,#f8d7da,#f5c2c7)";
+    border = "#dc3545";
+    color = "#b71c1c";
+    icon = "🚨";
+  }
+
+ arr.push({
+  key:
+    title
+      .replace(/\s+/g,"_")
+      .replace(/\//g,"_"),
+
+  title:title,
+
+  days:days,
+
+  hours:hours,
+
+  deadline:
+    deadline.toLocaleDateString("vi-VN")
+});
+
+}
+
+  function update(){
+
+    const now = new Date();
+
+    const year =
+      now.getFullYear();
+
+    const month =
+      now.getMonth() + 1;
+
+    baoCaoAlerts = [];
+
+    // =====================
+    // BÁO CÁO THÁNG
+    // =====================
+
+    // =====================
+// BÁO CÁO THÁNG
+// =====================
+
+let hanBaoCaoThang =
+  new Date(
+    year,
+    month - 1,
+    5,
+    23,59,59
+  );
+
+let thangBaoCao = month;
+let namBaoCao = year;
+
+addAlert(
+  baoCaoAlerts,
+  `Báo cáo tháng ${thangBaoCao}/${namBaoCao}`,
+  hanBaoCaoThang
+);
+    
+
+    // =====================
+    // QUÝ I
+    // =====================
+
+    addAlert(
+      baoCaoAlerts,
+      `Báo cáo Quý I/${year}`,
+      new Date(year,2,5,23,59,59)
+    );
+
+    // =====================
+    // QUÝ II
+    // =====================
+
+    addAlert(
+      baoCaoAlerts,
+      `Báo cáo Quý II/${year}`,
+      new Date(year,5,5,23,59,59)
+    );
+
+    // =====================
+    // QUÝ III
+    // =====================
+
+    addAlert(
+      baoCaoAlerts,
+      `Báo cáo Quý III/${year}`,
+      new Date(year,8,5,23,59,59)
+    );
+
+    // =====================
+    // QUÝ IV
+    // =====================
+
+    addAlert(
+      baoCaoAlerts,
+      `Báo cáo Quý IV/${year}`,
+      new Date(year,11,5,23,59,59)
+    );
+
+    // =====================
+    // BÁO CÁO 6 THÁNG
+    // =====================
+
+    addAlert(
+      baoCaoAlerts,
+      `Báo cáo 6 tháng đầu năm ${year}`,
+      new Date(year,5,5,23,59,59)
+    );
+
+    // =====================
+    // BÁO CÁO NĂM
+    // =====================
+
+    addAlert(
+      baoCaoAlerts,
+      `Báo cáo năm ${year}`,
+      new Date(year,11,5,23,59,59)
+    );
+
+ const btn =
+document.getElementById("baoCaoNotifyBtn");
+
+const badge =
+document.getElementById("baoCaoBadge");
+
+if(btn && badge){
+
+    if(baoCaoAlerts.length > 0){
+
+        btn.style.display = "inline-block";
+        badge.style.display = "block";
+        const soChuaLam =
+  baoCaoAlerts.filter(
+    x => !isBaoCaoDone(x.key)
+  ).length;
+
+badge.textContent =
+  soChuaLam;
+
+    }else{
+
+        btn.style.display = "none";
+        badge.style.display = "none";
+
+    }
+
+}
 
 
+if(baoCaoAlerts.length === 0){
+
+  box.innerHTML = "";
+
+}else{
+
+ box.innerHTML = "";
+return;
+}
+
+  }
+
+  update();
+
+  setInterval(
+    update,
+    60000
+  );
+
+}
+
+function toggleBaoCaoDone(key){
+
+  const storageKey =
+    "baocao_" + key;
+
+  const done =
+    localStorage.getItem(
+      storageKey
+    ) === "done";
+
+  if(done){
+
+    localStorage.removeItem(
+      storageKey
+    );
+
+  }else{
+
+    localStorage.setItem(
+      storageKey,
+      "done"
+    );
+
+  }
+
+  updateBaoCaoCountdown();
+
+  Swal.close();
+
+  setTimeout(() => {
+
+    showBaoCaoNotify();
+
+  },100);
+
+}
+
+function isBaoCaoDone(key){
+
+  return localStorage.getItem(
+    "baocao_" + key
+  ) === "done";
+
+}
+
+function showBaoCaoNotify(){
+
+  const soChuaLam =
+  baoCaoAlerts.filter(
+    x => !isBaoCaoDone(x.key)
+  ).length;
+
+  let chuaXong = "";
+  let daXong = "";
+
+  baoCaoAlerts.forEach(item => {
+
+    const done =
+      isBaoCaoDone(item.key);
+
+    const card = `
+
+<div style="
+  border:1px solid #e9ecef;
+  border-left:5px solid ${
+    done ? "#28a745" : "#dc3545"
+  };
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:12px;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+">
+
+  <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  ">
+
+    <div style="flex:1">
+
+      <div style="
+        font-size:16px;
+        font-weight:700;
+        color:${
+          done ? "#28a745" : "#212529"
+        };
+      ">
+        ${item.title}
+      </div>
+
+      <div style="
+        margin-top:6px;
+        color:#6c757d;
+        font-size:13px;
+      ">
+        📅 Hạn làm báo cáo: ${item.deadline}
+      </div>
+
+      <div style="
+        margin-top:8px;
+        font-weight:600;
+        color:${
+          done ? "#28a745" : "#dc3545"
+        };
+      ">
+        ${
+          done
+          ? "✓ Đã hoàn thành"
+          : item.days === 0
+            ? "🚨 Hôm nay là hạn cuối"
+            : `⏳ Còn ${item.days} ngày ${item.hours} giờ`
+        }
+      </div>
+
+    </div>
+
+    <div>
+
+      <button
+        onclick="toggleBaoCaoDone('${item.key}')"
+        style="
+          border:none;
+          background:${
+            done ? "#28a745" : "#dc3545"
+          };
+          color:white;
+          padding:8px 14px;
+          border-radius:8px;
+          font-size:13px;
+          font-weight:600;
+          cursor:pointer;
+        "
+      >
+        ${
+          done
+          ? "Đã hoàn thành"
+          : "Đánh dấu hoàn thành"
+        }
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+`;
+
+    if(done){
+      daXong += card;
+    }else{
+      chuaXong += card;
+    }
+
+  });
+
+  Swal.fire({
+
+  width: 800,
+
+  html: `
+
+    <div style="
+      text-align:left;
+    ">
+
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin-bottom:20px;
+      ">
+
+        <div>
+          <div style="
+            font-size:22px;
+            font-weight:700;
+            color:#dc3545;
+          ">
+            🔔 Nhắc hạn báo cáo
+          </div>
+
+          <div style="
+            color:#6c757d;
+            font-size:13px;
+            margin-top:4px;
+          ">
+            Theo dõi các báo cáo sắp đến hạn nộp
+          </div>
+        </div>
+
+        <div style="
+          background:#fff3cd;
+          color:#856404;
+          padding:6px 12px;
+          border-radius:20px;
+          font-weight:600;
+          font-size:13px;
+        ">
+           ${soChuaLam} báo cáo
+        </div>
+
+      </div>
+
+      <div style="
+  max-height:500px;
+  overflow:auto;
+">
+
+  ${
+    chuaXong ||
+
+    `<div style="
+      text-align:center;
+      padding:50px 20px;
+    ">
+
+      <div style="
+        font-size:60px;
+      ">
+        ✅
+      </div>
+
+      <div style="
+        color:#28a745;
+        font-size:20px;
+        font-weight:700;
+        margin-top:10px;
+      ">
+        Đã hoàn thành tất cả báo cáo
+      </div>
+
+      <div style="
+        color:#6c757d;
+        margin-top:8px;
+      ">
+        Hiện không còn báo cáo nào cần thực hiện.
+      </div>
+
+    </div>`
+  }
+
+</div>
+
+    </div>
+
+  `,
+
+  showConfirmButton:false,
+
+  showCloseButton:true
+
+});
+
+}
+
+function markBaoCaoDone(key){
+
+  localStorage.setItem(
+    key,
+    "done"
+  );
+
+ startBaoCaoCountdown();
+
+  Swal.close();
+
+}
+
+function showBaoCaoDone(){
+
+  let html = "";
+
+  baoCaoAlerts.forEach(item => {
+
+    if(
+      localStorage.getItem(item.key)
+      === "done"
+    ){
+
+      html += `
+      <div style="
+        padding:8px;
+        border-bottom:1px solid #eee;
+      ">
+        ✓ ${item.title}
+      </div>
+      `;
+
+    }
+
+  });
+
+  Swal.fire({
+    title:"Báo cáo đã hoàn thành",
+    width:600,
+    html: html || "Chưa có báo cáo nào được đánh dấu hoàn thành."
+  });
+
+}
 
 </script>
 </head>
@@ -8518,6 +9046,40 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <div id="welcomeBox"></div>
 
 <div class="user-actions">
+<div id="baoCaoNotifyBtn"
+     onclick="showBaoCaoNotify()"
+     style="
+       display:none;
+       position:relative;
+       cursor:pointer;
+       margin-right:10px;
+       background:#fff;
+       color:#dc3545;
+       padding:6px 12px;
+       border-radius:20px;
+       font-weight:bold;
+       border:1px solid #dc3545;
+     ">
+  🔔
+
+  <span id="baoCaoBadge"
+        style="
+          display:none;
+          position:absolute;
+          top:-6px;
+          right:-6px;
+          background:#dc3545;
+          color:#fff;
+          border-radius:50%;
+          min-width:18px;
+          height:18px;
+          line-height:18px;
+          text-align:center;
+          font-size:11px;
+          font-weight:bold;
+        ">
+  </span>
+</div>
 <button onclick="openChangePassword()">🔑 Đổi mật khẩu</button>
 <button class="btn-logout" onclick="logout()">Đăng xuất</button>
 </div>
@@ -8728,6 +9290,7 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
   <div class="container">
     <div class="card">
       <h3>📊 BÁO CÁO TIẾP NHẬN VÀ XỬ LÝ ĐƠN</h3>
+      <div id="countdownBaoCao"></div>
 
       <div class="search-bar">
         <input type="date" id="fromDateBaoCao" onchange="onChangeDate()">
