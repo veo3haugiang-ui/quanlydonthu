@@ -8519,7 +8519,8 @@ function startBaoCaoCountdown(){
   arr,
   title,
   deadline,
-  soNgayNhac = 5
+  soNgayNhac = 5,
+  period = ""
 ){
 
   const now = new Date();
@@ -8541,22 +8542,21 @@ function startBaoCaoCountdown(){
     );
 
   arr.push({
+  key:title
+    .replace(/\s+/g,"_")
+    .replace(/\//g,"_"),
 
-    key:
-      title
-        .replace(/\s+/g,"_")
-        .replace(/\//g,"_"),
+  title:title,
 
-    title:title,
+  days:days,
 
-    days:days,
+  hours:hours,
 
-    hours:hours,
+  deadline:
+    deadline.toLocaleDateString("vi-VN"),
 
-    deadline:
-      deadline.toLocaleDateString("vi-VN")
-
-  });
+  period: period || ""
+});
 
 }
 
@@ -8612,7 +8612,7 @@ addAlert(
   1
 );
 
-    // =====================
+// =====================
 // BÁO CÁO THÁNG
 // =====================
 
@@ -8621,17 +8621,29 @@ let hanBaoCaoThang =
     year,
     month - 1,
     5,
-    23,59,59
+    23,
+    59,
+    59
   );
 
-let thangBaoCao = month;
-let namBaoCao = year;
+let thangTruoc =
+  month === 1 ? 12 : month - 1;
+
+let namTu =
+  month === 1 ? year - 1 : year;
+
+let tuNgay =
+  `06/${String(thangTruoc).padStart(2,'0')}/${namTu}`;
+
+let denNgay =
+  `05/${String(month).padStart(2,'0')}/${year}`;
 
 addAlert(
   baoCaoAlerts,
-  `Báo cáo tháng ${thangBaoCao}/${namBaoCao}`,
+  `Báo cáo tháng ${month}/${year}`,
   hanBaoCaoThang,
-  5
+  5,
+  `${tuNgay} → ${denNgay}`
 );
     
 
@@ -8639,67 +8651,73 @@ addAlert(
     // QUÝ I
     // =====================
 
-    addAlert(
-      baoCaoAlerts,
-      `Báo cáo Quý I/${year}`,
-      new Date(year,2,5,23,59,59),
-      7
-    );
+   addAlert(
+  baoCaoAlerts,
+  `Báo cáo Quý I/${year}`,
+  new Date(year,2,5,23,59,59),
+  7,
+  `06/12/${year-1} → 05/03/${year}`
+);
 
     // =====================
     // QUÝ II
     // =====================
 
     addAlert(
-      baoCaoAlerts,
-      `Báo cáo Quý II/${year}`,
-      new Date(year,5,5,23,59,59),
-      7
-    );
+  baoCaoAlerts,
+  `Báo cáo Quý II/${year}`,
+  new Date(year,5,5,23,59,59),
+  7,
+  `06/03/${year} → 05/06/${year}`
+);
 
     // =====================
     // QUÝ III
     // =====================
 
-    addAlert(
-      baoCaoAlerts,
-      `Báo cáo Quý III/${year}`,
-      new Date(year,8,5,23,59,59),
-      7
-    );
+   addAlert(
+  baoCaoAlerts,
+  `Báo cáo Quý III/${year}`,
+  new Date(year,8,5,23,59,59),
+  7,
+  `06/06/${year} → 05/09/${year}`
+);
 
     // =====================
     // QUÝ IV
     // =====================
 
     addAlert(
-      baoCaoAlerts,
-      `Báo cáo Quý IV/${year}`,
-      new Date(year,11,5,23,59,59),
-      7
-    );
+  baoCaoAlerts,
+  `Báo cáo Quý IV/${year}`,
+  new Date(year,11,5,23,59,59),
+  7,
+  `06/09/${year} → 05/12/${year}`
+);
 
     // =====================
     // BÁO CÁO 6 THÁNG
     // =====================
 
-    addAlert(
-      baoCaoAlerts,
-      `Báo cáo 6 tháng đầu năm ${year}`,
-      new Date(year,5,5,23,59,59),
-      10
-    );
+   addAlert(
+  baoCaoAlerts,
+  `Báo cáo 6 tháng đầu năm ${year}`,
+  new Date(year,5,5,23,59,59),
+  10,
+  `06/12/${year-1} → 05/06/${year}`
+);
 
     // =====================
     // BÁO CÁO NĂM
     // =====================
 
-    addAlert(
-      baoCaoAlerts,
-      `Báo cáo năm ${year}`,
-      new Date(year,11,5,23,59,59),
-      15
-    );
+   addAlert(
+  baoCaoAlerts,
+  `Báo cáo năm ${year}`,
+  new Date(year,11,5,23,59,59),
+  15,
+  `06/12/${year-1} → 05/12/${year}`
+);
 
  const btn =
 document.getElementById("baoCaoNotifyBtn");
@@ -8926,7 +8944,7 @@ function showBaoCaoNotify(){
         color:#6c757d;
         font-size:13px;
       ">
-        📅 Hạn làm báo cáo: ${item.deadline}
+        📅 Hạn làm báo cáo: ${item.deadline}  📊 Số liệu: ${item.period}
       </div>
 
       <div style="
