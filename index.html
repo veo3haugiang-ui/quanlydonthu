@@ -8837,38 +8837,43 @@ function addWeeklyAlert(
 
 function toggleBaoCaoDone(key){
 
-  const storageKey =
-    "baocao_" + key;
-
-  const done =
-    localStorage.getItem(
-      storageKey
-    ) === "done";
-
-  if(done){
-
-    localStorage.removeItem(
-      storageKey
-    );
-
-  }else{
-
-    localStorage.setItem(
-      storageKey,
-      "done"
-    );
-
-  }
+  localStorage.setItem(
+    "baocao_" + key,
+    "done"
+  );
 
   updateBaoCaoCountdown();
 
-  Swal.close();
+  // Đổi màu nút ngay lập tức
+  const btn =
+    document.getElementById(
+      "btn_" + key
+    );
 
-  setTimeout(() => {
+  if(btn){
 
-    showBaoCaoNotify();
+    btn.innerHTML =
+      "✓ Đã hoàn thành";
 
-  },100);
+    btn.style.background =
+      "#28a745";
+
+    btn.disabled = true;
+
+    btn.style.cursor =
+      "default";
+
+  }
+
+  // Thông báo thành công
+  Swal.fire({
+    toast:true,
+    position:"top-end",
+    icon:"success",
+    title:"Đã đánh dấu hoàn thành",
+    showConfirmButton:false,
+    timer:1500
+  });
 
 }
 
@@ -8967,26 +8972,27 @@ function showBaoCaoNotify(){
 
     <div>
 
-      <button
-        onclick="toggleBaoCaoDone('${item.key}')"
-        style="
-          border:none;
-          background:${
-            done ? "#28a745" : "#dc3545"
-          };
-          color:white;
-          padding:8px 14px;
-          border-radius:8px;
-          font-size:13px;
-          font-weight:600;
-          cursor:pointer;
-        "
-      >
+     <button
+  id="btn_${item.key}"
+  onclick="toggleBaoCaoDone('${item.key}')"
+  style="
+    border:none;
+    background:${
+      done ? "#28a745" : "#dc3545"
+    };
+    color:white;
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+  "
+>
         ${
-          done
-          ? "Đã hoàn thành"
-          : "Đánh dấu hoàn thành"
-        }
+  done
+  ? "✓ Đã hoàn thành"
+  : "Đánh dấu hoàn thành"
+}
       </button>
 
     </div>
