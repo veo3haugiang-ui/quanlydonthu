@@ -3549,6 +3549,15 @@ let tbody;
 
 function updateStats(list = cases){
 let total = list.length;
+let daXuLy =
+  list.filter(c =>
+    (c.tinhtrang || "").trim() === "Đã xử lý"
+  ).length;
+
+let dangXuLy =
+  list.filter(c =>
+    (c.tinhtrang || "").trim() === "Đang xử lý"
+  ).length;
 let kn = list.filter(c=>c.loaidon==="Khiếu nại").length;
 let tc = list.filter(c=>c.loaidon==="Tố cáo").length;
 let pa = list.filter(c=>c.loaidon==="Phản ánh - Kiến nghị").length;
@@ -3557,7 +3566,9 @@ let k = list.filter(c=>c.loaidon==="Khác").length;
 
 
 document.getElementById("statsBox").innerHTML = `
-<b>📊 TỔNG SỐ HỒ SƠ: ${total}</b><br>
+<b style="color:#545151">📊 TỔNG SỐ HỒ SƠ:</b><b style="color:#131111"> ${total}</b> | ✅ ĐÃ XỬ LÝ: 
+<b style="color:#198754">${daXuLy}</b>  | ⏳ ĐANG XỬ LÝ: 
+<b style="color:#d32323">${dangXuLy}</b><br>
 Khiếu nại: ${kn} |
 Tố cáo: ${tc} |
 Phản ánh - Kiến nghị: ${pa} |
