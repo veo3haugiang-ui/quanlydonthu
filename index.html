@@ -2663,6 +2663,46 @@ document.getElementById("loginPage").style.display="none";
 document.getElementById("mainPage").style.display="block";
 startBaoCaoCountdown();
 
+setTimeout(()=>{
+
+  const baoCaoHanChot =
+    baoCaoAlerts.filter(
+      x =>
+        !isBaoCaoDone(x.key)
+        &&
+        x.days === 0
+    );
+
+  const baoCaoCon1Ngay =
+    baoCaoAlerts.filter(
+      x =>
+        !isBaoCaoDone(x.key)
+        &&
+        x.days === 1
+    );
+
+  // Hạn cuối
+  if(baoCaoHanChot.length > 0){
+
+    showBaoCaoNotify();
+
+    return;
+  }
+
+  // Còn 1 ngày
+  if(baoCaoCon1Ngay.length > 0){
+
+    showBaoCaoToast(
+  "⚠ Ngày mai đến hạn: " +
+  baoCaoCon1Ngay
+    .map(x => x.title)
+    .join(", ")
+);
+
+  }
+
+},1000);
+
 document.getElementById("welcomeBox").innerHTML =
 "👤 "+data.fullname+" | Vai trò: "+data.role;
 
@@ -8475,7 +8515,12 @@ function startBaoCaoCountdown(){
 
   if(!box) return;
 
-  function addAlert(arr,title,deadline){
+ function addAlert(
+  arr,
+  title,
+  deadline,
+  soNgayNhac = 5
+){
 
   const now = new Date();
 
@@ -8487,52 +8532,31 @@ function startBaoCaoCountdown(){
   const days =
     Math.floor(diff / 86400000);
 
-  if(days > 5) return;
+  // Chỉ nhắc trong khoảng cho phép
+  if(days > soNgayNhac) return;
 
   const hours =
     Math.floor(
       (diff % 86400000) / 3600000
     );
 
-  const mins =
-    Math.floor(
-      (diff % 3600000) / 60000
-    );
+  arr.push({
 
-  let bg = "linear-gradient(135deg,#fff3cd,#ffe69c)";
-  let border = "#ff9800";
-  let color = "#d35400";
-  let icon = "⏳";
+    key:
+      title
+        .replace(/\s+/g,"_")
+        .replace(/\//g,"_"),
 
-  if(days <= 3){
-    bg = "linear-gradient(135deg,#ffe5b4,#ffd699)";
-    border = "#ff5722";
-    color = "#c65d00";
-    icon = "⚠";
-  }
+    title:title,
 
-  if(days <= 1){
-    bg = "linear-gradient(135deg,#f8d7da,#f5c2c7)";
-    border = "#dc3545";
-    color = "#b71c1c";
-    icon = "🚨";
-  }
+    days:days,
 
- arr.push({
-  key:
-    title
-      .replace(/\s+/g,"_")
-      .replace(/\//g,"_"),
+    hours:hours,
 
-  title:title,
+    deadline:
+      deadline.toLocaleDateString("vi-VN")
 
-  days:days,
-
-  hours:hours,
-
-  deadline:
-    deadline.toLocaleDateString("vi-VN")
-});
+  });
 
 }
 
@@ -8548,9 +8572,45 @@ function startBaoCaoCountdown(){
 
     baoCaoAlerts = [];
 
-    // =====================
-    // BÁO CÁO THÁNG
-    // =====================
+// =====================
+// BÁO CÁO TUẦN
+// Hạn trước 16h thứ Năm
+// =====================
+
+let thu = now.getDay(); // CN=0, T2=1...T5=4
+
+let hanBaoCaoTuan = new Date(now);
+
+// tính ngày thứ Năm tuần hiện tại
+let soNgayDenThuNam = 4 - thu;
+
+hanBaoCaoTuan.setDate(
+  now.getDate() + soNgayDenThuNam
+);
+
+hanBaoCaoTuan.setHours(
+  16,0,0,0
+);
+
+// Nếu đã qua 16h thứ Năm
+// thì tính cho tuần sau
+
+if(now > hanBaoCaoTuan){
+
+  hanBaoCaoTuan.setDate(
+    hanBaoCaoTuan.getDate() + 7
+  );
+
+}
+
+let soTuan = getWeekNumber(now);
+
+addAlert(
+  baoCaoAlerts,
+  `Báo cáo tuần ${soTuan}/${year}`,
+  hanBaoCaoTuan,
+  1
+);
 
     // =====================
 // BÁO CÁO THÁNG
@@ -8570,7 +8630,8 @@ let namBaoCao = year;
 addAlert(
   baoCaoAlerts,
   `Báo cáo tháng ${thangBaoCao}/${namBaoCao}`,
-  hanBaoCaoThang
+  hanBaoCaoThang,
+  5
 );
     
 
@@ -8581,7 +8642,8 @@ addAlert(
     addAlert(
       baoCaoAlerts,
       `Báo cáo Quý I/${year}`,
-      new Date(year,2,5,23,59,59)
+      new Date(year,2,5,23,59,59),
+      7
     );
 
     // =====================
@@ -8591,7 +8653,8 @@ addAlert(
     addAlert(
       baoCaoAlerts,
       `Báo cáo Quý II/${year}`,
-      new Date(year,5,5,23,59,59)
+      new Date(year,5,5,23,59,59),
+      7
     );
 
     // =====================
@@ -8601,7 +8664,8 @@ addAlert(
     addAlert(
       baoCaoAlerts,
       `Báo cáo Quý III/${year}`,
-      new Date(year,8,5,23,59,59)
+      new Date(year,8,5,23,59,59),
+      7
     );
 
     // =====================
@@ -8611,7 +8675,8 @@ addAlert(
     addAlert(
       baoCaoAlerts,
       `Báo cáo Quý IV/${year}`,
-      new Date(year,11,5,23,59,59)
+      new Date(year,11,5,23,59,59),
+      7
     );
 
     // =====================
@@ -8621,7 +8686,8 @@ addAlert(
     addAlert(
       baoCaoAlerts,
       `Báo cáo 6 tháng đầu năm ${year}`,
-      new Date(year,5,5,23,59,59)
+      new Date(year,5,5,23,59,59),
+      10
     );
 
     // =====================
@@ -8631,7 +8697,8 @@ addAlert(
     addAlert(
       baoCaoAlerts,
       `Báo cáo năm ${year}`,
-      new Date(year,11,5,23,59,59)
+      new Date(year,11,5,23,59,59),
+      15
     );
 
  const btn =
@@ -8685,6 +8752,71 @@ return;
 
 }
 
+function getWeekNumber(d){
+
+  d = new Date(
+    Date.UTC(
+      d.getFullYear(),
+      d.getMonth(),
+      d.getDate()
+    )
+  );
+
+  let dayNum =
+    d.getUTCDay() || 7;
+
+  d.setUTCDate(
+    d.getUTCDate() + 4 - dayNum
+  );
+
+  let yearStart =
+    new Date(
+      Date.UTC(
+        d.getUTCFullYear(),
+        0,
+        1
+      )
+    );
+
+  return Math.ceil(
+    (
+      (
+        (
+          d - yearStart
+        ) / 86400000
+      ) + 1
+    ) / 7
+  );
+
+}
+
+function addWeeklyAlert(
+  arr,
+  title,
+  deadline
+){
+
+  const now = new Date();
+
+  const diff =
+    deadline.getTime() - now.getTime();
+
+  if(diff <= 0) return;
+
+  const days =
+    Math.floor(diff / 86400000);
+
+  // Chỉ nhắc trước 1 ngày
+  if(days > 1) return;
+
+  addAlert(
+    arr,
+    title,
+    deadline
+  );
+
+}
+
 function toggleBaoCaoDone(key){
 
   const storageKey =
@@ -8727,6 +8859,18 @@ function isBaoCaoDone(key){
   return localStorage.getItem(
     "baocao_" + key
   ) === "done";
+
+}
+
+function hasUrgentBaoCao(){
+
+  return baoCaoAlerts.some(item =>
+
+    !isBaoCaoDone(item.key)
+    &&
+    item.days === 0
+
+  );
 
 }
 
@@ -8940,6 +9084,20 @@ function showBaoCaoNotify(){
   showCloseButton:true
 
 });
+
+}
+
+function showBaoCaoToast(msg){
+
+  Swal.fire({
+    toast:true,
+    position:"top-end",
+    icon:"warning",
+    title:msg,
+    showConfirmButton:false,
+    timer:6000,
+    timerProgressBar:true
+  });
 
 }
 
