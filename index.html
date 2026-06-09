@@ -474,7 +474,53 @@ transform:translateY(-1px);
 
 #pageTiepDan table{
 width:100%;
+table-layout:fixed;
 }
+
+#pageTiepDan th,
+#pageTiepDan td{
+    word-break:break-word;
+    white-space:normal;
+}
+
+/* STT */
+#pageTiepDan th:nth-child(1),
+#pageTiepDan td:nth-child(1){ width:45px; }
+
+/* Ngày */
+#pageTiepDan th:nth-child(2),
+#pageTiepDan td:nth-child(2){ width:90px; }
+
+/* Công chức */
+#pageTiepDan th:nth-child(3),
+#pageTiepDan td:nth-child(3){ width:120px; }
+
+/* Công dân */
+#pageTiepDan th:nth-child(4),
+#pageTiepDan td:nth-child(4){ width:230px; }
+
+/* CCCD */
+#pageTiepDan th:nth-child(5),
+#pageTiepDan td:nth-child(5){ width:90px; }
+
+/* Nội dung */
+#pageTiepDan th:nth-child(6),
+#pageTiepDan td:nth-child(6){ width:240px; }
+
+/* Hướng xử lý */
+#pageTiepDan th:nth-child(7),
+#pageTiepDan td:nth-child(7){ width:100px; }
+
+/* Thao tác */
+#pageTiepDan th:nth-child(8),
+#pageTiepDan td:nth-child(8){ width:160px; }
+
+#pageTiepDan table{
+    width:100%;
+    table-layout:fixed;
+}
+
+
 
 .clamp-4{
   display: -webkit-box;
@@ -727,10 +773,7 @@ background:transparent;
 outline:none;
 font-size:13px;
 }
-#pageTiepDan td:nth-child(2){
-text-align:center;
-font-weight:500;
-}
+
 #pageTiepDan tbody tr:hover{
 background:#f1f6ff;
 }
@@ -809,48 +852,6 @@ background:#ffc107;
 background:#e0a800;
 }
 
-#pageTiepDan th,
-#pageTiepDan td{
-padding:8px;
-vertical-align:middle;
-}
-
-#pageTiepDan table{
-  table-layout: fixed;
-  width:100%;
-}
-
-/* STT */
-#pageTiepDan th:nth-child(1),
-#pageTiepDan td:nth-child(1){ width:50px; }
-
-/* Ngày */
-#pageTiepDan th:nth-child(2),
-#pageTiepDan td:nth-child(2){ width:110px; }
-
-/* Công chức */
-#pageTiepDan th:nth-child(3),
-#pageTiepDan td:nth-child(3){ width:160px; }
-
-/* Công dân */
-#pageTiepDan th:nth-child(4),
-#pageTiepDan td:nth-child(4){ width:260px; }
-
-/* CCCD */
-#pageTiepDan th:nth-child(5),
-#pageTiepDan td:nth-child(5){ width:140px; }
-
-/* Nội dung */
-#pageTiepDan th:nth-child(6),
-#pageTiepDan td:nth-child(6){ width:260px; }
-
-/* Hướng xử lý */
-#pageTiepDan th:nth-child(7),
-#pageTiepDan td:nth-child(7){ width:180px; }
-
-/* Thao tác */
-#pageTiepDan th:nth-child(8),
-#pageTiepDan td:nth-child(8){ width:160px; }
 
 /* ===== SIDEBAR ===== */
 
@@ -924,14 +925,6 @@ background:#1a252f;
 border-left:4px solid #ffc107;
 }
 
-.main-content{
-flex:1;
-padding:10px;
-}
-
-#pageTiepDan td:nth-child(7){
-  max-width:300px;
-}
 
 /* ===== BACKGROUND ===== */
 
@@ -1099,7 +1092,7 @@ align-items:flex-start;
 
 .container{width:98%;margin:15px auto;}
 .card{background:white;padding:15px;border-radius:8px;margin-bottom:15px;}
-input,select,textarea{width:100%;padding:6px;margin-bottom:8px;}
+input,select,textarea{padding:6px;margin-bottom:8px;}
 button{padding:6px 10px;border:none;border-radius:5px;cursor:pointer;margin-right:4px;}
 .btn-save{background:#198754;color:white;}
 .btn-delete{background:#dc3545;color:white;}
@@ -1669,9 +1662,10 @@ left:0;
 width:100%;
 }
 .main-content{
-flex:1;
-padding:15px;
-padding-bottom:60px;
+  flex:1;
+  min-width:0;
+  padding:15px;
+  padding-bottom:60px;
 }
 
 .btn-save{
@@ -4473,14 +4467,14 @@ let realIndex = tiepDanList.indexOf(c);
 let fullName = (users[currentUser]?.fullname || "").trim().toLowerCase();
 let congChuc = (c.congchuc || "").trim().toLowerCase();
 
-let buttons = `<button class="btn-view" onclick="viewTiepDan(${realIndex})">Xem</button>`;
+let buttons = `<button class="btn-view"  title="Xem thông tin" onclick="viewTiepDan(${realIndex})">👁</button>`;
 
 if(currentRole==="Ban Giám đốc" || currentRole==="Admin" || c.username === currentUser){
-  buttons += `<button class="btn-edit" onclick="editTiepDan(${realIndex})">Sửa</button>`;
+  buttons += `<button class="btn-edit"  title="Sửa thông tin" onclick="editTiepDan(${realIndex})">✏</button>`;
 }
 
 if(currentRole==="Admin" || c.username === currentUser){
-  buttons += `<button class="btn-delete" onclick="deleteTiepDan('${c.id}')">Xóa</button>`;
+  buttons += `<button class="btn-delete"  title="Xóa thông tin" onclick="deleteTiepDan('${c.id}')">🗑</button>`;
 }
 
 let ngay = "";
