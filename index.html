@@ -477,6 +477,15 @@ width:100%;
 table-layout:fixed;
 }
 
+#tbodyTiepDan tr{
+    cursor:pointer;
+    transition:0.2s;
+}
+
+#tbodyTiepDan tr:hover{
+    background:#eaf4ff !important;
+}
+
 #pageTiepDan th,
 #pageTiepDan td{
     word-break:break-word;
@@ -934,6 +943,15 @@ font-family:'Segoe UI',sans-serif;
 background:#f4f6f9;
 }
 
+#tbodyDonThu tr{
+    cursor:pointer;
+    transition:0.2s;
+}
+
+#tbodyDonThu tr:hover{
+    background:#eaf4ff !important;
+}
+
 #loginPage{
 height:100vh;
 display:flex;
@@ -1169,6 +1187,17 @@ animation:fadeIn .25s ease;
 
   align-items:center;
 
+}
+
+.download-btn{
+font-size:22px;
+text-decoration:none;
+cursor:pointer;
+display:inline-block;
+}
+
+.download-btn:hover{
+transform:scale(1.2);
 }
 
 .report-header h2{
@@ -2139,12 +2168,15 @@ let tiepDanList = [];
 let filteredTiepDanList = [];
 let filteredBaoCao = [];
 let filteredBaoCaoTiepDan = [];
+let baoCaoLuuTru=[];
+
 
 /* ===== THƯ VIỆN VĂN BẢN ===== */
 let vanBanList = [];
 let vanBanPage = 1;
 let vanBanRowsPerPage = 10;
 let editVanBanId = null;
+let editBaoCaoId = null;
 let currentEditOwner = "";
 
 function loadVanBan(){
@@ -2159,6 +2191,30 @@ fetch(API_URL+"?action=getVanBan")
   vanBanPage = 1;
 
   renderVanBan();
+
+});
+
+}
+
+function loadBaoCaoLuuTru(){
+
+fetch(API_URL + "?action=getBaoCaoLuuTru")
+
+.then(r => r.json())
+
+.then(data => {
+
+baoCaoLuuTru = data || [];
+
+console.log("BAOCAO=",baoCaoLuuTru);
+
+renderBaoCaoLuuTru();
+
+})
+
+.catch(err => {
+
+console.error(err);
 
 });
 
@@ -2291,6 +2347,180 @@ renderVanBanPagination(ds.length);
 
 }
 
+
+function saveBaoCaoLuuTru(){
+
+let data = {
+
+action:
+  editBaoCaoId
+    ? "updateBaoCaoLuuTru"
+    : "addBaoCaoLuuTru",
+
+id:
+  editBaoCaoId || Date.now(),
+
+sohieu:
+document.getElementById("bcSoHieu").value,
+
+tenbaocao:
+document.getElementById("bcTen").value,
+
+loaibaocao:
+document.getElementById("bcLoai").value,
+
+ngaybanhanh:
+String(
+document.getElementById("bcNgay").value
+),
+
+linkdrive:
+document.getElementById("bcLink").value,
+
+ghichu:
+document.getElementById("bcGhiChu").value,
+
+owner: currentUser
+
+};
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify(data)
+})
+.then(r=>r.text())
+.then(res=>{
+
+alert("Đã lưu báo cáo");
+
+document.getElementById(
+"baoCaoModal"
+).style.display="none";
+
+editBaoCaoId = null;
+
+loadBaoCaoLuuTru();
+
+})
+.catch(err=>{
+
+console.error(err);
+
+alert("Lỗi lưu báo cáo");
+
+});
+
+}
+
+
+
+function editBaoCaoLuuTru(id){
+
+  let item = baoCaoLuuTru.find(
+    x => String(x.id) === String(id)
+  );
+
+  if(!item){
+    alert("Không tìm thấy báo cáo");
+    return;
+  }
+
+  editBaoCaoId = id;
+
+  document.getElementById("bcSoHieu").value =
+    item.sohieu || "";
+
+  document.getElementById("bcTen").value =
+    item.tenbaocao || "";
+
+  document.getElementById("bcLoai").value =
+    item.loaibaocao || "";
+
+  document.getElementById("bcNgay").value =
+    formatDateInputSafe(item.ngaybanhanh);
+
+  document.getElementById("bcLink").value =
+    item.linkdrive || "";
+
+  document.getElementById("bcGhiChu").value =
+    item.ghichu || "";
+
+  document.getElementById("baoCaoModal")
+    .style.display = "block";
+}
+
+function deleteBaoCaoLuuTru(id){
+
+  if(!confirm("Bạn có chắc muốn xóa báo cáo này?")){
+    return;
+  }
+
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"deleteBaoCaoLuuTru",
+      id:id
+    })
+  })
+  .then(r=>r.text())
+  .then(res=>{
+
+    alert("Đã xóa báo cáo");
+
+    loadBaoCaoLuuTru();
+
+  })
+  .catch(err=>{
+
+    console.error(err);
+
+    alert("Lỗi xóa báo cáo");
+
+  });
+
+}
+
+
+
+
+function viewBaoCaoLuuTru(link){
+
+    if(!link){
+        alert("Báo cáo chưa có file.");
+        return;
+    }
+
+    let fileId = "";
+
+    let match = link.match(/\/d\/([^\/]+)/);
+
+    if(match){
+        fileId = match[1];
+    }
+
+    if(fileId){
+
+        link =
+        "https://drive.google.com/file/d/"
+        + fileId +
+        "/preview";
+
+    }
+
+    document.getElementById("viewerBaoCao")
+      .style.display = "block";
+
+    document.getElementById("pdfViewerBaoCao")
+      .src = link;
+
+    document.getElementById("viewerBaoCao")
+      .scrollIntoView({
+          behavior:"smooth"
+      });
+
+}
+
+
 function changeVanBanRows(){
 
 vanBanRowsPerPage = Number(
@@ -2355,9 +2585,20 @@ function showPage(page){
 document.getElementById("pageDonThu").style.display="none";
 document.getElementById("pageTiepDan").style.display="none";
 document.getElementById("pageVanBan").style.display="none";
+/* ĐÓNG TRÌNH XEM VĂN BẢN */
+
+if(document.getElementById("viewerBox")){
+    document.getElementById("viewerBox").style.display = "none";
+}
+
+if(document.getElementById("pdfViewer")){
+    document.getElementById("pdfViewer").src = "";
+}
 document.getElementById("pageUsers").style.display="none";
 document.getElementById("pageBaoCao").style.display="none"; // 👈 THÊM DÒNG NÀY
 document.getElementById("pageBaoCaoTuan").style.display="none";
+/* THÊM DÒNG NÀY */
+document.getElementById("pageBaoCaoLuuTru").style.display="none";
 
 // reset active menu
 document.querySelectorAll(".sidebar a").forEach(a=>{
@@ -2425,19 +2666,33 @@ document.querySelectorAll(".sidebar a")[3]
 document.getElementById("pageTitle")
 .innerText="THƯ VIỆN VĂN BẢN";
 
-/* RESET BỘ LỌC */
+/* RESET PHÂN TRANG */
 
 vanBanPage = 1;
 
+/* RESET TÌM KIẾM */
+
 if(document.getElementById("searchVanBan"))
 document.getElementById("searchVanBan").value = "";
+
+/* RESET SỐ DÒNG */
 
 if(document.getElementById("vanBanRows"))
 document.getElementById("vanBanRows").value = "10";
 
 vanBanRowsPerPage = 10;
 
-/* TẢI LẠI DỮ LIỆU */
+/* ẨN KHUNG PDF */
+
+if(document.getElementById("viewerBox")){
+    document.getElementById("viewerBox").style.display = "none";
+}
+
+if(document.getElementById("pdfViewer")){
+    document.getElementById("pdfViewer").src = "";
+}
+
+/* TẢI LẠI DỮ LIỆU MỚI NHẤT */
 
 loadVanBan();
 
@@ -2523,7 +2778,7 @@ let currentEditId = null; // 👈 THÊM DÒNG NÀY
 let baoCaoAlerts = [];
 let filteredBaoCaoDonThu = [];
 
-const API_URL="https://script.google.com/macros/s/AKfycbympzK5nNP7t04PI7EIsGzXSyHJYV2ixH7wtn_AShxK2seO883eD8Z0PO6qzb1Qyuom/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbxQualFZxpWd-R28fy6ZUaGze6Dp14Mt3LBRBV2w7ki4btCniiWSJruBW5M9HIX-uiz/exec";
 
 function parseLocalDate(str){
   if(!str) return null;
@@ -3367,19 +3622,22 @@ let fullName = users[ownerKey]
   ? users[ownerKey].fullname
   : c.owner;
 
-let buttons=`<button class="btn-view" onclick="viewCase(${i})">Xem</button>`;
+let buttons=`<button class="btn-view" onclick="event.stopPropagation();viewCase(${i})">Xem</button>`;
 
 if(c.tinhtrang!=="Đã xử lý"){
 if(currentRole==="Ban Giám đốc" || c.owner===currentUser){
-buttons+=`<button class="btn-edit" onclick="editCase(${i})">Sửa</button>`;
+buttons+=`<button class="btn-edit" onclick="event.stopPropagation();editCase(${i})">Sửa</button>`;
 }
 if(c.owner===currentUser || currentRole==="Admin"){
-buttons+=`<button class="btn-delete" onclick="deleteCase(${i})">Xóa</button>`;
+buttons+=`<button class="btn-delete" onclick="event.stopPropagation();deleteCase(${i})">Xóa</button>`;
 }
 }
 
 tbody.innerHTML+=`
-<tr>
+<tr
+class="row-click"
+onclick="viewCase(${i})"
+>
 <td>${i+1}</td>
 <td>${c.mahoso}</td>
 <td>${formatDate(c.ngayden)}</td>
@@ -3418,6 +3676,7 @@ function formatDate(dateStr){
 }
 
 function viewCase(i){
+
 let c = cases[i];
 
 let statusClass = "status-processing";
@@ -3787,7 +4046,7 @@ pageItems.forEach((c,i)=>{
 
 let realIndex = cases.findIndex(x=>x.mahoso===c.mahoso);
 
-let buttons=`<button class="btn-view" onclick="viewCase(${realIndex})">Xem</button>`;
+let buttons=`<button class="btn-view" onclick="event.stopPropagation();viewCase(${realIndex})">Xem</button>`;
 
 if(c.tinhtrang!=="Đã giải quyết"){
 
@@ -3809,17 +4068,20 @@ if(
   c.owner===currentUser ||
   laNguoiThamMuu
 ){
-buttons+=`<button class="btn-edit" onclick="editCase(${realIndex})">Sửa</button>`;
+buttons+=`<button class="btn-edit" onclick="event.stopPropagation();editCase(${realIndex})">Sửa</button>`;
 }
 
 if(c.owner===currentUser || currentRole==="Admin"){
-buttons+=`<button class="btn-delete" onclick="deleteCase(${realIndex})">Xóa</button>`;
+buttons+=`<button class="btn-delete" onclick="event.stopPropagation();deleteCase(${realIndex})">Xóa</button>`;
 }
 
 }
 
 tbody.innerHTML+=`
-<tr>
+<tr
+class="row-click"
+onclick="viewCase(${realIndex})"
+>
 <td>${start+i+1}</td>
 
 <td>${formatDate(c.ngayden)}</td>
@@ -4467,14 +4729,14 @@ let realIndex = tiepDanList.indexOf(c);
 let fullName = (users[currentUser]?.fullname || "").trim().toLowerCase();
 let congChuc = (c.congchuc || "").trim().toLowerCase();
 
-let buttons = `<button class="btn-view"  title="Xem thông tin" onclick="viewTiepDan(${realIndex})">👁</button>`;
+let buttons = `<button class="btn-view"  title="Xem thông tin" onclick="event.stopPropagation();viewTiepDan(${realIndex})">👁</button>`;
 
 if(currentRole==="Ban Giám đốc" || currentRole==="Admin" || c.username === currentUser){
-  buttons += `<button class="btn-edit"  title="Sửa thông tin" onclick="editTiepDan(${realIndex})">✏</button>`;
+  buttons += `<button class="btn-edit"  title="Sửa thông tin" onclick="event.stopPropagation();editTiepDan(${realIndex})">✏</button>`;
 }
 
 if(currentRole==="Admin" || c.username === currentUser){
-  buttons += `<button class="btn-delete"  title="Xóa thông tin" onclick="deleteTiepDan('${c.id}')">🗑</button>`;
+  buttons += `<button class="btn-delete"  title="Xóa thông tin" onclick="event.stopPropagation();deleteTiepDan('${c.id}')">🗑</button>`;
 }
 
 let ngay = "";
@@ -4483,7 +4745,10 @@ ngay = formatDateDisplaySafe(c.ngay);
 }
 
 tbody.innerHTML += `
-<tr>
+<tr
+  class="row-click"
+  onclick="viewTiepDan(${realIndex})"
+>
 <td>${start+i+1}</td>
 <td>${ngay}</td>
 <td>${c.congchuc}</td>
@@ -4492,10 +4757,12 @@ tbody.innerHTML += `
 
 <td>
   <div class="clamp-4">
-    ${c.noidung || ""}
+    ${c.noidung||""}
   </div>
 </td>
+
 <td>${c.xuly||""}</td>
+
 <td>
   <div class="action-buttons">
     ${buttons}
@@ -8458,23 +8725,25 @@ function convertGoogleDriveToPreview(url){
 
 function viewVanBan(link){
 
-if(!link){
+    console.log("LINK =", link);
 
-  alert("Văn bản chưa có link.");
+    if(!link){
 
-  return;
-}
+        alert("Chưa có file.");
 
-document.getElementById("viewerBox")
-.style.display = "block";
+        return;
+    }
 
-document.getElementById("pdfViewer")
-.src = convertGoogleDriveToPreview(link);
+    document.getElementById("viewerBox")
+      .style.display = "block";
 
-document.getElementById("viewerBox")
-.scrollIntoView({
-  behavior:"smooth"
-});
+    document.getElementById("pdfViewer")
+      .src = link;
+
+    document.getElementById("viewerBox")
+      .scrollIntoView({
+          behavior:"smooth"
+      });
 
 }
 
@@ -9164,6 +9433,285 @@ function showBaoCaoDone(){
 
 }
 
+function openBaoCaoLuuTru(){
+  // ẨN PDF
+   let viewer =
+   document.getElementById("viewerBaoCao");
+
+   if(viewer){
+      viewer.style.display="none";
+   }
+
+   // XÓA FILE CŨ
+   let pdf =
+   document.getElementById("pdfViewerBaoCao");
+
+   if(pdf){
+      pdf.src="";
+   }
+
+   // XÓA Ô TÌM KIẾM
+   let search =
+   document.getElementById("searchBaoCaoLuuTru");
+
+   if(search){
+      search.value="";
+   }
+
+   // TẢI LẠI DANH SÁCH
+   loadBaoCaoLuuTru();
+
+
+    // Ẩn các trang khác
+    document.getElementById("pageDonThu").style.display="none";
+    document.getElementById("pageTiepDan").style.display="none";
+    document.getElementById("pageVanBan").style.display="none";
+    document.getElementById("pageBaoCao").style.display="none";
+    document.getElementById("pageBaoCaoTuan").style.display="none";
+
+    // Hiện trang báo cáo
+    document.getElementById("pageBaoCaoLuuTru").style.display="block";
+
+    document.getElementById("pageTitle").innerText =
+        "DANH MỤC BÁO CÁO THÁNG / QUÝ / NĂM";
+
+    // RESET GIAO DIỆN
+    resetBaoCaoLuuTru();
+
+    // Nạp lại dữ liệu mới nhất
+    loadBaoCaoLuuTru();
+}
+
+function backBaoCao(){
+
+  document.getElementById("pageBaoCaoLuuTru")
+    .style.display="none";
+
+  document.getElementById("pageBaoCao")
+    .style.display="block";
+
+  document.getElementById("pageTitle")
+    .innerText=
+    "BÁO CÁO THỐNG KÊ";
+
+}
+
+function renderBaoCaoLuuTru(){
+
+const tbody =
+document.getElementById("tbodyBaoCaoLuuTru");
+
+if(!tbody) return;
+
+tbody.innerHTML = "";
+
+const dsSapXep = [...baoCaoLuuTru].sort((a,b)=>{
+
+  return new Date(b.ngaybanhanh) - new Date(a.ngaybanhanh);
+
+});
+
+dsSapXep.forEach((item,index)=>{
+
+const tr =
+document.createElement("tr");
+
+tr.style.cursor = "pointer";
+
+tr.onclick = function(){
+
+viewBaoCaoLuuTru(item.linkdrive);
+
+};
+
+tr.innerHTML = `
+
+<td>${index+1}</td>
+<td>${item.sohieu || ""}</td>
+<td>${item.tenbaocao || ""}</td>
+<td>${item.loaibaocao || ""}</td>
+<td>${formatDate(item.ngaybanhanh)}</td>
+
+<td align="center">
+
+<a
+href="${getDownloadLink(item.linkdrive)}"
+target="_blank"
+class="download-btn"
+onclick="event.stopPropagation();">
+
+📥
+
+</a>
+
+</td>
+
+
+<td>
+
+<button
+class="btn-view">
+Xem
+</button>
+
+${
+(item.owner === currentUser || currentRole === "Admin")
+?
+
+`
+<button
+class="btn-edit">
+Sửa
+</button>
+
+<button
+class="btn-delete">
+Xóa
+</button>
+`
+
+: ""
+
+}
+
+
+</td>
+`;
+
+tr.querySelector(".btn-view")
+.onclick = function(e){
+
+e.stopPropagation();
+
+viewBaoCaoLuuTru(item.linkdrive);
+
+};
+
+const btnEdit =
+tr.querySelector(".btn-edit");
+
+if(btnEdit){
+
+btnEdit.onclick = function(e){
+
+e.stopPropagation();
+
+editBaoCaoLuuTru(item.id);
+
+};
+
+}
+
+const btnDelete =
+tr.querySelector(".btn-delete");
+
+if(btnDelete){
+
+btnDelete.onclick = function(e){
+
+e.stopPropagation();
+
+deleteBaoCaoLuuTru(item.id);
+
+};
+
+}
+
+tbody.appendChild(tr);
+
+});
+
+}
+
+
+
+function convertDriveLink(url){
+
+if(!url) return "";
+
+let match = url.match(/\/d\/(.*?)\//);
+
+if(match){
+
+return `https://drive.google.com/file/d/${match[1]}/preview`;
+
+}
+
+return url;
+
+}
+
+function newBaoCaoLuuTru(){
+
+  editBaoCaoId = null;
+
+  document.getElementById("bcSoHieu").value="";
+  document.getElementById("bcTen").value="";
+  document.getElementById("bcLoai").value="";
+  document.getElementById("bcNgay").value="";
+  document.getElementById("bcLink").value="";
+  document.getElementById("bcGhiChu").value="";
+
+  document.getElementById("baoCaoModalTitle").innerText =
+  "Thêm báo cáo";
+
+  document.getElementById("baoCaoModal").style.display =
+  "block";
+
+}
+function closeBaoCaoViewer(){
+
+    document.getElementById("viewerBaoCao")
+      .style.display="none";
+
+    document.getElementById("pdfViewerBaoCao")
+      .src="";
+
+}
+
+function resetBaoCaoLuuTru(){
+
+    // Xóa ô tìm kiếm
+    let search = document.getElementById("searchBaoCaoLuuTru");
+    if(search) search.value = "";
+
+    // Ẩn khung PDF
+    let viewer = document.getElementById("viewerBox");
+    if(viewer) viewer.style.display = "none";
+
+    // Xóa file PDF đang xem
+    let pdf = document.getElementById("pdfViewer");
+    if(pdf) pdf.src = "";
+
+    // Cuộn lên đầu
+    window.scrollTo({
+        top: 0,
+        behavior: "instant"
+    });
+
+}
+
+function getDownloadLink(link){
+
+  if(!link) return "#";
+
+  // Google Drive
+  if(link.includes("drive.google.com")){
+
+    const match = link.match(/\/d\/(.*?)\//);
+
+    if(match){
+
+      return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+
+    }
+
+  }
+
+  // Datafiles hoặc link PDF khác
+  return link;
+
+}
 </script>
 </head>
 <body>
@@ -9485,11 +10033,11 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
         <input type="date" id="toDateBaoCao" onchange="onChangeDate()">
         <button id="btnBaoCao" class="btn-report" onclick="handleBaoCao()">Xem báo cáo</button>
 
-        
-
-        <button class="btn-report" style="margin-left:10px;background:#0d6efd"
-        onclick="showPage('baocaotuan')">
-        📅 Báo cáo nhiệm vụ theo tuần
+        <button
+        class="btn-report" style="margin-left:10px;background:#0d6efd"
+        onclick="openBaoCaoDonThu()"
+        >
+        📊 Báo cáo đơn thư
         </button>
         <button
         class="btn-report" style="margin-left:10px;background:#0d6efd"
@@ -9498,17 +10046,104 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
         📄 Báo cáo tiếp công dân
         </button>
 
-        <button
-        class="btn-report" style="margin-left:10px;background:#0d6efd"
-        onclick="openBaoCaoDonThu()"
-        >
-        📊 Báo cáo đơn thư
+       <button class="btn-report" style="margin-left:10px;background:#0d6efd"
+        onclick="showPage('baocaotuan')">
+        📅 Báo cáo tuần
+        </button>
+        <button class="btn-report" style="margin-left:10px;background:#0d6efd"
+        onclick="openBaoCaoLuuTru()">
+        📅 Báo cáo tháng/quý/năm
         </button>
       </div>
 
       <div id="baoCaoContent" style="margin-top:15px"></div>
     </div>
   </div>
+</div>
+
+<div id="pageBaoCaoLuuTru" style="display:none">
+
+<div class="container">
+
+<div class="card">
+
+<div class="table-toolbar">
+
+<h3>📋 Danh sách báo cáo tháng/quý/năm</h3>
+
+<button
+class="btn-add"
+onclick="newBaoCaoLuuTru()">
+➕ Thêm báo cáo
+</button>
+
+</div>
+
+<div class="search-bar">
+
+<input
+id="searchBaoCaoLuuTru"
+placeholder="🔍 Tìm báo cáo..."
+oninput="renderBaoCaoLuuTru()">
+
+<button
+class="btn-reset"
+onclick="backBaoCao()">
+← Quay lại
+</button>
+
+</div>
+
+<div class="table-scroll">
+
+<table>
+
+<thead>
+<tr>
+<th>STT</th>
+<th>Số hiệu báo cáo</th>
+<th>Tên báo cáo</th>
+<th>Loại báo cáo</th>
+<th>Ngày ban hành</th>
+<th>Tải báo cáo</th>
+<th>Thao tác</th>
+</tr>
+</thead>
+
+<tbody id="tbodyBaoCaoLuuTru">
+</tbody>
+
+</table>
+
+</div>
+<!-- HIỂN THỊ PDF -->
+
+<div id="viewerBaoCao"
+style="
+display:none;
+margin-top:20px;
+background:#fff;
+padding:10px;
+">
+
+<h3>📄 Nội dung báo cáo</h3>
+<button
+onclick="closeBaoCaoViewer()"
+class="btn-delete">
+Đóng
+</button>
+<iframe
+id="pdfViewerBaoCao"
+width="100%"
+height="900"
+style="border:none;">
+</iframe>
+
+</div>
+</div>
+
+</div>
+
 </div>
 
 <!-- ================= BÁO CÁO TUAN ================= -->
@@ -10531,6 +11166,61 @@ color:#666;">
 <button onclick="closeVanBanForm()">
 ❌ Đóng
 </button>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
+<!-- MODAL BÁO CÁO THÁNG/QUÝ/NĂM -->
+<!-- ========================= -->
+
+<div id="baoCaoModal" class="modal" style="display:none">
+
+<div class="modal-content">
+
+<h3 id="baoCaoModalTitle">
+Thêm báo cáo
+</h3>
+
+<label>Số hiệu báo cáo</label>
+<input id="bcSoHieu">
+
+<label>Tên báo cáo</label>
+<input id="bcTen">
+
+<label>Loại báo cáo</label>
+<select id="bcLoai">
+<option value="Tháng">Tháng</option>
+<option value="Quý">Quý</option>
+<option value="Năm">Năm</option>
+</select>
+
+<label>Ngày ban hành</label>
+<input type="date" id="bcNgay">
+
+<label>Link Drive</label>
+<input id="bcLink">
+
+<label>Ghi chú</label>
+<textarea id="bcGhiChu"></textarea>
+
+<div style="text-align:right">
+
+<button
+class="btn-save"
+onclick="saveBaoCaoLuuTru()">
+Lưu
+</button>
+
+<button
+onclick="
+document.getElementById('baoCaoModal').style.display='none'
+">
+Đóng
+</button>
+
+</div>
 
 </div>
 
