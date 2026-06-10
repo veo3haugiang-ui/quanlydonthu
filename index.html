@@ -8815,6 +8815,11 @@ function startBaoCaoCountdown(){
 
   hours:hours,
 
+  isDeadlineToday:
+      now.getDate() === deadline.getDate()
+   && now.getMonth() === deadline.getMonth()
+   && now.getFullYear() === deadline.getFullYear(),
+
   deadline:
     deadline.toLocaleDateString("vi-VN"),
 
@@ -8868,11 +8873,23 @@ if(now > hanBaoCaoTuan){
 
 let soTuan = getWeekNumber(now);
 
+// Thứ 5 là ngày chốt số liệu
+let thu5 = new Date(hanBaoCaoTuan);
+
+// Thứ 6 tuần trước
+let thu6 = new Date(thu5);
+thu6.setDate(thu5.getDate() - 6);
+
+let periodTuan =
+  `ngày ${thu6.toLocaleDateString("vi-VN")} → ` +
+  `ngày ${thu5.toLocaleDateString("vi-VN")}`;
+
 addAlert(
   baoCaoAlerts,
   `Báo cáo tuần ${soTuan}/${year}`,
   hanBaoCaoTuan,
-  1
+  1,
+  periodTuan
 );
 
 // =====================
@@ -9224,10 +9241,12 @@ function showBaoCaoNotify(){
       ">
         ${
           done
-          ? "✓ Đã hoàn thành"
-          : item.days === 0
-            ? "🚨 Hôm nay là hạn cuối"
-            : `⏳ Còn ${item.days} ngày ${item.hours} giờ`
+? "✓ Đã hoàn thành"
+: item.isDeadlineToday
+  ? `🚨 Hôm nay hạn chót lúc 16:00`
+  : item.days === 0
+      ? `⏳ Còn ${item.hours} giờ`
+      : `⏳ Còn ${item.days} ngày ${item.hours} giờ`
         }
       </div>
 
