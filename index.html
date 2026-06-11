@@ -2169,6 +2169,8 @@ let filteredTiepDanList = [];
 let filteredBaoCao = [];
 let filteredBaoCaoTiepDan = [];
 let baoCaoLuuTru=[];
+let baoCaoPage = 1;
+let baoCaoRowsPerPage = 10;
 
 
 /* ===== THƯ VIỆN VĂN BẢN ===== */
@@ -2230,6 +2232,21 @@ function changeVanBanRows(){
   vanBanPage = 1;
 
   renderVanBan();
+
+}
+
+function changeBaoCaoRows(){
+
+  baoCaoRowsPerPage =
+    Number(
+      document.getElementById(
+        "baoCaoRows"
+      ).value
+    );
+
+  baoCaoPage = 1;
+
+  renderBaoCaoLuuTru();
 
 }
 
@@ -2728,6 +2745,22 @@ if(page==="users"){
 
 }
 
+function closeBaoCaoTuanxx(){
+
+  document.getElementById(
+    "pageBaoCaoTuan"
+  ).style.display = "none";
+
+  document.getElementById(
+    "pageBaoCao"
+  ).style.display = "block";
+
+  document.getElementById(
+    "pageTitle"
+  ).innerText = "BÁO CÁO THỐNG KÊ";
+
+}
+
 function reloadDonThuPage(){
 
   currentPage = 1;
@@ -2778,7 +2811,7 @@ let currentEditId = null; // 👈 THÊM DÒNG NÀY
 let baoCaoAlerts = [];
 let filteredBaoCaoDonThu = [];
 
-const API_URL="https://script.google.com/macros/s/AKfycbxQualFZxpWd-R28fy6ZUaGze6Dp14Mt3LBRBV2w7ki4btCniiWSJruBW5M9HIX-uiz/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbxlicuIGdGGDSOwz-htpkDPS_gslBb0FJDvDeeT8cv33KyNdvxwTszkESezBPg6Lh6y/exec";
 
 function parseLocalDate(str){
   if(!str) return null;
@@ -9453,6 +9486,8 @@ function showBaoCaoDone(){
 }
 
 function openBaoCaoLuuTru(){
+  baoCaoPage = 1;
+baoCaoRowsPerPage = 10;
   // ẨN PDF
    let viewer =
    document.getElementById("viewerBaoCao");
@@ -9524,13 +9559,53 @@ if(!tbody) return;
 
 tbody.innerHTML = "";
 
+// Từ khóa tìm kiếm
+let key =
+(
+document.getElementById(
+"searchBaoCaoLuuTru"
+)?.value || ""
+)
+.toLowerCase();
+
+// Sắp xếp mới nhất lên đầu
 const dsSapXep = [...baoCaoLuuTru].sort((a,b)=>{
 
-  return new Date(b.ngaybanhanh) - new Date(a.ngaybanhanh);
+  return new Date(b.ngaybanhanh)
+       - new Date(a.ngaybanhanh);
 
 });
 
-dsSapXep.forEach((item,index)=>{
+// Lọc tìm kiếm
+let ds = dsSapXep.filter(x =>
+
+(x.sohieu || "")
+.toLowerCase()
+.includes(key)
+
+||
+
+(x.tenbaocao || "")
+.toLowerCase()
+.includes(key)
+
+);
+
+// Phân trang
+let start =
+(baoCaoPage - 1)
+*
+baoCaoRowsPerPage;
+
+let end =
+start +
+baoCaoRowsPerPage;
+
+let pageData =
+ds.slice(start,end);
+
+// Hiển thị dữ liệu trang hiện tại
+pageData.forEach((item,index)=>{
 
 const tr =
 document.createElement("tr");
@@ -9539,16 +9614,22 @@ tr.style.cursor = "pointer";
 
 tr.onclick = function(){
 
-viewBaoCaoLuuTru(item.linkdrive);
+viewBaoCaoLuuTru(
+item.linkdrive
+);
 
 };
 
 tr.innerHTML = `
 
-<td>${index+1}</td>
+<td>${start + index + 1}</td>
+
 <td>${item.sohieu || ""}</td>
+
 <td>${item.tenbaocao || ""}</td>
+
 <td>${item.loaibaocao || ""}</td>
+
 <td>${formatDate(item.ngaybanhanh)}</td>
 
 <td align="center">
@@ -9565,7 +9646,6 @@ onclick="event.stopPropagation();">
 
 </td>
 
-
 <td>
 
 <button
@@ -9574,7 +9654,8 @@ Xem
 </button>
 
 ${
-(item.owner === currentUser || currentRole === "Admin")
+(item.owner === currentUser ||
+ currentRole === "Admin")
 ?
 
 `
@@ -9593,7 +9674,6 @@ Xóa
 
 }
 
-
 </td>
 `;
 
@@ -9602,7 +9682,9 @@ tr.querySelector(".btn-view")
 
 e.stopPropagation();
 
-viewBaoCaoLuuTru(item.linkdrive);
+viewBaoCaoLuuTru(
+item.linkdrive
+);
 
 };
 
@@ -9615,7 +9697,9 @@ btnEdit.onclick = function(e){
 
 e.stopPropagation();
 
-editBaoCaoLuuTru(item.id);
+editBaoCaoLuuTru(
+item.id
+);
 
 };
 
@@ -9630,7 +9714,9 @@ btnDelete.onclick = function(e){
 
 e.stopPropagation();
 
-deleteBaoCaoLuuTru(item.id);
+deleteBaoCaoLuuTru(
+item.id
+);
 
 };
 
@@ -9639,6 +9725,61 @@ deleteBaoCaoLuuTru(item.id);
 tbody.appendChild(tr);
 
 });
+
+// Hiển thị số trang
+renderBaoCaoPagination(
+ds.length
+);
+
+}
+
+function renderBaoCaoPagination(totalRows){
+
+let totalPage =
+
+Math.ceil(
+totalRows
+/
+baoCaoRowsPerPage
+);
+
+let html = "";
+
+if(totalPage <= 1){
+
+document.getElementById(
+"baoCaoPagination"
+).innerHTML = "";
+
+return;
+
+}
+
+for(let i=1;i<=totalPage;i++){
+
+html += `
+
+<button
+class="
+page-btn
+${i===baoCaoPage?'active':''}
+"
+onclick="
+baoCaoPage=${i};
+renderBaoCaoLuuTru();
+">
+
+${i}
+
+</button>
+
+`;
+
+}
+
+document.getElementById(
+"baoCaoPagination"
+).innerHTML = html;
 
 }
 
@@ -9730,6 +9871,15 @@ function getDownloadLink(link){
   // Datafiles hoặc link PDF khác
   return link;
 
+}
+
+function closeVanBanViewer(){
+
+  document.getElementById("viewerBox").style.display = "none";
+
+  document.getElementById("btnClosePdf").style.display = "none";
+
+  document.getElementById("pdfViewer").src = "";
 }
 </script>
 </head>
@@ -10135,6 +10285,29 @@ onclick="backBaoCao()">
 </table>
 
 </div>
+<div class="table-footer">
+
+<div class="rows-control">
+
+<span>Hiển thị</span>
+
+<select
+id="baoCaoRows"
+onchange="changeBaoCaoRows()">
+
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="50">50</option>
+
+</select>
+
+<span>báo cáo/trang</span>
+
+</div>
+
+<div id="baoCaoPagination"></div>
+
+</div>
 <!-- HIỂN THỊ PDF -->
 
 <div id="viewerBaoCao"
@@ -10182,6 +10355,11 @@ style="border:none;">
     onkeyup="searchBaoCaoTuan()"
     style="padding:6px; width:250px;"
   >
+  <button
+class="btn-reset"
+onclick="closeBaoCaoTuanxx()">
+← Quay lại
+</button>
 
   
 </div>
@@ -10413,6 +10591,11 @@ display:none;
 ">
 
 <h3>📄 Nội dung văn bản</h3>
+<button
+onclick="closeVanBanViewer()"
+class="btn-delete">
+Đóng
+</button>
 
 <iframe
 id="pdfViewer"
