@@ -529,7 +529,216 @@ table-layout:fixed;
     table-layout:fixed;
 }
 
+/* =========================
+   MODAL BÁO CÁO MỚI
+========================= */
 
+.baocao-modal{
+
+width:850px;
+max-width:95%;
+padding:0;
+overflow:hidden;
+border-radius:16px;
+
+}
+
+.baocao-header{
+
+background:linear-gradient(
+135deg,
+#b02a37,
+#8f1f2b
+);
+
+color:white;
+
+padding:18px 24px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+}
+
+.baocao-header h2{
+
+margin:0;
+font-size:22px;
+
+}
+
+.close-modal-btn{
+
+background:rgba(255,255,255,.2);
+color:white;
+border:none;
+
+width:40px;
+height:40px;
+
+border-radius:50%;
+
+font-size:18px;
+
+cursor:pointer;
+
+}
+
+.close-modal-btn:hover{
+
+background:rgba(255,255,255,.35);
+
+}
+
+.form-section{
+
+padding:20px 24px;
+
+border-bottom:1px solid #eee;
+
+}
+
+.form-section h4{
+
+margin-top:0;
+margin-bottom:16px;
+
+color:#b02a37;
+
+font-size:16px;
+
+}
+
+.form-grid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:16px;
+
+}
+
+.form-group{
+
+display:flex;
+flex-direction:column;
+
+}
+
+.full-width{
+
+grid-column:1 / -1;
+
+}
+
+.form-group label{
+
+font-weight:600;
+
+margin-bottom:6px;
+
+}
+
+.form-group label span{
+
+color:red;
+
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+
+padding:10px 12px;
+
+border:1px solid #d5d5d5;
+
+border-radius:8px;
+
+font-size:14px;
+
+background:#fafafa;
+
+transition:.2s;
+
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+
+outline:none;
+
+border-color:#b02a37;
+
+background:white;
+
+box-shadow:
+0 0 0 3px rgba(176,42,55,.15);
+
+}
+
+.form-group textarea{
+
+min-height:100px;
+
+resize:vertical;
+
+}
+
+.modal-footer{
+
+display:flex;
+
+justify-content:flex-end;
+
+gap:10px;
+
+padding:20px 24px;
+
+background:#fafafa;
+
+}
+
+.btn-save-large{
+
+background:#198754;
+color:white;
+
+padding:10px 24px;
+
+font-size:15px;
+
+font-weight:600;
+
+border:none;
+
+border-radius:8px;
+
+}
+
+.btn-save-large:hover{
+
+background:#157347;
+
+}
+
+.btn-cancel{
+
+background:#6c757d;
+color:white;
+
+padding:10px 20px;
+
+border:none;
+
+border-radius:8px;
+
+}
 
 .clamp-4{
   display: -webkit-box;
@@ -2088,6 +2297,25 @@ select:disabled{
   color:#666;
   cursor:not-allowed;
 }
+
+#tbodyBaoCaoLuuTru .download-btn{
+    font-size:12px !important;
+    padding:0 !important;
+    margin:0 2px !important;
+    line-height:1 !important;
+    display:inline-block;
+    text-decoration:none;
+}
+
+#vanBanTable .download-btn{
+    font-size:12px !important;
+    padding:0 !important;
+    margin:0 2px !important;
+    line-height:1.2 !important;
+    display:inline-block;
+    text-decoration:none;
+
+}
 </style>
 
 
@@ -2322,6 +2550,54 @@ onclick="viewVanBan('${v.linkdrive}')">
 
 <td>${formatNgayVanBan(v.ngaybanhanh)}</td>
 
+<td align="center">
+
+${(() => {
+
+  const files =
+    (v.linkdrive || "")
+    .split("|")
+    .filter(x => x);
+
+  if(files.length === 0){
+    return "";
+  }
+
+  return files.map((link,i)=>{
+
+    let label;
+
+    if(i===0){
+
+      label = "📄 Văn bản";
+
+    }else{
+
+      label =
+        files.length===2
+        ? "📎 Đính kèm"
+        : `📎 Đính kèm ${i}`;
+
+    }
+
+    return `
+      <a
+        href="${getDownloadLink(link)}"
+        target="_blank"
+        class="download-btn"
+        onclick="event.stopPropagation();">
+
+        ${label}
+
+      </a>
+    `;
+
+  }).join("<br>");
+
+})()}
+
+</td>
+
 <td>
 
 <button
@@ -2367,6 +2643,69 @@ renderVanBanPagination(ds.length);
 
 function saveBaoCaoLuuTru(){
 
+let soHieu =
+document.getElementById("bcSoHieu").value.trim();
+
+let tenBaoCao =
+document.getElementById("bcTen").value.trim();
+
+let loaiBaoCao =
+document.getElementById("bcLoai").value.trim();
+
+let ngayBanHanh =
+document.getElementById("bcNgay").value.trim();
+
+let dsLink = Array.from(
+document.querySelectorAll(".bcLinkItem")
+)
+.map(x => x.value.trim())
+.filter(x => x);
+
+if(!soHieu){
+Swal.fire(
+"Thiếu dữ liệu",
+"Vui lòng nhập Số hiệu báo cáo",
+"warning"
+);
+return;
+}
+
+if(!tenBaoCao){
+Swal.fire(
+"Thiếu dữ liệu",
+"Vui lòng nhập Tên báo cáo",
+"warning"
+);
+return;
+}
+
+if(!loaiBaoCao){
+Swal.fire(
+"Thiếu dữ liệu",
+"Vui lòng chọn Loại báo cáo",
+"warning"
+);
+return;
+}
+
+if(!ngayBanHanh){
+Swal.fire(
+"Thiếu dữ liệu",
+"Vui lòng chọn Ngày ban hành",
+"warning"
+);
+return;
+}
+
+if(dsLink.length===0){
+Swal.fire(
+"Thiếu dữ liệu",
+"Vui lòng nhập Link Drive",
+"warning"
+);
+return;
+}
+
 let data = {
 
 action:
@@ -2392,7 +2731,7 @@ document.getElementById("bcNgay").value
 ),
 
 linkdrive:
-document.getElementById("bcLink").value,
+dsLink.join("|"),
 
 ghichu:
 document.getElementById("bcGhiChu").value,
@@ -2456,8 +2795,47 @@ function editBaoCaoLuuTru(id){
   document.getElementById("bcNgay").value =
     formatDateInputSafe(item.ngaybanhanh);
 
-  document.getElementById("bcLink").value =
-    item.linkdrive || "";
+  // ===== LINK ĐÍNH KÈM =====
+
+  document.getElementById("fileContainer")
+    .innerHTML = "";
+
+  const dsLink =
+    (item.linkdrive || "")
+    .split("|");
+
+  dsLink.forEach(link => {
+
+    const div =
+      document.createElement("div");
+
+    div.style.display = "flex";
+    div.style.gap = "5px";
+    div.style.marginTop = "5px";
+
+    div.innerHTML = `
+
+      <input
+        class="bcLinkItem"
+        value="${link}">
+
+      <button
+        type="button"
+        onclick="this.parentElement.remove()">
+
+        ❌
+
+      </button>
+
+    `;
+
+    document
+      .getElementById("fileContainer")
+      .appendChild(div);
+
+  });
+
+  // ==========================
 
   document.getElementById("bcGhiChu").value =
     item.ghichu || "";
@@ -8451,7 +8829,15 @@ document.getElementById("vbTen").value="";
 document.getElementById("vbLoai").value="";
 document.getElementById("vbCoQuan").value="";
 document.getElementById("vbNgay").value="";
-document.getElementById("vbLink").value="";
+document.getElementById(
+"vbFileContainer"
+).innerHTML = `
+
+<input
+class="vbLinkItem"
+placeholder="Dán link Google Drive hoặc PDF">
+
+`;
 document.getElementById("vbGhiChu").value="";
 
 document.getElementById("vanBanModal")
@@ -8473,14 +8859,93 @@ editVanBanId
 ? "updateVanBan"
 : "addVanBan";
 
-let link =
-document.getElementById("vbLink")
-.value
-.trim();
+// Lấy danh sách link tài liệu
+let dsLink = Array.from(
+document.querySelectorAll(".vbLinkItem")
+)
+.map(x => x.value.trim())
+.filter(x => x);
+
+let link = dsLink.join("|");
 
 let file =
 document.getElementById("vbFile")
 .files[0];
+
+if(!document.getElementById("vbSoHieu").value.trim()){
+  alert("⚠ Chưa nhập Số hiệu văn bản");
+  document.getElementById("vbSoHieu").focus();
+  return;
+}
+
+if(!document.getElementById("vbTen").value.trim()){
+  alert("⚠ Chưa nhập Tên văn bản");
+  document.getElementById("vbTen").focus();
+  return;
+}
+
+if(!document.getElementById("vbLoai").value.trim()){
+  alert("⚠ Chưa nhập Loại văn bản");
+  document.getElementById("vbLoai").focus();
+  return;
+}
+
+if(!document.getElementById("vbCoQuan").value.trim()){
+  alert("⚠ Chưa nhập Cơ quan ban hành");
+  document.getElementById("vbCoQuan").focus();
+  return;
+}
+
+if(!document.getElementById("vbNgay").value.trim()){
+  alert("⚠ Chưa nhập Ngày ban hành");
+  document.getElementById("vbNgay").focus();
+  return;
+}
+
+if(dsLink.length === 0){
+  alert("⚠ Chưa nhập tài liệu đính kèm");
+  return;
+}
+
+// Upload file nếu có
+if(!link && file){
+
+  let base64 =
+  await fileToBase64(file);
+
+  let uploadRes =
+  await fetch(API_URL,{
+
+    method:"POST",
+
+    body:JSON.stringify({
+
+      action:"uploadVanBanFile",
+
+      fileName:file.name,
+
+      mimeType:file.type,
+
+      base64:base64
+
+    })
+
+  });
+
+  let uploadData =
+  await uploadRes.json();
+
+  if(!uploadData.success){
+
+    alert("Upload file thất bại.");
+
+    return;
+
+  }
+
+  link = uploadData.url;
+
+}
 
 let obj = {
 
@@ -8515,81 +8980,6 @@ document.getElementById("vbGhiChu").value
 
 };
 
-if(!document.getElementById("vbSoHieu").value.trim()){
-  alert("⚠ Chưa nhập Số hiệu văn bản");
-  document.getElementById("vbSoHieu").focus();
-  return;
-}
-
-if(!document.getElementById("vbTen").value.trim()){
-  alert("⚠ Chưa nhập Tên văn bản");
-  document.getElementById("vbTen").focus();
-  return;
-}
-
-if(!document.getElementById("vbLoai").value.trim()){
-  alert("⚠ Chưa nhập Loại văn bản");
-  document.getElementById("vbLoai").focus();
-  return;
-}
-
-if(!document.getElementById("vbCoQuan").value.trim()){
-  alert("⚠ Chưa nhập Cơ quan ban hành");
-  document.getElementById("vbCoQuan").focus();
-  return;
-}
-
-if(!document.getElementById("vbNgay").value.trim()){
-  alert("⚠ Chưa nhập Ngày ban hành");
-  document.getElementById("vbNgay").focus();
-  return;
-}
-
-
-
-
-if(!link && file){
-
-  let base64 =
-  await fileToBase64(file);
-
-  let uploadRes =
-  await fetch(API_URL,{
-
-    method:"POST",
-
-    body:JSON.stringify({
-
-      action:"uploadVanBanFile",
-
-      fileName:file.name,
-
-      mimeType:file.type,
-
-      base64:base64
-
-    })
-
-  });
-
-  let uploadData =
-  await uploadRes.json();
-
-  if(!uploadData.success){
-
-    alert(
-    "Upload file thất bại."
-    );
-
-    return;
-
-  }
-
-  link =
-  uploadData.url;
-
-}
-
 await fetch(API_URL,{
 
 method:"POST",
@@ -8604,56 +8994,17 @@ loadVanBan();
 
 }
 
-async function deleteVanBan(id){
-let vb =
-vanBanList.find(v=>v.id==id);
-
-if(
-
-currentRole!=="Admin"
-
-&&
-
-currentRole!=="Ban Giám đốc"
-
-&&
-
-vb.owner!==currentUser
-
-){
-
-alert("Bạn không có quyền xóa văn bản này");
-
-return;
-
-}
-
-if(!confirm("Bạn có chắc muốn xóa văn bản này?")){
-  return;
-}
-
-await fetch(API_URL,{
-
-  method:"POST",
-
-  body:JSON.stringify({
-    action:"deleteVanBan",
-    id:id
-  })
-
-});
-
-loadVanBan();
-
-}
-
 function editVanBan(id){
 
 let vb =
 vanBanList.find(
 v => String(v.id) === String(id)
 );
-currentEditOwner = vb.owner || "";
+
+if(!vb) return;
+
+currentEditOwner =
+vb.owner || "";
 
 if(
 
@@ -8674,8 +9025,6 @@ alert("Bạn không có quyền sửa văn bản này");
 return;
 
 }
-
-if(!vb) return;
 
 editVanBanId = id;
 
@@ -8698,8 +9047,43 @@ document.getElementById("vbNgay")
 .value =
 formatDateInput(vb.ngaybanhanh);
 
-document.getElementById("vbLink")
-.value = vb.linkdrive || "";
+// Hiển thị nhiều file đính kèm
+document.getElementById(
+"vbFileContainer"
+).innerHTML = "";
+
+(vb.linkdrive || "")
+.split("|")
+.forEach(link=>{
+
+const div =
+document.createElement("div");
+
+div.style.display="flex";
+div.style.gap="5px";
+div.style.marginTop="5px";
+
+div.innerHTML = `
+
+<input
+class="vbLinkItem"
+value="${link}">
+
+<button
+type="button"
+onclick="this.parentElement.remove()">
+
+❌
+
+</button>
+
+`;
+
+document
+.getElementById("vbFileContainer")
+.appendChild(div);
+
+});
 
 document.getElementById("vbGhiChu")
 .value = vb.ghichu || "";
@@ -8708,22 +9092,6 @@ document.getElementById("vanBanModal")
 .style.display = "block";
 
 }
-
-document.addEventListener("change",function(e){
-
-  if(e.target.id==="vbFile"){
-
-    let file=e.target.files[0];
-
-    document.getElementById("selectedFile")
-    .innerText=
-      file
-      ? "📄 "+file.name
-      : "";
-
-  }
-
-});
 
 function formatDateInput(dateStr){
 
@@ -8765,6 +9133,13 @@ function viewVanBan(link){
         alert("Chưa có file.");
 
         return;
+    }
+
+    // Nếu có nhiều file thì lấy file đầu tiên
+    if(link.includes("|")){
+
+        link = link.split("|")[0];
+
     }
 
     document.getElementById("viewerBox")
@@ -9615,7 +9990,7 @@ tr.style.cursor = "pointer";
 tr.onclick = function(){
 
 viewBaoCaoLuuTru(
-item.linkdrive
+item.linkdrive.split("|")[0]
 );
 
 };
@@ -9634,15 +10009,53 @@ tr.innerHTML = `
 
 <td align="center">
 
-<a
-href="${getDownloadLink(item.linkdrive)}"
-target="_blank"
-class="download-btn"
-onclick="event.stopPropagation();">
+${
 
-📥
+(()=>{
+    
+    const files =
+      (item.linkdrive || "")
+      .split("|");
 
-</a>
+    const soDinhKem =
+      files.length - 1;
+
+    return files.map((link,i)=>{
+
+      let label;
+
+      if(i === 0){
+
+        label = "📄 Báo cáo";
+
+      }else{
+
+        label =
+          soDinhKem === 1
+          ? "📎 Đính kèm"
+          : `📎 Đính kèm ${i}`;
+
+      }
+
+      return `
+
+      <a
+      href="${getDownloadLink(link)}"
+      target="_blank"
+      class="download-btn"
+      onclick="event.stopPropagation();">
+
+      ${label}
+
+      </a>
+
+      `;
+
+    }).join("<br>");
+
+})()
+
+}
 
 </td>
 
@@ -9809,7 +10222,11 @@ function newBaoCaoLuuTru(){
   document.getElementById("bcTen").value="";
   document.getElementById("bcLoai").value="";
   document.getElementById("bcNgay").value="";
-  document.getElementById("bcLink").value="";
+  document.getElementById("fileContainer").innerHTML = `
+<input
+class="bcLinkItem"
+placeholder="Dán link Google Drive hoặc PDF">
+`;
   document.getElementById("bcGhiChu").value="";
 
   document.getElementById("baoCaoModalTitle").innerText =
@@ -9881,6 +10298,68 @@ function closeVanBanViewer(){
 
   document.getElementById("pdfViewer").src = "";
 }
+
+function themLinkBaoCao(){
+
+const div =
+document.createElement("div");
+
+div.style.display = "flex";
+div.style.gap = "5px";
+div.style.marginTop = "5px";
+
+div.innerHTML = `
+
+<input
+class="bcLinkItem"
+placeholder="Dán link Google Drive hoặc PDF">
+
+<button
+type="button"
+onclick="this.parentElement.remove()">
+
+❌
+
+</button>
+
+`;
+
+document
+.getElementById("fileContainer")
+.appendChild(div);
+
+}
+function addVanBanFile(){
+
+const div =
+document.createElement("div");
+
+div.style.display = "flex";
+div.style.gap = "5px";
+div.style.marginTop = "5px";
+
+div.innerHTML = `
+
+<input
+class="vbLinkItem"
+placeholder="Dán link Google Drive hoặc PDF">
+
+<button
+type="button"
+onclick="this.parentElement.remove()">
+
+❌
+
+</button>
+
+`;
+
+document
+.getElementById("vbFileContainer")
+.appendChild(div);
+
+}
+
 </script>
 </head>
 <body>
@@ -10535,6 +11014,7 @@ onkeyup="renderVanBan()">
 <th>Loại văn bản</th>
 <th>Cơ quan ban hành</th>
 <th>Ngày ban hành</th>
+<th>Tải văn bản</th>
 <th>Thao tác</th>
 
 </tr>
@@ -11303,40 +11783,98 @@ onclick="exportBaoCaoExcel()"
 
 <div id="vanBanModal" class="modal" style="display:none">
 
-<div class="modal-content">
+<div class="modal-content baocao-modal">
 
-<h3 id="vanBanModalTitle">
-Thêm văn bản
-</h3>
+<div class="baocao-header">
 
-<label>Số hiệu<span style="color:red">*</span></label>
+<h2 id="vanBanModalTitle">
+📄 Thêm văn bản
+</h2>
+
+<button
+class="close-modal-btn"
+onclick="closeVanBanForm()">
+✕
+</button>
+
+</div>
+
+<div class="form-section">
+
+<h4>📄 Thông tin văn bản</h4>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Số hiệu <span>*</span></label>
 <input id="vbSoHieu">
+</div>
 
-<label>Tên văn bản<span style="color:red">*</span></label>
-<input id="vbTen">
-
-<label>Loại văn bản<span style="color:red">*</span></label>
+<div class="form-group">
+<label>Loại văn bản <span>*</span></label>
 <input id="vbLoai">
+</div>
 
-<label>Cơ quan ban hành<span style="color:red">*</span></label>
+<div class="form-group full-width">
+<label>Tên văn bản <span>*</span></label>
+<input id="vbTen">
+</div>
+
+<div class="form-group">
+<label>Cơ quan ban hành <span>*</span></label>
 <input id="vbCoQuan">
+</div>
 
-<label>Ngày ban hành<span style="color:red">*</span></label>
+<div class="form-group">
+<label>Ngày ban hành <span>*</span></label>
 <input type="date" id="vbNgay">
+</div>
 
-<label>Link tài liệu <span style="color:red">*</span></label>
+</div>
+
+</div>
+
+<div class="form-section">
+
+<h4>📎 Tài liệu đính kèm</h4>
+
+<div class="form-group">
+
+
+<div id="vbFileContainer">
 
 <input
-id="vbLink"
-placeholder="Dán link tài liệu hoặc hãy dùng link Google Drive nếu đã có">
+class="vbLinkItem"
+placeholder="Dán link Google Drive hoặc PDF">
+
+</div>
+
+<button
+type="button"
+style="
+margin-top:8px;
+background:#f1f1f1;
+color:#333;
+border:1px solid #ddd;
+padding:8px 12px;
+border-radius:6px;"
+onclick="addVanBanFile()">
+
+➕ Thêm tài liệu
+
+</button>
+
+</div>
 
 <div style="
 text-align:center;
-margin:10px 0;
+margin:15px 0;
 font-weight:bold;
-color:#666;">
+color:#777;">
 HOẶC
 </div>
+
+<div class="form-group">
 
 <label>Tệp văn bản</label>
 
@@ -11347,6 +11885,7 @@ onclick="
 alert('⚠ Chức năng tải tệp đang được hoàn thiện. Vui lòng sử dụng Link Google Drive.');
 return false;
 ">
+
 <div
 id="selectedFile"
 style="
@@ -11355,19 +11894,43 @@ font-size:13px;
 color:#666;">
 </div>
 
+</div>
+
+</div>
+
+<div class="form-section">
+
+<div class="form-group">
+
 <label>Ghi chú</label>
 
 <textarea id="vbGhiChu"></textarea>
 
-<br><br>
+</div>
 
-<button onclick="saveVanBan()">
-💾 Lưu
+</div>
+
+<div class="modal-footer">
+
+<button
+type="button"
+class="btn-cancel"
+onclick="closeVanBanForm()">
+
+❌ Hủy
+
 </button>
 
-<button onclick="closeVanBanForm()">
-❌ Đóng
+<button
+type="button"
+class="btn-save-large"
+onclick="saveVanBan()">
+
+💾 Lưu văn bản
+
 </button>
+
+</div>
 
 </div>
 
@@ -11379,47 +11942,110 @@ color:#666;">
 
 <div id="baoCaoModal" class="modal" style="display:none">
 
-<div class="modal-content">
+<div class="modal-content baocao-modal">
 
-<h3 id="baoCaoModalTitle">
-Thêm báo cáo
-</h3>
+<div class="baocao-header">
 
-<label>Số hiệu báo cáo</label>
-<input id="bcSoHieu">
-
-<label>Tên báo cáo</label>
-<input id="bcTen">
-
-<label>Loại báo cáo</label>
-<select id="bcLoai">
-<option value="Tháng">Tháng</option>
-<option value="Quý">Quý</option>
-<option value="Năm">Năm</option>
-</select>
-
-<label>Ngày ban hành</label>
-<input type="date" id="bcNgay">
-
-<label>Link Drive</label>
-<input id="bcLink">
-
-<label>Ghi chú</label>
-<textarea id="bcGhiChu"></textarea>
-
-<div style="text-align:right">
+<h2 id="baoCaoModalTitle">
+📊 Thêm báo cáo tháng / quý / năm
+</h2>
 
 <button
-class="btn-save"
-onclick="saveBaoCaoLuuTru()">
-Lưu
-</button>
-
-<button
+class="close-modal-btn"
 onclick="
 document.getElementById('baoCaoModal').style.display='none'
 ">
-Đóng
+✖
+</button>
+
+</div>
+
+<div class="form-section">
+
+<h4>📄 Thông tin báo cáo</h4>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Số hiệu báo cáo <span>*</span></label>
+<input id="bcSoHieu">
+</div>
+
+<div class="form-group">
+<label>Loại báo cáo <span>*</span></label>
+
+<select id="bcLoai">
+<option value="">-- Chọn loại báo cáo --</option>
+<option value="Tháng">Tháng</option>
+<option value="Quý">Quý</option>
+<option value="6 tháng">6 tháng đầu năm</option>
+<option value="Năm">Năm</option>
+<option value="Khác">Khác</option>
+</select>
+
+</div>
+
+<div class="form-group full-width">
+<label>Tên báo cáo <span>*</span></label>
+<input id="bcTen">
+</div>
+
+<div class="form-group">
+<label>Ngày ban hành <span>*</span></label>
+<input type="date" id="bcNgay">
+</div>
+
+</div>
+
+</div>
+
+<div class="form-section">
+
+<h4>📎 Tài liệu đính kèm</h4>
+
+<div class="form-group">
+
+
+<div id="fileContainer">
+
+<input
+class="bcLinkItem"
+placeholder="Dán link Google Drive hoặc PDF">
+
+</div>
+
+<button
+type="button"
+class="btn-add-file"
+onclick="themLinkBaoCao()">
+
+➕ Thêm tài liệu
+
+</button>
+
+</div>
+
+<div class="form-group">
+<label>Ghi chú</label>
+<textarea id="bcGhiChu"></textarea>
+</div>
+
+</div>
+
+<div class="modal-footer">
+
+<button
+class="btn-cancel"
+onclick="
+document.getElementById('baoCaoModal').style.display='none'
+">
+❌ Hủy
+</button>
+
+<button
+class="btn-save-large"
+onclick="saveBaoCaoLuuTru()">
+💾 Lưu báo cáo
 </button>
 
 </div>
