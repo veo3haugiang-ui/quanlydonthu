@@ -2641,7 +2641,7 @@ renderVanBanPagination(ds.length);
 }
 
 
-function saveBaoCaoLuuTru(){
+async function saveBaoCaoLuuTru(){
 
 let soHieu =
 document.getElementById("bcSoHieu").value.trim();
@@ -2655,11 +2655,32 @@ document.getElementById("bcLoai").value.trim();
 let ngayBanHanh =
 document.getElementById("bcNgay").value.trim();
 
+let uploadedLink = "";
+
+const fileInput =
+document.getElementById("vbFile");
+
+if(
+  fileInput &&
+  fileInput.files.length > 0
+){
+
+  uploadedLink =
+  await uploadVanBanFile();
+
+}
+
 let dsLink = Array.from(
-document.querySelectorAll(".bcLinkItem")
+  document.querySelectorAll(".vbLinkItem")
 )
-.map(x => x.value.trim())
-.filter(x => x);
+.map(x=>x.value.trim())
+.filter(x=>x);
+
+if(uploadedLink){
+
+  dsLink.unshift(uploadedLink);
+
+}
 
 if(!soHieu){
 Swal.fire(
@@ -2906,6 +2927,8 @@ function viewBaoCaoLuuTru(link){
       .style.display = "block";
 
     document.getElementById("pdfViewerBaoCao")
+      .src = link;
+    document.getElementById("viewerBaoCao")
       .src = link;
 
     document.getElementById("viewerBaoCao")
@@ -3189,7 +3212,7 @@ let currentEditId = null; // 👈 THÊM DÒNG NÀY
 let baoCaoAlerts = [];
 let filteredBaoCaoDonThu = [];
 
-const API_URL="https://script.google.com/macros/s/AKfycbxlicuIGdGGDSOwz-htpkDPS_gslBb0FJDvDeeT8cv33KyNdvxwTszkESezBPg6Lh6y/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbxRJ333k81zTjbmn6V9B3GjkZml0GcH3AFoQ1j81TxeVZvp0vES0fpwX6VjwvClZjkL/exec";
 
 function parseLocalDate(str){
   if(!str) return null;
@@ -3401,6 +3424,13 @@ function newCase(){
   document.getElementById("ngayden").value = `${dd}/${mm}/${yyyy}`;
 
   document.getElementById("formModal").style.display="block";
+  document.getElementById(
+"hosoFileContainer"
+).innerHTML="";
+
+document.getElementById(
+"hosoLink"
+).value="";
 }
 
 function generateCode(type){
@@ -3655,16 +3685,40 @@ let day2="", m2="", y2="";
 if(ngayxuly.value){
   [day2, m2, y2] = ngayxuly.value.split("/");
 }
+let dsFile = [];
+
+document
+.querySelectorAll(".hosoFileItem")
+.forEach(item=>{
+
+  let link =
+    item.value.trim();
+
+  if(!link) return;
+
+  let owner =
+    item.dataset.owner
+    || currentUser;
+
+  dsFile.push(
+    `${link}@@${owner}`
+  );
+
+});
+
 let newData={
 action:(editIndex===-1)?"add":"update",
 mahoso,
-ngayden: `${day1}/${m1}/${y1}`,
+ngayden:`${day1}/${m1}/${y1}`,
 nguondon:nguondon.value,
 linhvuc:linhvuc.value,
 soluong:soluong.value,
-hoten: hoten.value.trim() === ""
+
+hoten:
+  hoten.value.trim()===""
   ? "Đơn nặc danh"
   : hoten.value.trim(),
+
 diachi:diachi.value,
 dienthoai:dienthoai.value,
 noidung:noidung.value,
@@ -3672,21 +3726,35 @@ coquan:coquan.value,
 ketqua:ketqua.value,
 sokyhieu:sokyhieu.value,
 kyduyet:kyduyet.value,
-soanthao: soanThaoValue,
+soanthao:soanThaoValue,
 ghichu:ghichu.value,
+
+file:
+  dsFile.join("|"),
+
 tinhtrang:tinhtrang.value,
-loaidon: loaiDonValue,   // ✅ CHUẨN
+loaidon:loaiDonValue,
 dieukien:dieukien.value,
+
 owner:
-  editIndex === -1
-    ? currentUser.trim().toLowerCase()
-    : cases[editIndex].owner,
+  editIndex===-1
+  ? currentUser.trim().toLowerCase()
+  : cases[editIndex].owner,
+
 created:
-  editIndex === -1
-    ? Date.now()
-    : cases[editIndex].created,
-ngayxuly: day2 ? `${day2}/${m2}/${y2}` : "",
-history:[]
+  editIndex===-1
+  ? Date.now()
+  : cases[editIndex].created,
+
+ngayxuly:
+  day2
+  ? `${day2}/${m2}/${y2}`
+  : "",
+
+history:
+  editIndex===-1
+  ? []
+  : (cases[editIndex].history || [])
 };
 
 fetch(API_URL,{
@@ -3931,6 +3999,30 @@ editIndex=i;
 document.getElementById("formModal").style.display="block";
 
 toggleXuLyFields();
+document
+.getElementById("hosoFileContainer")
+.innerHTML = "";
+
+(c.file || "")
+.split("|")
+.filter(x=>x)
+.forEach(item=>{
+
+  let parts =
+    item.split("@@");
+
+  let link =
+    parts[0] || "";
+
+  let owner =
+    parts[1] || "";
+
+  addHoSoFileField(
+    link,
+    owner
+  );
+
+});
 
 
 // ===============================
@@ -3971,37 +4063,55 @@ else if(laNguoiThamMuu){
 
   let allowFields = [
 
+    "coquan",      // thẩm quyền
+    "dieukien",    // điều kiện xử lý
+
     "tinhtrang",
     "ketqua",
     "ngayxuly",
     "sokyhieu",
     "kyduyet",
-    "ghichu"
+    "ghichu",
 
+    "hosoLink"     // ô nhập link đầu tiên
   ];
 
-  // khóa toàn bộ
+  // khóa toàn bộ form
   document
   .querySelectorAll(
     "#formModal input, #formModal select, #formModal textarea"
   )
   .forEach(el=>{
-
     el.disabled = true;
-
   });
 
-  // mở field được phép sửa
+  // mở các field được phép sửa
   allowFields.forEach(id=>{
 
     let el = document.getElementById(id);
 
     if(el){
-
       el.disabled = false;
-
     }
 
+  });
+
+  // ===== MỞ TOÀN BỘ LINK FILE ĐÍNH KÈM =====
+
+  document
+  .querySelectorAll(".hosoLinkItem")
+  .forEach(el=>{
+    el.disabled = false;
+  });
+
+  // ===== CHO PHÉP THÊM FILE MỚI =====
+
+  document
+  .querySelectorAll(
+    '#hosoFileContainer button'
+  )
+  .forEach(btn=>{
+    btn.disabled = false;
   });
 
 }
@@ -4207,7 +4317,7 @@ ${c.tinhtrang||""}
 <div class="view-value">${c.ngayxuly}</div>
 </div>
 
-<div class="view-item">
+<div class="view-item view-full">
 <div class="view-label">Số ký hiệu văn bản</div>
 <div class="view-value">${c.sokyhieu||""}</div>
 </div>
@@ -4229,18 +4339,206 @@ ${c.tinhtrang||""}
 <div class="view-value">${c.ghichu||""}</div>
 </div>
 
+<div class="section-title">
+📎 TÀI LIỆU ĐÍNH KÈM
+</div>
+<div class="view-item view-full">
+<div class="view-value">
+
+${
+(c.file || "")
+.split("|")
+.filter(x=>x)
+.map((f,index)=>`
+
+<button
+class="btn-view"
+style="
+background:#ffc107;
+border:none;
+color:#000;
+font-weight:600;
+margin-right:5px;
+"
+onclick="event.stopPropagation();showTaiLieu('${f}')">
+
+📎 Tài liệu ${index+1}
+
+</button>
+
+`)
+.join(" ")
+
+||
+
+"Không có tài liệu"
+
+}
+
+</div>
+
+</div>
+
+<div
+id="taiLieuViewer"
+class="view-full"
+style="
+display:none;
+margin-top:15px;
+width:100%;
+grid-column:1 / -1;
+">
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+">
+
+<h4 style="
+margin:0;
+color:#b22222;
+">
+📄 Xem tài liệu
+</h4>
+
+<button
+type="button"
+class="btn-delete"
+onclick="closeTaiLieu()">
+
+✖ Đóng tài liệu
+
+</button>
+
+</div>
+
+<iframe
+id="taiLieuFrame"
+style="
+width:100%;
+height:850px;
+border:1px solid #ddd;
+border-radius:8px;
+background:#fff;
+">
+</iframe>
+
+</div>
+
+
 </div>
 </div>
 
 <div class="popup-actions">
 <button class="print-btn" onclick="window.print()">🖨 In</button>
 <button class="pdf-btn" onclick="window.print()">📑 Xuất PDF</button>
+<button
+    class="btn btn-secondary"
+    onclick="closeModal()">
+    ❌ Đóng
+  </button>
 </div>
 
 </div>
 `;
 
 modal.style.display="block";
+}
+
+function showTaiLieu(link){
+
+let viewer =
+document.getElementById("taiLieuViewer");
+
+let fileId = "";
+
+let match =
+link.match(/\/d\/([^\/]+)/);
+
+if(match){
+
+  fileId = match[1];
+
+}
+
+let previewLink =
+
+fileId
+
+?
+
+`https://drive.google.com/file/d/${fileId}/preview`
+
+:
+
+link;
+
+viewer.style.display = "block";
+
+viewer.innerHTML = `
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:15px 0;
+">
+
+<h3 style="
+margin:0;
+color:#b22222;
+">
+📄 Xem tài liệu
+</h3>
+
+<button
+class="btn-delete"
+onclick="closeTaiLieuViewer()">
+✖ Đóng
+</button>
+
+</div>
+
+<div style="
+width:100%;
+height:1000px;
+background:#fff;
+border:1px solid #ddd;
+border-radius:8px;
+overflow:hidden;
+">
+
+<iframe
+src="${previewLink}"
+style="
+width:100%;
+height:100%;
+border:none;
+">
+</iframe>
+
+</div>
+
+`;
+
+viewer.scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+
+}
+
+function closeTaiLieuViewer(){
+
+const viewer =
+document.getElementById("taiLieuViewer");
+
+viewer.innerHTML = "";
+
+viewer.style.display = "none";
+
 }
 
 function closeModal(){modal.style.display="none";}
@@ -8859,93 +9157,110 @@ editVanBanId
 ? "updateVanBan"
 : "addVanBan";
 
-// Lấy danh sách link tài liệu
+// ===== Danh sách link đã nhập =====
+
 let dsLink = Array.from(
 document.querySelectorAll(".vbLinkItem")
 )
 .map(x => x.value.trim())
 .filter(x => x);
 
-let link = dsLink.join("|");
-
 let file =
 document.getElementById("vbFile")
 .files[0];
 
+// ===== Kiểm tra dữ liệu =====
+
 if(!document.getElementById("vbSoHieu").value.trim()){
   alert("⚠ Chưa nhập Số hiệu văn bản");
-  document.getElementById("vbSoHieu").focus();
   return;
 }
 
 if(!document.getElementById("vbTen").value.trim()){
   alert("⚠ Chưa nhập Tên văn bản");
-  document.getElementById("vbTen").focus();
   return;
 }
 
 if(!document.getElementById("vbLoai").value.trim()){
   alert("⚠ Chưa nhập Loại văn bản");
-  document.getElementById("vbLoai").focus();
   return;
 }
 
 if(!document.getElementById("vbCoQuan").value.trim()){
   alert("⚠ Chưa nhập Cơ quan ban hành");
-  document.getElementById("vbCoQuan").focus();
   return;
 }
 
 if(!document.getElementById("vbNgay").value.trim()){
   alert("⚠ Chưa nhập Ngày ban hành");
-  document.getElementById("vbNgay").focus();
   return;
 }
 
-if(dsLink.length === 0){
-  alert("⚠ Chưa nhập tài liệu đính kèm");
+// ===== BẮT BUỘC phải có LINK hoặc FILE =====
+
+if(dsLink.length===0 && !file){
+
+  alert(
+    "⚠ Vui lòng nhập link hoặc chọn file văn bản"
+  );
+
   return;
+
 }
 
-// Upload file nếu có
-if(!link && file){
+// ====================================
+// Upload file lên Drive nếu có
+// ====================================
+
+if(file){
 
   let base64 =
-  await fileToBase64(file);
+    await fileToBase64(file);
 
   let uploadRes =
-  await fetch(API_URL,{
+    await fetch(API_URL,{
 
-    method:"POST",
+      method:"POST",
 
-    body:JSON.stringify({
+      body:JSON.stringify({
 
-      action:"uploadVanBanFile",
+        action:"uploadVanBanFile",
 
-      fileName:file.name,
+        fileName:file.name,
 
-      mimeType:file.type,
+        mimeType:file.type,
 
-      base64:base64
+        base64:base64
 
-    })
+      })
 
-  });
+    });
 
   let uploadData =
-  await uploadRes.json();
+    await uploadRes.json();
 
   if(!uploadData.success){
 
-    alert("Upload file thất bại.");
+    alert("Upload file thất bại");
 
     return;
 
   }
 
-  link = uploadData.url;
+  // thêm link vừa upload vào danh sách
+
+  dsLink.unshift(
+    uploadData.url
+  );
 
 }
+
+// ===== Ghép toàn bộ link =====
+
+let link =
+dsLink.join("|");
+
+// ===== Lưu dữ liệu =====
 
 let obj = {
 
@@ -8987,6 +9302,8 @@ method:"POST",
 body:JSON.stringify(obj)
 
 });
+
+alert("✅ Đã lưu văn bản");
 
 closeVanBanForm();
 
@@ -9129,18 +9446,18 @@ function viewVanBan(link){
     console.log("LINK =", link);
 
     if(!link){
-
         alert("Chưa có file.");
-
         return;
     }
 
-    // Nếu có nhiều file thì lấy file đầu tiên
     if(link.includes("|")){
-
         link = link.split("|")[0];
-
     }
+
+    // Chuyển sang link preview
+    link = convertGoogleDriveToPreview(link);
+
+    console.log("PREVIEW =", link);
 
     document.getElementById("viewerBox")
       .style.display = "block";
@@ -9152,7 +9469,6 @@ function viewVanBan(link){
       .scrollIntoView({
           behavior:"smooth"
       });
-
 }
 
 async function fileToBase64(file){
@@ -10360,6 +10676,199 @@ document
 
 }
 
+function addHoSoFile(link=""){
+
+  let div =
+    document.createElement("div");
+
+  div.style.display = "flex";
+  div.style.gap = "5px";
+  div.style.marginTop = "5px";
+
+  div.innerHTML = `
+
+    <input
+      class="hosoLinkItem"
+      value="${link}"
+      placeholder="Link tài liệu">
+
+    <button
+      type="button"
+      onclick="this.parentElement.remove()">
+
+      ❌
+
+    </button>
+
+  `;
+
+  document
+    .getElementById("hosoFileContainer")
+    .appendChild(div);
+
+}
+
+async function uploadVanBanFile(){
+
+  const file =
+    document.getElementById("vbFile")
+    .files[0];
+
+  if(!file){
+
+    alert("Chọn file");
+
+    return "";
+
+  }
+
+  const reader =
+    new FileReader();
+
+  return new Promise(resolve=>{
+
+    reader.onload = async e=>{
+
+      const base64 =
+        e.target.result
+        .split(",")[1];
+
+      const res =
+        await fetch(API_URL,{
+          method:"POST",
+          body:JSON.stringify({
+
+            action:"uploadVanBanFile",
+
+            fileName:file.name,
+
+            mimeType:file.type,
+
+            base64:base64
+
+          })
+        });
+
+      const data =
+        await res.json();
+
+      resolve(data.url);
+
+    };
+
+    reader.readAsDataURL(file);
+
+  });
+
+}
+
+function addHoSoFileField(link="", owner=""){
+
+  const current =
+    (currentUser || "")
+    .trim()
+    .toLowerCase();
+
+  const fileOwner =
+    (owner || "")
+    .trim()
+    .toLowerCase();
+
+  const isMine =
+    !fileOwner || fileOwner === current;
+
+  const div =
+    document.createElement("div");
+
+  div.style.display = "flex";
+  div.style.gap = "5px";
+  div.style.marginTop = "5px";
+
+  div.innerHTML = `
+
+    <input
+      class="hosoFileItem"
+      value="${link}"
+      data-owner="${owner}"
+      ${isMine ? "" : "readonly"}
+      placeholder="Dán link Google Drive hoặc PDF">
+
+    ${
+      isMine
+      ?
+      `
+      <button
+        type="button"
+        onclick="this.parentElement.remove()">
+        ❌
+      </button>
+      `
+      :
+      `
+      <button
+        type="button"
+        disabled
+        title="Không có quyền xóa">
+        🔒
+      </button>
+      `
+    }
+
+  `;
+
+  document
+    .getElementById("hosoFileContainer")
+    .appendChild(div);
+}
+
+function addHoSoFile(){
+
+  let link =
+    document
+    .getElementById("hosoLink")
+    .value
+    .trim();
+
+  if(!link){
+    alert("Nhập link trước");
+    return;
+  }
+
+  addHoSoFileField(link);
+
+  document
+    .getElementById("hosoLink")
+    .value = "";
+}
+
+function deleteVanBan(id){
+
+  if(!confirm("Xóa văn bản này?")) return;
+
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"deleteVanBan",
+      id:id
+    })
+  })
+  .then(r=>r.text())
+  .then(res=>{
+
+    alert("Đã xóa");
+
+    loadVanBan();
+
+  })
+  .catch(err=>{
+
+    console.error(err);
+
+    alert("Lỗi xóa");
+
+  });
+
+}
 </script>
 </head>
 <body>
@@ -11282,6 +11791,8 @@ style="display:none;margin-top:5px;"
 >
 </div>
 
+
+
 <div class="form-group">
 <label>Ghi chú</label>
 <textarea id="ghichu"></textarea>
@@ -11289,6 +11800,27 @@ style="display:none;margin-top:5px;"
 
 </div>
 
+<div class="card-section">
+
+<div class="section-title">
+📎 TÀI LIỆU ĐÍNH KÈM
+</div>
+
+<input
+  id="hosoLink"
+  placeholder="Dán link Google Drive hoặc PDF">
+
+<button
+  type="button"
+  onclick="addHoSoFile()">
+
+➕ Thêm tài liệu
+
+</button>
+
+<div id="hosoFileContainer"></div>
+
+</div>
 <button class="btn-save">💾 Lưu hồ sơ</button>
 
 </form>
@@ -11866,35 +12398,7 @@ onclick="addVanBanFile()">
 
 </div>
 
-<div style="
-text-align:center;
-margin:15px 0;
-font-weight:bold;
-color:#777;">
-HOẶC
-</div>
 
-<div class="form-group">
-
-<label>Tệp văn bản</label>
-
-<input
-type="file"
-id="vbFile"
-onclick="
-alert('⚠ Chức năng tải tệp đang được hoàn thiện. Vui lòng sử dụng Link Google Drive.');
-return false;
-">
-
-<div
-id="selectedFile"
-style="
-margin-top:5px;
-font-size:13px;
-color:#666;">
-</div>
-
-</div>
 
 </div>
 
