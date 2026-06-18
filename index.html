@@ -2399,6 +2399,8 @@ let filteredBaoCaoTiepDan = [];
 let baoCaoLuuTru=[];
 let baoCaoPage = 1;
 let baoCaoRowsPerPage = 10;
+let baoCaoTuanPage = 1;
+let baoCaoTuanRowsPerPage = 10;
 
 
 /* ===== THƯ VIỆN VĂN BẢN ===== */
@@ -2417,7 +2419,13 @@ fetch(API_URL+"?action=getVanBan")
 
 .then(data=>{
 
-  vanBanList = data;
+  vanBanList = (data || []).sort((a,b)=>{
+
+    return Number(b.id || 0)
+         - Number(a.id || 0);
+
+  });
+
   vanBanPage = 1;
 
   renderVanBan();
@@ -2434,17 +2442,19 @@ fetch(API_URL + "?action=getBaoCaoLuuTru")
 
 .then(data => {
 
-baoCaoLuuTru = data || [];
+  baoCaoLuuTru = (data || []).sort((a,b)=>
+    Number(b.id || 0) - Number(a.id || 0)
+  );
 
-console.log("BAOCAO=",baoCaoLuuTru);
+  console.log("BAOCAO=",baoCaoLuuTru);
 
-renderBaoCaoLuuTru();
+  renderBaoCaoLuuTru();
 
 })
 
 .catch(err => {
 
-console.error(err);
+  console.error(err);
 
 });
 
@@ -2655,118 +2665,142 @@ document.getElementById("bcLoai").value.trim();
 let ngayBanHanh =
 document.getElementById("bcNgay").value.trim();
 
-let uploadedLink = "";
 
-const fileInput =
-document.getElementById("vbFile");
-
-if(
-  fileInput &&
-  fileInput.files.length > 0
-){
-
-  uploadedLink =
-  await uploadVanBanFile();
-
-}
+// =========================
+// LẤY TOÀN BỘ LINK
+// =========================
 
 let dsLink = Array.from(
-  document.querySelectorAll(".vbLinkItem")
+document.querySelectorAll(".bcLinkItem")
 )
-.map(x=>x.value.trim())
-.filter(x=>x);
+.map(item => item.value.trim())
+.filter(item => item !== "");
+
+
+// =========================
+// FILE UPLOAD
+// =========================
+
+const fileInput =
+document.getElementById("bcFile");
+
+let uploadedLink = "";
+
+if(
+fileInput &&
+fileInput.files &&
+fileInput.files.length > 0
+){
+
+try{
+
+uploadedLink =
+await uploadVanBanFile();
 
 if(uploadedLink){
 
-  dsLink.unshift(uploadedLink);
+dsLink.unshift(uploadedLink);
 
 }
 
-if(!soHieu){
-Swal.fire(
-"Thiếu dữ liệu",
-"Vui lòng nhập Số hiệu báo cáo",
-"warning"
-);
+}catch(err){
+
+console.error(err);
+
+alert("Upload file thất bại");
+
 return;
+
+}
+
+}
+
+
+// =========================
+// KIỂM TRA DỮ LIỆU
+// =========================
+
+if(!soHieu){
+
+alert("Vui lòng nhập Số hiệu báo cáo");
+
+return;
+
 }
 
 if(!tenBaoCao){
-Swal.fire(
-"Thiếu dữ liệu",
-"Vui lòng nhập Tên báo cáo",
-"warning"
-);
+
+alert("Vui lòng nhập Tên báo cáo");
+
 return;
+
 }
 
 if(!loaiBaoCao){
-Swal.fire(
-"Thiếu dữ liệu",
-"Vui lòng chọn Loại báo cáo",
-"warning"
-);
+
+alert("Vui lòng chọn Loại báo cáo");
+
 return;
+
 }
 
 if(!ngayBanHanh){
-Swal.fire(
-"Thiếu dữ liệu",
-"Vui lòng chọn Ngày ban hành",
-"warning"
-);
+
+alert("Vui lòng chọn Ngày ban hành");
+
 return;
+
 }
 
 if(dsLink.length===0){
-Swal.fire(
-"Thiếu dữ liệu",
-"Vui lòng nhập Link Drive",
-"warning"
-);
+
+alert("Vui lòng nhập Link Drive hoặc chọn File");
+
 return;
+
 }
+
+
+// =========================
+// LƯU
+// =========================
 
 let data = {
 
 action:
-  editBaoCaoId
-    ? "updateBaoCaoLuuTru"
-    : "addBaoCaoLuuTru",
+editBaoCaoId
+? "updateBaoCaoLuuTru"
+: "addBaoCaoLuuTru",
 
 id:
-  editBaoCaoId || Date.now(),
+editBaoCaoId || Date.now(),
 
-sohieu:
-document.getElementById("bcSoHieu").value,
+sohieu:soHieu,
 
-tenbaocao:
-document.getElementById("bcTen").value,
+tenbaocao:tenBaoCao,
 
-loaibaocao:
-document.getElementById("bcLoai").value,
+loaibaocao:loaiBaoCao,
 
-ngaybanhanh:
-String(
-document.getElementById("bcNgay").value
-),
+ngaybanhanh:ngayBanHanh,
 
-linkdrive:
-dsLink.join("|"),
+linkdrive:dsLink.join("|"),
 
 ghichu:
 document.getElementById("bcGhiChu").value,
 
-owner: currentUser
+owner:currentUser
 
 };
 
-fetch(API_URL,{
+try{
+
+await fetch(API_URL,{
+
 method:"POST",
+
 body:JSON.stringify(data)
-})
-.then(r=>r.text())
-.then(res=>{
+
+});
 
 alert("Đã lưu báo cáo");
 
@@ -2778,14 +2812,13 @@ editBaoCaoId = null;
 
 loadBaoCaoLuuTru();
 
-})
-.catch(err=>{
+}catch(err){
 
 console.error(err);
 
 alert("Lỗi lưu báo cáo");
 
-});
+}
 
 }
 
@@ -5749,40 +5782,77 @@ function loadBaoCaoTuan(){
     baoCaoTuanList = data.sort((a,b)=>
       new Date(b.created) - new Date(a.created)
     );
-
+    baoCaoTuanPage = 1;
     displayBaoCaoTuan();
+    
   });
 
 }
 
 function displayBaoCaoTuan(){
 
-  let tbody = document.getElementById("tbodyBaoCaoTuan");
+  let tbody =
+  document.getElementById(
+    "tbodyBaoCaoTuan"
+  );
+
   tbody.innerHTML = "";
 
-  baoCaoTuanList.forEach((c,i)=>{
+  // ===== TÍNH PHÂN TRANG =====
 
-    let buttons = `<button onclick="viewBaoCaoTuan(${i})">Xem</button>`;
+  let start =
+  (baoCaoTuanPage - 1)
+  * baoCaoTuanRowsPerPage;
 
-    if(currentRole==="Admin" || c.username===currentUser){
-  buttons += `<button onclick="editBaoCaoTuan(${i})">Sửa</button>`;
-  buttons += `<button onclick="deleteBaoCaoTuan('${c.id}')">Xóa</button>`;
-}
+  let end =
+  start +
+  baoCaoTuanRowsPerPage;
 
-// ai cũng được xuất Excel
-buttons += `
-<button
-class="btn-excel"
-onclick="exportBaoCaoTuanExcel(${i})"
->
-📗 Excel
-</button>
-`;
-    
+  let pageData =
+  baoCaoTuanList.slice(
+    start,
+    end
+  );
+
+  pageData.forEach((c,i)=>{
+
+    let realIndex =
+    start + i;
+
+    let buttons =
+    `<button onclick="viewBaoCaoTuan(${realIndex})">Xem</button>`;
+
+    if(
+      currentRole==="Admin"
+      ||
+      c.username===currentUser
+    ){
+
+      buttons += `
+      <button onclick="editBaoCaoTuan(${realIndex})">
+      Sửa
+      </button>
+      `;
+
+      buttons += `
+      <button onclick="deleteBaoCaoTuan('${c.id}')">
+      Xóa
+      </button>
+      `;
+
+    }
+
+    buttons += `
+    <button
+      class="btn-excel"
+      onclick="exportBaoCaoTuanExcel(${realIndex})">
+      📗 Excel
+    </button>
+    `;
 
     tbody.innerHTML += `
       <tr>
-        <td>${i+1}</td>
+        <td>${realIndex + 1}</td>
         <td>${c.tuan||""}</td>
         <td>${c.hoanthanh||""}</td>
         <td>${c.chuahoanthanh||""}</td>
@@ -5790,7 +5860,65 @@ onclick="exportBaoCaoTuanExcel(${i})"
         <td>${buttons}</td>
       </tr>
     `;
+
   });
+
+  renderBaoCaoTuanPagination();
+
+}
+
+function renderBaoCaoTuanPagination(){
+
+  let totalPage =
+  Math.ceil(
+    baoCaoTuanList.length /
+    baoCaoTuanRowsPerPage
+  );
+
+  let div =
+  document.getElementById(
+    "baoCaoTuanPagination"
+  );
+
+  if(!div) return;
+
+  let html = "";
+
+  for(let i=1;i<=totalPage;i++){
+
+    html += `
+      <button
+        class="${
+          i===baoCaoTuanPage
+          ? 'active-page'
+          : ''
+        }"
+        onclick="
+          baoCaoTuanPage=${i};
+          displayBaoCaoTuan();
+        ">
+        ${i}
+      </button>
+    `;
+
+  }
+
+  div.innerHTML = html;
+
+}
+
+function changeBaoCaoTuanRows(){
+
+  baoCaoTuanRowsPerPage =
+  Number(
+    document.getElementById(
+      "baoCaoTuanRows"
+    ).value
+  );
+
+  baoCaoTuanPage = 1;
+
+  displayBaoCaoTuan();
 
 }
 
@@ -9157,19 +9285,15 @@ editVanBanId
 ? "updateVanBan"
 : "addVanBan";
 
-// ===== Danh sách link đã nhập =====
+// ===== Danh sách link =====
 
 let dsLink = Array.from(
 document.querySelectorAll(".vbLinkItem")
 )
-.map(x => x.value.trim())
-.filter(x => x);
+.map(x=>x.value.trim())
+.filter(x=>x);
 
-let file =
-document.getElementById("vbFile")
-.files[0];
-
-// ===== Kiểm tra dữ liệu =====
+// ===== Kiểm tra =====
 
 if(!document.getElementById("vbSoHieu").value.trim()){
   alert("⚠ Chưa nhập Số hiệu văn bản");
@@ -9196,71 +9320,10 @@ if(!document.getElementById("vbNgay").value.trim()){
   return;
 }
 
-// ===== BẮT BUỘC phải có LINK hoặc FILE =====
-
-if(dsLink.length===0 && !file){
-
-  alert(
-    "⚠ Vui lòng nhập link hoặc chọn file văn bản"
-  );
-
+if(dsLink.length===0){
+  alert("⚠ Vui lòng nhập Link Drive");
   return;
-
 }
-
-// ====================================
-// Upload file lên Drive nếu có
-// ====================================
-
-if(file){
-
-  let base64 =
-    await fileToBase64(file);
-
-  let uploadRes =
-    await fetch(API_URL,{
-
-      method:"POST",
-
-      body:JSON.stringify({
-
-        action:"uploadVanBanFile",
-
-        fileName:file.name,
-
-        mimeType:file.type,
-
-        base64:base64
-
-      })
-
-    });
-
-  let uploadData =
-    await uploadRes.json();
-
-  if(!uploadData.success){
-
-    alert("Upload file thất bại");
-
-    return;
-
-  }
-
-  // thêm link vừa upload vào danh sách
-
-  dsLink.unshift(
-    uploadData.url
-  );
-
-}
-
-// ===== Ghép toàn bộ link =====
-
-let link =
-dsLink.join("|");
-
-// ===== Lưu dữ liệu =====
 
 let obj = {
 
@@ -9288,7 +9351,8 @@ document.getElementById("vbCoQuan").value,
 ngaybanhanh:
 document.getElementById("vbNgay").value,
 
-linkdrive:link,
+linkdrive:
+dsLink.join("|"),
 
 ghichu:
 document.getElementById("vbGhiChu").value
@@ -9296,11 +9360,8 @@ document.getElementById("vbGhiChu").value
 };
 
 await fetch(API_URL,{
-
-method:"POST",
-
-body:JSON.stringify(obj)
-
+  method:"POST",
+  body:JSON.stringify(obj)
 });
 
 alert("✅ Đã lưu văn bản");
@@ -10869,6 +10930,58 @@ function deleteVanBan(id){
   });
 
 }
+
+
+function renderBaoCaoTuanPagination(totalRows){
+
+  let totalPage =
+    Math.ceil(
+      totalRows /
+      baoCaoTuanRowsPerPage
+    );
+
+  let html = "";
+
+  if(totalPage <= 1){
+
+    document.getElementById(
+      "baoCaoTuanPagination"
+    ).innerHTML = "";
+
+    return;
+
+  }
+
+  for(
+    let i=1;
+    i<=totalPage;
+    i++
+  ){
+
+    html += `
+      <button
+        class="
+        page-btn
+        ${i===baoCaoTuanPage
+          ? "active"
+          : ""
+        }
+        "
+        onclick="
+        baoCaoTuanPage=${i};
+        renderBaoCaoTuan();
+        ">
+        ${i}
+      </button>
+    `;
+
+  }
+
+  document.getElementById(
+    "baoCaoTuanPagination"
+  ).innerHTML = html;
+
+}
 </script>
 </head>
 <body>
@@ -11366,6 +11479,33 @@ onclick="closeBaoCaoTuanxx()">
   </table>
 
   <div id="paginationBaoCaoTuan"></div>
+  <div
+style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:10px;
+">
+
+  <div>
+    Hiển thị
+
+    <select
+      id="baoCaoTuanRows"
+      onchange="changeBaoCaoTuanRows()">
+
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+
+    </select>
+
+    báo cáo/trang
+  </div>
+
+  <div id="baoCaoTuanPagination"></div>
+
+</div>
 
 </div>
 <!-- ================= SỔ TIẾP CÔNG DÂN ================= -->
