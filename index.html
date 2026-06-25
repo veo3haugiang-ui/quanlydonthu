@@ -1180,6 +1180,21 @@ color:white;
 width:100%;
 }
 
+.cd-group{
+    line-height:1.5;
+    font-size:13px;
+}
+
+.cd-count{
+    font-weight:700;
+    color:#2563eb;
+    margin-bottom:4px;
+}
+
+.cd-single{
+    line-height:1.5;
+}
+
 /* ===== HEADER TITLE ===== */
 
 .system-title{
@@ -2147,6 +2162,64 @@ text-align:center;
 margin:12px 0;
 }
 
+/* ===== CÔNG DÂN ĐI CÙNG ===== */
+
+.congdan-them{
+
+    background:#eef6ff;
+
+    border:1px dashed #7fb3ff;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    margin-top:15px;
+
+    transition:all .2s;
+}
+
+.congdan-them:hover{
+
+    background:#e6f1ff;
+
+}
+
+.congdan-them-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:15px;
+
+    padding-bottom:10px;
+
+    border-bottom:1px solid #dbe8ff;
+}
+
+.congdan-icon{
+
+    font-size:16px;
+
+    line-height:1;
+}
+
+.congdan-title{
+
+    color:#2563eb;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+
+    letter-spacing:0.3px;
+}
+
 .page-btn{
 padding:5px 10px;
 margin:3px;
@@ -2270,6 +2343,52 @@ grid-column:1 / -1;
 width:100%;
 padding:7px;
 margin:0;
+}
+
+.cccd-display{
+    line-height:1.5;
+    font-size:13px;
+}
+
+.citizen-card{
+
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+
+    padding:10px 14px;
+    margin-bottom:8px;
+
+    background:#fff;
+
+}
+
+.citizen-name{
+
+    font-weight:600;
+    color:#1e40af;
+
+    margin-bottom:4px;
+
+    font-size:15px;
+
+}
+
+.citizen-meta{
+
+    font-size:13px;
+
+    color:#4b5563;
+
+    line-height:1.5;
+
+}
+
+.citizen-meta .dot{
+
+    margin:0 8px;
+
+    color:#9ca3af;
+
 }
 
 .print-area{
@@ -5309,61 +5428,46 @@ td_congchuc.focus();
 return;
 }
 
-if(!td_congdan.value.trim()){
-alert("⚠ Vui lòng nhập Họ tên – địa chỉ – điện thoại công dân");
-td_congdan.focus();
+if(!td_hoten.value.trim()){
+alert("⚠ Vui lòng nhập Họ tên công dân");
+td_hoten.focus();
 return;
 }
 
-// ===== KIỂM TRA SỐ NGƯỜI =====
+if(!td_diachi.value.trim()){
+alert("⚠ Vui lòng nhập Địa chỉ công dân");
+td_diachi.focus();
+return;
+}
 
 if(!td_songuoi.value.trim()){
-
-  alert("⚠ Vui lòng nhập Số người");
-
-  td_songuoi.focus();
-
-  return;
+alert("⚠ Vui lòng nhập Số người");
+td_songuoi.focus();
+return;
 }
 
-// phải là số
 if(isNaN(td_songuoi.value)){
-
-  alert("⚠ Số người phải là số");
-
-  td_songuoi.focus();
-
-  return;
+alert("⚠ Số người phải là số");
+td_songuoi.focus();
+return;
 }
 
-// phải lớn hơn 0
 if(Number(td_songuoi.value) <= 0){
-
-  alert("⚠ Số người phải lớn hơn 0");
-
-  td_songuoi.focus();
-
-  return;
+alert("⚠ Số người phải lớn hơn 0");
+td_songuoi.focus();
+return;
 }
 
 if(!td_noidung.value.trim()){
 alert("⚠ Vui lòng nhập Nội dung vụ việc");
 td_noidung.focus();
 return;
-
 }
 
-
-
-// ===== KIỂM TRA HƯỚNG XỬ LÝ =====
-
 if(!td_xuly.value){
-
-  alert("⚠ Vui lòng chọn Hướng xử lý");
-
-  td_xuly.focus();
-
-  return;
+alert("⚠ Vui lòng chọn Hướng xử lý");
+td_xuly.focus();
+return;
 }
 
 if(!td_ghichu.value.trim()){
@@ -5372,68 +5476,158 @@ td_ghichu.focus();
 return;
 }
 
-let action = (editIndex === -1) ? "addTiepDan" : "updateTiepDan";
+let action =
+(editIndex === -1)
+? "addTiepDan"
+: "updateTiepDan";
 
-let [day, m, y] = td_ngay.value.split("/");
+let [day,m,y] =
+td_ngay.value.split("/");
 
-// ===== LẤY GIÁ TRỊ CÔNG CHỨC TIẾP =====
+/* ===== CÔNG CHỨC TIẾP ===== */
 
 let congChucValue = "";
 
 if(
-  document.getElementById("td_congchuc").value === "Khác"
+document.getElementById("td_congchuc").value
+=== "Khác"
 ){
+
 if(
-  !document
-    .getElementById("td_congchuc_khac")
-    .value
-    .trim()
+!document
+.getElementById("td_congchuc_khac")
+.value
+.trim()
 ){
 
-  alert("⚠ Vui lòng nhập tên công chức tiếp");
+```
+alert("⚠ Vui lòng nhập tên công chức tiếp");
 
-  document
-    .getElementById("td_congchuc_khac")
-    .focus();
+document
+  .getElementById("td_congchuc_khac")
+  .focus();
 
-  return;
+return;
+```
+
 }
 
-  congChucValue =
-    document
-      .getElementById("td_congchuc_khac")
-      .value
-      .trim();
+congChucValue =
+document
+.getElementById("td_congchuc_khac")
+.value
+.trim();
 
 }else{
 
-  congChucValue =
-    document
-      .getElementById("td_congchuc")
-      .value;
+congChucValue =
+document
+.getElementById("td_congchuc")
+.value;
 
 }
 
+/* ==========================
+CÔNG DÂN THỨ NHẤT
+========================== */
+
+let congDanValue =
+
+`Họ tên: ${td_hoten.value.trim()}
+
+Địa chỉ: ${td_diachi.value.trim()}
+
+Điện thoại: ${td_dienthoai.value.trim()}`;
+
+let cccdValue =
+td_cccd.value.trim();
+
+/* ==========================
+CÔNG DÂN ĐI CÙNG
+========================== */
+
+document
+.querySelectorAll(".them_hoten")
+.forEach((item,index)=>{
+
+let hoTen =
+item.value.trim();
+
+let diaChi =
+document
+.querySelectorAll(".them_diachi")[index]
+?.value
+?.trim() || "";
+
+let dienThoai =
+document
+.querySelectorAll(".them_dienthoai")[index]
+?.value
+?.trim() || "";
+
+let cccd =
+document
+.querySelectorAll(".them_cccd")[index]
+?.value
+?.trim() || "";
+
+if(hoTen){
+
+congDanValue +=
+`\n\nNGƯỜI THỨ ${index + 2}
+
+Họ tên: ${hoTen}
+
+Địa chỉ: ${diaChi}
+
+Điện thoại: ${dienThoai}`;
+
+}
+
+if(cccd){
+
+cccdValue +=
+`\nNGƯỜI THỨ ${index + 2}: ${cccd}`;
+
+}
+
+});
+
 let data = {
 
-  action: action,
+action: action,
 
-  id: (editIndex === -1) ? Date.now() : currentEditId,
+id:
+(editIndex === -1)
+? Date.now()
+: currentEditId,
 
-  username: currentUser,
+username: currentUser,
 
-  ngay: `${day}/${m}/${y}`, // 🔥 FIX CHÍNH Ở ĐÂY
-  congchuc: congChucValue,
-  phong: td_phong.value,
-  congdan: td_congdan.value,
-  cccd: td_cccd.value,
-  noidung: td_noidung.value,
-  phanloai: td_phanloai.value,
-  songuoi: td_songuoi.value,
-  coquan: td_coquan.value,
-  xuly: td_xuly.value,
-  theodoi: td_theodoi.value,
-  ghichu: td_ghichu.value
+ngay: `${day}/${m}/${y}`,
+
+congchuc: congChucValue,
+
+phong: td_phong.value,
+
+congdan: congDanValue,
+
+cccd: cccdValue,
+
+noidung: td_noidung.value,
+
+phanloai: td_phanloai.value,
+
+songuoi: td_songuoi.value,
+
+coquan: td_coquan.value,
+
+xuly: td_xuly.value,
+
+theodoi: td_theodoi.value,
+
+ghichu: td_ghichu.value
+
 };
 
 fetch(API_URL,{
@@ -5449,10 +5643,71 @@ closeTiepDan();
 
 loadTiepDan();
 
+})
+.catch(err=>{
+
+console.error(err);
+
+alert("❌ Lỗi lưu dữ liệu");
+
 });
 
 }
 
+function formatCongDanTable(c){
+
+    let songuoi =
+        Number(c.songuoi || 1);
+
+    let text =
+        c.congdan || "";
+
+    // Chỉ có 1 người
+    if(songuoi <= 1){
+
+        let hoTen =
+            text.match(/Họ tên:\s*(.*)/i);
+
+        let diaChi =
+            text.match(/Địa chỉ:\s*(.*)/i);
+
+        return `
+            <div class="cd-single">
+                <b>👤 ${hoTen ? hoTen[1] : ""}</b>
+                <div>⌘ ${diaChi ? diaChi[1] : ""}</div>
+            </div>
+        `;
+    }
+
+    let names = [];
+
+let matches =
+    text.matchAll(
+        /Họ tên:\s*(.*)/gi
+    );
+
+for(let item of matches){
+
+    names.push(
+        item[1].trim()
+    );
+
+}
+
+    return `
+        <div class="cd-group">
+
+            <div class="cd-count">
+                👥 ${songuoi} công dân
+            </div>
+
+            ${names.map(name=>
+                `<div>• ${name}</div>`
+            ).join("")}
+
+        </div>
+    `;
+}
 
 function displayTiepDan(){
 
@@ -5494,8 +5749,10 @@ tbody.innerHTML += `
 <td>${start+i+1}</td>
 <td>${ngay}</td>
 <td>${c.congchuc}</td>
-<td>${c.congdan||""}</td>
-<td>${c.cccd||""}</td>
+<td>${formatCongDanTable(c)}</td>
+<td>
+    ${formatCCCDDisplay(c.cccd || "")}
+</td>
 
 <td>
   <div class="clamp-4">
@@ -5517,6 +5774,29 @@ tbody.innerHTML += `
 
 renderPaginationTiepDan(filteredTiepDanList.length);
 updateStatsTiepDan(filteredTiepDanList);
+}
+
+function formatCCCDDisplay(text){
+
+    if(!text) return "";
+
+    let lines =
+        String(text)
+        .split("\n")
+        .filter(x => x.trim());
+
+    return lines
+        .map(x => {
+
+            x = x.replace(
+                /NGƯỜI THỨ \d+\s*:\s*/i,
+                ""
+            );
+
+            return `• ${x}`;
+
+        })
+        .join("<br>");
 }
 
 function renderPaginationTiepDan(totalRows){
@@ -5548,6 +5828,37 @@ document.getElementById("paginationTiepDan").innerHTML = html;
 function goPageTiepDan(page){
 currentPageTiepDan = page;
 displayTiepDan();
+}
+
+function deleteTiepDan(id){
+
+    if(!confirm("Bạn có chắc muốn xóa sổ tiếp công dân này không?")){
+        return;
+    }
+
+    fetch(API_URL,{
+        method:"POST",
+        body:JSON.stringify({
+            action:"deleteTiepDan",
+            id:id
+        })
+    })
+    .then(res=>res.text())
+    .then(res=>{
+
+        alert("✅ Đã xóa thành công");
+
+        loadTiepDan();
+
+    })
+    .catch(err=>{
+
+        console.error(err);
+
+        alert("❌ Lỗi khi xóa");
+
+    });
+
 }
 
 function setDefaultCongChuc() {
@@ -5641,81 +5952,264 @@ function formatDateInput(dateStr){
 
 function editTiepDan(i){
 
-let c = tiepDanList[i];
+  let c = tiepDanList[i];
 
-// 👇 QUAN TRỌNG
-currentEditId = c.id;
-
-if(c.ngay){
-
-  // nếu là yyyy-MM-dd hoặc ISO
-  if(c.ngay.includes("-")){
-    let [y,m,d] = c.ngay.split("T")[0].split("-");
-    td_ngay.value = `${d}/${m}/${y}`;
+  if(!c){
+    alert("Không tìm thấy dữ liệu");
+    return;
   }
 
-  // nếu đã là dd/MM/yyyy
-  else if(c.ngay.includes("/")){
-    td_ngay.value = c.ngay;
+  currentEditId = c.id;
+
+  // ===== NGÀY =====
+
+  if(c.ngay){
+
+    if(c.ngay.includes("-")){
+
+      let [y,m,d] =
+        c.ngay
+        .split("T")[0]
+        .split("-");
+
+      td_ngay.value = `${d}/${m}/${y}`;
+
+    }else{
+
+      td_ngay.value = c.ngay;
+
+    }
+
   }
 
-}
-td_congchuc.value = c.congchuc || "";
-td_phong.value = c.phong || "";
-td_congdan.value = c.congdan || "";
-td_cccd.value = c.cccd || "";
-td_songuoi.value = c.songuoi || "";
-td_noidung.value = c.noidung || "";
-td_phanloai.value = c.phanloai || "";
-td_coquan.value = c.coquan || "";
-td_xuly.value = c.xuly || "";
-td_theodoi.value = c.theodoi || "";
-td_ghichu.value = c.ghichu || "";
+  // ===== THÔNG TIN CHUNG =====
 
-editIndex = i;
+  td_congchuc.value = c.congchuc || "";
+  td_phong.value    = c.phong || "";
 
-document.getElementById("tiepDanModal").style.display="block";
-}
+  td_hoten.value     = "";
+  td_diachi.value    = "";
+  td_dienthoai.value = "";
+  td_cccd.value      = "";
 
-function deleteTiepDan(id){
+  // ===== XÓA CÔNG DÂN ĐI CÙNG =====
 
-if(!confirm("Bạn có chắc muốn xóa?")) return;
+  document.getElementById(
+    "congDanThemContainer"
+  ).innerHTML = "";
 
-fetch(API_URL,{
-method:"POST",
-body:JSON.stringify({
-action:"deleteTiepDan",
-id:id   // 👈 dùng ID
-})
-})
-.then(res=>res.text())
-.then(res=>{
-alert("Đã xóa");
-loadTiepDan();
-});
+  let songuoi =
+    parseInt(c.songuoi || 1);
 
+  if(isNaN(songuoi) || songuoi < 1){
+    songuoi = 1;
+  }
+
+  td_songuoi.value = songuoi;
+
+  // ===== TÁCH THÔNG TIN =====
+
+  let congDanText =
+    c.congdan || "";
+
+  let cccdText =
+    c.cccd || "";
+
+  let blocks =
+    congDanText.split(
+      /\n\s*NGƯỜI THỨ \d+\s*/i
+    );
+
+  // ===== NGƯỜI THỨ NHẤT =====
+
+  if(blocks.length > 0){
+
+    let first = blocks[0];
+
+    let hoTen =
+      first.match(/Họ tên:\s*(.*?)(?:\n|$)/i);
+
+    let diaChi =
+      first.match(/Địa chỉ:\s*(.*?)(?:\n|$)/i);
+
+    let dienThoai =
+      first.match(/Điện thoại:\s*(.*?)(?:\n|$)/i);
+
+    td_hoten.value =
+      hoTen ? hoTen[1].trim() : "";
+
+    td_diachi.value =
+      diaChi ? diaChi[1].trim() : "";
+
+    td_dienthoai.value =
+      dienThoai ? dienThoai[1].trim() : "";
+  }
+
+  // ===== CCCD NGƯỜI THỨ NHẤT =====
+
+  let cccdLines =
+    cccdText
+      .split("\n")
+      .filter(x => x.trim());
+
+  if(cccdLines.length){
+
+    td_cccd.value =
+      cccdLines[0]
+        .replace(/^CCCD:\s*/i,"")
+        .trim();
+  }
+
+  // ===== TẠO CÔNG DÂN ĐI CÙNG =====
+
+  for(let x=1; x<songuoi; x++){
+
+    updateCongDanThem();
+
+  }
+
+  let extraBlocks =
+    blocks.slice(1);
+
+  let extraCCCD =
+    cccdLines.slice(1);
+
+  let dsHoTen =
+    document.querySelectorAll(".them_hoten");
+
+  let dsDiaChi =
+    document.querySelectorAll(".them_diachi");
+
+  let dsDienThoai =
+    document.querySelectorAll(".them_dienthoai");
+
+  let dsCCCD =
+    document.querySelectorAll(".them_cccd");
+
+  // ===== ĐỔ DỮ LIỆU =====
+
+  dsHoTen.forEach((el,index)=>{
+
+    let block =
+      extraBlocks[index] || "";
+
+    let hoTen =
+      block.match(/Họ tên:\s*(.*?)(?:\n|$)/i);
+
+    let diaChi =
+      block.match(/Địa chỉ:\s*(.*?)(?:\n|$)/i);
+
+    let dienThoai =
+      block.match(/Điện thoại:\s*(.*?)(?:\n|$)/i);
+
+    el.value =
+      hoTen ? hoTen[1].trim() : "";
+
+    if(dsDiaChi[index]){
+
+      dsDiaChi[index].value =
+        diaChi ? diaChi[1].trim() : "";
+
+    }
+
+    if(dsDienThoai[index]){
+
+      dsDienThoai[index].value =
+        dienThoai ? dienThoai[1].trim() : "";
+
+    }
+
+    let cccd =
+      extraCCCD[index] || "";
+
+    cccd =
+      cccd.replace(
+        /NGƯỜI THỨ \d+\s*:\s*/i,
+        ""
+      ).trim();
+
+    if(dsCCCD[index]){
+
+      dsCCCD[index].value = cccd;
+
+    }
+
+  });
+
+  // ===== NỘI DUNG =====
+
+  td_noidung.value =
+    c.noidung || "";
+
+  td_phanloai.value =
+    c.phanloai || "";
+
+  td_coquan.value =
+    c.coquan || "";
+
+  td_xuly.value =
+    c.xuly || "";
+
+  td_theodoi.value =
+    c.theodoi || "";
+
+  td_ghichu.value =
+    c.ghichu || "";
+
+  editIndex = i;
+
+  document.getElementById(
+    "tiepDanModal"
+  ).style.display = "block";
 }
 
 
 function newTiepDan(){
 
-  let form = document.querySelector("#tiepDanModal form");
-  form.reset();
+let form =
+document.querySelector(
+"#tiepDanModal form"
+);
 
-  editIndex = -1;
-  currentEditId = null;
+form.reset();
 
-  // 🔥 LẤY NGÀY HÔM NAY (ĐÚNG FORMAT flatpickr)
-  let today = new Date();
-  let yyyy = today.getFullYear();
-  let mm = String(today.getMonth()+1).padStart(2,'0');
-  let dd = String(today.getDate()).padStart(2,'0');
+editIndex = -1;
 
-  td_ngay.value = `${dd}/${mm}/${yyyy}`;
+currentEditId = null;
 
-  document.getElementById("tiepDanModal").style.display="block";
+let today = new Date();
 
-  setTimeout(setDefaultCongChuc, 50);
+let yyyy =
+today.getFullYear();
+
+let mm =
+String(
+today.getMonth()+1
+).padStart(2,'0');
+
+let dd =
+String(
+today.getDate()
+).padStart(2,'0');
+
+td_ngay.value =
+`${dd}/${mm}/${yyyy}`;
+
+td_songuoi.value = 1;
+
+document.getElementById(
+"congDanThemContainer"
+).innerHTML = "";
+
+document.getElementById(
+"tiepDanModal"
+).style.display = "block";
+
+setTimeout(
+setDefaultCongChuc,
+50
+);
+
 }
 
 function closeTiepDan(){
@@ -6036,28 +6530,178 @@ function deleteBaoCaoTuan(id){
 
 function viewTiepDan(i){
 
-let c = tiepDanList[i];
+    let c = tiepDanList[i];
 
-document.getElementById("v_ngay").innerText =
-  formatDateDisplaySafe(c.ngay);
+    const setText = (id, value) => {
+        let el = document.getElementById(id);
+        if(el) el.innerText = value || "";
+    };
 
-document.getElementById("v_congchuc").innerText = c.congchuc;
-document.getElementById("v_phong").innerText = c.phong || "";
-document.getElementById("v_congdan").innerText = c.congdan || "";
-document.getElementById("v_cccd").innerText = c.cccd || "";
-document.getElementById("v_phanloai").innerText = c.phanloai || "";
-document.getElementById("v_songuoi").innerText = c.songuoi || "";
-document.getElementById("v_noidung").innerText = c.noidung || "";
-document.getElementById("v_coquan").innerText = c.coquan || "";
-document.getElementById("v_thuly").innerText = c.xuly || "";
-document.getElementById("v_theodoi").innerText = c.theodoi || "";
-document.getElementById("v_ghichu").innerText = c.ghichu || "";
+    setText(
+        "v_ngay",
+        formatDateDisplaySafe(c.ngay)
+    );
 
-document.getElementById("viewTiepDanModal").style.display="block";
+    setText(
+        "v_congchuc",
+        c.congchuc
+    );
+
+    setText(
+        "v_phong",
+        c.phong
+    );
+
+    // HIỂN THỊ THÔNG TIN CÔNG DÂN
+    let congDanEl =
+        document.getElementById("v_congdan");
+
+        let soNguoi =
+    Number(c.songuoi || 1);
+
+let title =
+    `II. THÔNG TIN CÔNG DÂN (${String(soNguoi).padStart(2,"0")} NGƯỜI)`;
+
+let lbl =
+    document.getElementById(
+        "lblCongDanTitle"
+    );
+
+if(lbl){
+    lbl.innerText = title;
+}
+
+    if(congDanEl){
+
+        congDanEl.innerHTML =
+            formatCongDanView(
+                c.congdan || "",
+                c.cccd || ""
+            );
+
+    }
+
+    setText(
+        "v_phanloai",
+        c.phanloai
+    );
+
+    setText(
+        "v_noidung",
+        c.noidung
+    );
+
+    setText(
+        "v_coquan",
+        c.coquan
+    );
+
+    setText(
+        "v_thuly",
+        c.xuly
+    );
+
+    setText(
+        "v_theodoi",
+        c.theodoi
+    );
+
+    setText(
+        "v_ghichu",
+        c.ghichu
+    );
+
+    document.getElementById(
+        "viewTiepDanModal"
+    ).style.display = "block";
 
 }
+
 function closeViewTiepDan(){
-document.getElementById("viewTiepDanModal").style.display="none";
+
+    document.getElementById(
+        "viewTiepDanModal"
+    ).style.display = "none";
+
+}
+
+function formatCongDanView(congdan, cccd){
+
+    if(!congdan) return "";
+
+    let html = "";
+
+    let blocks =
+        congdan.split(
+            /\n\s*NGƯỜI THỨ \d+\s*/i
+        );
+
+    let cccdLines =
+        (cccd || "")
+        .split("\n")
+        .filter(x => x.trim());
+
+    blocks.forEach((block,index)=>{
+
+        let hoTen =
+            block.match(/Họ tên:\s*(.*)/i);
+
+        let diaChi =
+            block.match(/Địa chỉ:\s*(.*)/i);
+
+        let dienThoai =
+            block.match(/Điện thoại:\s*(.*)/i);
+
+        let ten =
+            hoTen ? hoTen[1].trim() : "";
+
+        let dc =
+            diaChi ? diaChi[1].trim() : "";
+
+        let dt =
+            dienThoai ? dienThoai[1].trim() : "";
+
+        let soCCCD =
+            cccdLines[index] || "";
+
+        soCCCD =
+            soCCCD.replace(
+                /NGƯỜI THỨ \d+\s*:\s*/i,
+                ""
+            ).trim();
+
+        html += `
+
+<div class="citizen-card">
+
+    <div class="citizen-name">
+        👤 ${ten}
+    </div>
+
+    <div class="citizen-meta">
+
+    ${dc ? `⌂ Địa chỉ: ${dc}` : ""}
+
+    ${dt
+        ? `<span class="dot">|</span> ☎ Điện thoại: ${dt}`
+        : ""
+    }
+
+    ${soCCCD
+        ? `<span class="dot">|</span> 🆔 CCCD/Hộ chiếu: ${soCCCD}`
+        : ""
+    }
+
+</div>
+
+</div>
+
+`;
+
+    });
+
+    return html;
+
 }
 
 function printTiepDan(){
@@ -10982,6 +11626,91 @@ function renderBaoCaoTuanPagination(totalRows){
   ).innerHTML = html;
 
 }
+
+function updateCongDanThem(){
+
+    let soNguoi =
+        Number(
+            document.getElementById("td_songuoi").value
+        ) || 1;
+
+    let container =
+        document.getElementById(
+            "congDanThemContainer"
+        );
+
+    container.innerHTML = "";
+
+    if(soNguoi <= 1){
+        return;
+    }
+
+    for(let i = 2; i <= soNguoi; i++){
+
+        container.innerHTML += `
+
+        <div class="congdan-them">
+
+            <div class="congdan-them-header">
+
+                <span class="congdan-icon">
+                    👤
+                </span>
+
+                <span class="congdan-title">
+                    CÔNG DÂN THỨ ${i}
+                </span>
+
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Họ tên</label>
+
+                    <input
+                        type="text"
+                        class="them_hoten"
+                        placeholder="Nhập họ tên công dân thứ ${i}">
+                </div>
+
+
+                 <div class="form-group">
+                    <label>Địa chỉ</label>
+
+                    <input
+                        type="text"
+                        class="them_diachi"
+                        placeholder="Nhập địa chỉ">
+                </div>
+
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+
+                    <input
+                        type="text"
+                        class="them_dienthoai"
+                        placeholder="Nhập số điện thoại">
+                </div>
+
+                <div class="form-group">
+                    <label>CCCD/Hộ chiếu</label>
+
+                    <input
+                        type="text"
+                        class="them_cccd"
+                        placeholder="Nhập số CCCD / Hộ chiếu">
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+}
 </script>
 </head>
 <body>
@@ -12021,27 +12750,52 @@ style="display:none;margin-top:5px;"
 
 <!-- PHẦN 2 -->
 <div class="section">
-<div class="section-title">II. Thông tin công dân</div>
 
-<div class="form-grid">
+    <div class="section-title">
+        II. Thông tin công dân
+    </div>
+<div class="form-group">
+            <label>Số người<span style="color:red">*</span></label>
 
-<div class="form-group form-full">
-<label>Họ tên – địa chỉ – điện thoại công dân <span style="color:red">*</span></label>
-<textarea id="td_congdan"></textarea>
+            <input
+                type="number"
+                id="td_songuoi"
+                min="1"
+                value="1"
+                oninput="updateCongDanThem()">
+        </div>
+    <div class="form-grid">
+       
+
+        <div class="form-group">
+    <label>Họ tên công dân <span style="color:red">*</span></label>
+    <input type="text" id="td_hoten">
 </div>
 
 <div class="form-group">
-<label>Số CCCD / Hộ chiếu công dân</label>
-<input id="td_cccd">
+    <label>Địa chỉ</label>
+    <input type="text" id="td_diachi">
 </div>
 
 <div class="form-group">
-<label>Số người<span style="color:red">*</span></label>
-<input id="td_songuoi">
+    <label>Số điện thoại</label>
+    <input type="text" id="td_dienthoai">
 </div>
 
 
-</div>
+
+        <div class="form-group">
+            <label>Số CCCD / Hộ chiếu công dân</label>
+            <input id="td_cccd">
+        </div>
+
+       
+
+    </div>
+
+    <!-- DANH SÁCH NGƯỜI ĐI CÙNG -->
+    <div id="congDanThemContainer"></div>
+
 </div>
 
 
@@ -12153,26 +12907,24 @@ I. THÔNG TIN NGƯỜI TIẾP CÔNG DÂN
 
 
 <!-- PHẦN 2 -->
-<div class="section-title">
-II. THÔNG TIN CÔNG DÂN
+<div
+    class="section-title"
+    id="lblCongDanTitle">
+
+    II. THÔNG TIN CÔNG DÂN (01 NGƯỜI)
+
 </div>
 
 <div class="view-grid">
 
 <div class="view-item view-full">
-<div class="view-label">Họ tên - địa chỉ - số điện thoại công dân</div>
+
 <div class="view-value" id="v_congdan"></div>
 </div>
 
-<div class="view-item">
-<div class="view-label">Số CCCD </div>
-<div class="view-value" id="v_cccd"></div>
-</div>
 
-<div class="view-item">
-<div class="view-label">Số người</div>
-<div class="view-value" id="v_songuoi"></div>
-</div>
+
+
 </div>
 
 <div class="section-title">
