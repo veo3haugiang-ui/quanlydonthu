@@ -1070,6 +1070,32 @@ background:#ffc107;
 background:#e0a800;
 }
 
+.nguoi-gui-view{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.nguoi-item{
+    border:1px solid #dcdcdc;
+    border-left:5px solid #1976d2;
+    border-radius:8px;
+    padding:12px 15px;
+    background:#fafafa;
+}
+
+.nguoi-title{
+    font-size:16px;
+    font-weight:bold;
+    color:#1976d2;
+    margin-bottom:10px;
+}
+
+.nguoi-row{
+    margin:5px 0;
+    line-height:1.6;
+}
+
 
 /* ===== SIDEBAR ===== */
 
@@ -1369,6 +1395,56 @@ max-height:90%;
 overflow:auto;
 box-shadow:0 25px 60px rgba(0,0,0,0.35);
 animation:fadeIn .25s ease;
+}
+
+/* =========================
+   THÊM NGƯƠI GỬI ĐƠN
+========================= */
+
+.nguoi-gui-view{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:6px;
+}
+
+.nguoi-card{
+    background:#fafafa;
+    border:1px solid #dcdcdc;
+    border-left:5px solid #1976d2;
+    border-radius:8px;
+    padding:12px 14px;
+    transition:.2s;
+}
+
+.nguoi-card:hover{
+    background:#f3f8ff;
+}
+
+.nguoi-name{
+    font-size:16px;
+    font-weight:700;
+    color:#0d47a1;
+    margin-bottom:8px;
+}
+
+.nguoi-info{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    color:#444;
+    font-size:14px;
+    line-height:1.6;
+}
+
+.nguoi-info span{
+    display:flex;
+    align-items:center;
+}
+
+.nguoi-info .sep{
+    color:#bbb;
+    font-weight:bold;
 }
 
 /* =========================
@@ -3574,6 +3650,13 @@ function newCase(){
   let yyyy = today.getFullYear();
 
   document.getElementById("ngayden").value = `${dd}/${mm}/${yyyy}`;
+  // ===== RESET NGƯỜI GỬI =====
+document.getElementById("soluong").value = 1;
+
+document.getElementById("nguoiGuiThemContainer").innerHTML = "";
+
+// cập nhật lại giao diện
+updateNguoiGuiThem();
 
   document.getElementById("formModal").style.display="block";
   document.getElementById(
@@ -3824,6 +3907,43 @@ return;
 }
 
 let loaiDonValue = document.getElementById("loaidon").value;
+//==============================
+// GHÉP THÔNG TIN NHIỀU NGƯỜI GỬI
+//==============================
+
+let hotenValue = hoten.value.trim();
+let diachiValue = diachi.value.trim();
+let dienthoaiValue = dienthoai.value.trim();
+
+document.querySelectorAll(".them_hoten")
+.forEach((item,index)=>{
+
+    let ten = item.value.trim();
+
+    let dc =
+        document.querySelectorAll(".them_diachi")[index]
+        ?.value
+        ?.trim() || "";
+
+    let dt =
+        document.querySelectorAll(".them_dienthoai")[index]
+        ?.value
+        ?.trim() || "";
+
+    if(ten){
+
+        hotenValue +=
+`\n\nNGƯỜI THỨ ${index+2}: ${ten}`;
+
+        diachiValue +=
+`\nNGƯỜI THỨ ${index+2}: ${dc}`;
+
+        dienthoaiValue +=
+`\nNGƯỜI THỨ ${index+2}: ${dt}`;
+
+    }
+
+});
 
 let mahoso = (editIndex===-1)
 ? generateCode(loaiDonValue)
@@ -3866,13 +3986,12 @@ nguondon:nguondon.value,
 linhvuc:linhvuc.value,
 soluong:soluong.value,
 
-hoten:
-  hoten.value.trim()===""
-  ? "Đơn nặc danh"
-  : hoten.value.trim(),
+hoten:hotenValue,
 
-diachi:diachi.value,
-dienthoai:dienthoai.value,
+diachi:diachiValue,
+
+dienthoai:dienthoaiValue,
+
 noidung:noidung.value,
 coquan:coquan.value,
 ketqua:ketqua.value,
@@ -3881,8 +4000,7 @@ kyduyet:kyduyet.value,
 soanthao:soanThaoValue,
 ghichu:ghichu.value,
 
-file:
-  dsFile.join("|"),
+file:dsFile.join("|"),
 
 tinhtrang:tinhtrang.value,
 loaidon:loaiDonValue,
@@ -4151,6 +4269,85 @@ editIndex=i;
 document.getElementById("formModal").style.display="block";
 
 toggleXuLyFields();
+//==============================
+// LOAD NHIỀU NGƯỜI GỬI
+//==============================
+
+updateNguoiGuiThem();
+
+let soNguoi =
+    parseInt(c.soluong || 1);
+
+document.getElementById("soluong").value =
+    soNguoi;
+
+// tạo đủ số người
+updateNguoiGuiThem();
+
+if(soNguoi > 1){
+
+    // ----- HỌ TÊN -----
+    let dsHoTen =
+        (c.hoten || "")
+        .split(/NGƯỜI THỨ \d+\s*:/i)
+        .map(x=>x.trim())
+        .filter(x=>x);
+
+    // ----- ĐỊA CHỈ -----
+    let dsDiaChi =
+        (c.diachi || "")
+        .split(/NGƯỜI THỨ \d+\s*:/i)
+        .map(x=>x.trim())
+        .filter(x=>x);
+
+    // ----- ĐIỆN THOẠI -----
+    let dsDienThoai =
+        (c.dienthoai || "")
+        .split(/NGƯỜI THỨ \d+\s*:/i)
+        .map(x=>x.trim())
+        .filter(x=>x);
+
+    // Người thứ 1
+
+    hoten.value =
+        dsHoTen[0] || "";
+
+    diachi.value =
+        dsDiaChi[0] || "";
+
+    dienthoai.value =
+        dsDienThoai[0] || "";
+
+    // Người thứ 2 trở đi
+
+    document
+        .querySelectorAll(".them_hoten")
+        .forEach((el,index)=>{
+
+            el.value =
+                dsHoTen[index+1] || "";
+
+        });
+
+    document
+        .querySelectorAll(".them_diachi")
+        .forEach((el,index)=>{
+
+            el.value =
+                dsDiaChi[index+1] || "";
+
+        });
+
+    document
+        .querySelectorAll(".them_dienthoai")
+        .forEach((el,index)=>{
+
+            el.value =
+                dsDienThoai[index+1] || "";
+
+        });
+
+}
 document
 .getElementById("hosoFileContainer")
 .innerHTML = "";
@@ -4284,6 +4481,77 @@ else{
 
 }
 
+function updateNguoiGuiThem(){
+
+    let soNguoi =
+        parseInt(
+            document.getElementById("soluong").value
+        ) || 1;
+
+    let container =
+        document.getElementById(
+            "nguoiGuiThemContainer"
+        );
+
+    container.innerHTML = "";
+
+    if(soNguoi <= 1){
+        return;
+    }
+
+    for(let i = 2; i <= soNguoi; i++){
+
+        container.innerHTML += `
+
+<div class="congdan-them">
+
+    <div class="congdan-them-header">
+
+        <span class="congdan-icon">
+            👤
+        </span>
+
+        <span class="congdan-title">
+            NGƯỜI GỬI THỨ ${i}
+        </span>
+
+    </div>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label>Họ tên</label>
+            <input
+                type="text"
+                class="them_hoten">
+        </div>
+
+        <div class="form-group">
+            <label>Điện thoại</label>
+            <input
+                type="text"
+                class="them_dienthoai">
+        </div>
+
+        <div class="form-group form-full">
+            <label>Địa chỉ</label>
+            <input
+                type="text"
+                class="them_diachi">
+        </div>
+
+        
+
+    </div>
+
+</div>
+
+`;
+
+    }
+
+}
+
 function displayData(){
 tbody.innerHTML="";
 
@@ -4348,6 +4616,62 @@ function formatDate(dateStr){
   return dateStr;
 }
 
+function formatNguoiGui(hoten,diachi,dienthoai){
+
+    let names =
+        String(hoten || "")
+        .split(/\n\s*NGƯỜI THỨ \d+\s*:\s*/i);
+
+    let addrs =
+        String(diachi || "")
+        .split(/\n\s*NGƯỜI THỨ \d+\s*:\s*/i);
+
+    let phones =
+        String(dienthoai || "")
+        .split(/\n\s*NGƯỜI THỨ \d+\s*:\s*/i);
+
+    let html="";
+
+    names.forEach((name,i)=>{
+
+        if(!name.trim()) return;
+
+        html += `
+
+       <div class="nguoi-card">
+
+    <div class="nguoi-name">
+
+        👤 ${name.trim()}
+
+    </div>
+
+    <div class="nguoi-info">
+
+        ${addrs[i] ? `
+            <span>⌂ ${addrs[i].trim()}</span>
+        ` : ""}
+
+        ${addrs[i] && phones[i] ? `
+            <span class="sep">│</span>
+        ` : ""}
+
+        ${phones[i] ? `
+            <span>☎ ${phones[i].trim()}</span>
+        ` : ""}
+
+    </div>
+
+</div>
+
+        `;
+
+    });
+
+    return html;
+
+}
+
 function viewCase(i){
 
 let c = cases[i];
@@ -4389,27 +4713,20 @@ modalBody.innerHTML = `
 </div>
 
 <div class="view-section">
-<div class="section-title">Thông tin người gửi đơn</div>
+<div class="section-title">
+THÔNG TIN NGƯỜI GỬI ĐƠN (${String(c.soluong || 1).padStart(2,'0')} NGƯỜI)
+</div>
 <div class="view-grid">
 
-<div class="view-item">
-<div class="view-label">Họ tên</div>
-<div class="view-value">${c.hoten||""}</div>
-</div>
+<div class="form-group full-width">
 
-<div class="view-item">
-<div class="view-label">Điện thoại</div>
-<div class="view-value">${c.dienthoai||""}</div>
-</div>
+    
 
-<div class="view-item">
-<div class="view-label">Địa chỉ</div>
-<div class="view-value">${c.diachi||""}</div>
-</div>
+    <div
+        id="v_nguoigui"
+        class="nguoi-gui-view">
+    </div>
 
-<div class="view-item">
-<div class="view-label">Số người gửi đơn</div>
-<div class="view-value">${c.soluong||""}</div>
 </div>
 
 
@@ -4597,6 +4914,84 @@ background:#fff;
 `;
 
 modal.style.display="block";
+// ======================
+// HIỂN THỊ NGƯỜI GỬI ĐƠN
+// ======================
+
+// ======================
+// HIỂN THỊ THÔNG TIN NGƯỜI GỬI
+// ======================
+
+let container = document.getElementById("v_nguoigui");
+
+if(container){
+
+    let html = "";
+
+    // ===== TÁCH HỌ TÊN =====
+    let dsTen = (c.hoten || "")
+        .split(/\nNGƯỜI THỨ \d+\s*:/i)
+        .map(x => x.trim());
+
+    // ===== TÁCH ĐỊA CHỈ =====
+    let dsDiaChi = (c.diachi || "")
+        .split(/\nNGƯỜI THỨ \d+\s*:/i)
+        .map(x => x.trim());
+
+    // ===== TÁCH ĐIỆN THOẠI =====
+    let dsDienThoai = (c.dienthoai || "")
+        .split(/\nNGƯỜI THỨ \d+\s*:/i)
+        .map(x => x.trim());
+
+    dsTen.forEach((ten,index)=>{
+
+        if(!ten) return;
+
+        html += `
+
+        <div class="nguoi-card">
+
+            <div class="nguoi-name">
+                👤 ${ten}
+            </div>
+
+            <div class="nguoi-info">
+
+                ${
+                    dsDiaChi[index]
+                    ?
+                    `<span>⌂ ${dsDiaChi[index]}</span>`
+                    :
+                    ""
+                }
+
+                ${
+                    dsDiaChi[index] && dsDienThoai[index]
+                    ?
+                    `<span class="sep">│</span>`
+                    :
+                    ""
+                }
+
+                ${
+                    dsDienThoai[index]
+                    ?
+                    `<span>☎ ${dsDienThoai[index]}</span>`
+                    :
+                    ""
+                }
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    container.innerHTML = html;
+
+}
 }
 
 function showTaiLieu(link){
@@ -12527,15 +12922,23 @@ background:#fff;
 </select>
 </div>
 
-<div class="form-group">
-<label>Số người <span style="color:red">*</span></label>
-<input id="soluong">
-</div>
+
 </div>
 
 
 <div class="section">
 <div class="section-title">Thông tin người gửi</div>
+<div class="form-group">
+<label>Số người <span style="color:red">*</span></label>
+<input
+        id="soluong"
+        type="number"
+        min="1"
+        value="1"
+        oninput="updateNguoiGuiThem()">
+</div>
+
+
 <div class="form-group">
 <label>Họ tên</label>
 <input id="hoten">
@@ -12550,7 +12953,7 @@ background:#fff;
 <label>Địa chỉ</label>
 <input id="diachi">
 </div>
-
+<div id="nguoiGuiThemContainer"></div>
 </div>
 
 <div class="form-group">
