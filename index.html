@@ -3370,8 +3370,13 @@ if(page==="users"){
   setTimeout(loadUsers, 50);
 
 }
+// Cập nhật lại chuông thông báo
+loadHoSoThamMuu();
 
+if(typeof updateThongBaoThamMuu === "function"){
+    updateThongBaoThamMuu();
 
+}
 }
 
 function closeBaoCaoTuanxx(){
@@ -3439,6 +3444,7 @@ let currentEditId = null; // 👈 THÊM DÒNG NÀY
 // ======================
 let baoCaoAlerts = [];
 let filteredBaoCaoDonThu = [];
+let hoSoChoThamMuu = [];
 
 const API_URL="https://script.google.com/macros/s/AKfycbxRJ333k81zTjbmn6V9B3GjkZml0GcH3AFoQ1j81TxeVZvp0vES0fpwX6VjwvClZjkL/exec";
 
@@ -3527,6 +3533,7 @@ if(c.ngayxuly){
   currentPage = 1;
   displayFiltered(filteredCases);
   updateStats(cases);
+  loadHoSoThamMuu();
 if(document.getElementById("pageBaoCao").style.display === "block"){
     renderBaoCao();
   }
@@ -3539,7 +3546,104 @@ filteredCases=[...cases];
 currentPage = 1;
 displayFiltered(filteredCases);
 updateStats(cases);
+loadHoSoThamMuu();
 });
+}
+
+function loadHoSoThamMuu(){
+
+    hoSoChoThamMuu = [];
+
+    let loginFullname =
+        (
+            localStorage.getItem("loginFullname")
+            || ""
+        )
+        .trim()
+        .toLowerCase();
+
+    if(!loginFullname) return;
+
+    hoSoChoThamMuu =
+        cases.filter(c => {
+
+            let nguoiThamMuu =
+                String(c.soanthao || "")
+                .trim()
+                .toLowerCase();
+
+            return (
+                nguoiThamMuu === loginFullname
+                &&
+                c.tinhtrang !== "Đã xử lý"
+            );
+
+        });
+
+    updateThongBaoThamMuu();
+
+}
+
+function openHoSoThamMuu(mahoso){
+
+    let index =
+        cases.findIndex(
+            x =>
+            String(x.mahoso).trim()
+            ===
+            String(mahoso).trim()
+        );
+
+    if(index < 0){
+        alert("Không tìm thấy hồ sơ");
+        return;
+    }
+
+    Swal.close();
+
+    // MỞ GIỐNG NÚT SỬA
+    editCase(index);
+
+}
+
+function updateThongBaoThamMuu(){
+
+    let badge =
+        document.getElementById(
+            "baoCaoBadge"
+        );
+
+    let btn =
+        document.getElementById(
+            "baoCaoNotifyBtn"
+        );
+
+    if(!badge || !btn) return;
+
+    let soHoSo =
+        hoSoChoThamMuu.length;
+
+    // số nhắc báo cáo hiện có
+    let soBaoCao =
+        baoCaoAlerts
+        ? baoCaoAlerts.length
+        : 0;
+
+    let tong =
+        soBaoCao + soHoSo;
+
+    badge.innerText = tong;
+
+    badge.style.display =
+        tong > 0
+        ? "inline-block"
+        : "none";
+
+    btn.style.display =
+        tong > 0
+        ? "inline-block"
+        : "none";
+
 }
 
 function login(){
@@ -10618,7 +10722,7 @@ function startBaoCaoCountdown(){
   if(diff <= 0) return;
 
   const days =
-    Math.floor(diff / 86400000);
+  Math.ceil(diff / 86400000);
 
   // Chỉ nhắc trong khoảng cho phép
   if(days > soNgayNhac) return;
@@ -10712,7 +10816,7 @@ addAlert(
   baoCaoAlerts,
   `Báo cáo tuần ${soTuan}/${year}`,
   hanBaoCaoTuan,
-  1,
+  0,
   periodTuan
 );
 
@@ -10831,24 +10935,30 @@ document.getElementById("baoCaoBadge");
 
 if(btn && badge){
 
-    if(baoCaoAlerts.length > 0){
+    const soBaoCao =
+        baoCaoAlerts.filter(
+            x => !isBaoCaoDone(x.key)
+        ).length;
 
-        btn.style.display = "inline-block";
-        badge.style.display = "block";
-        const soChuaLam =
-  baoCaoAlerts.filter(
-    x => !isBaoCaoDone(x.key)
-  ).length;
+    const soHoSo =
+        hoSoChoThamMuu
+        ? hoSoChoThamMuu.length
+        : 0;
 
-badge.textContent =
-  soChuaLam;
+    const tong =
+        soBaoCao + soHoSo;
 
-    }else{
+    btn.style.display =
+        tong > 0
+        ? "inline-block"
+        : "none";
 
-        btn.style.display = "none";
-        badge.style.display = "none";
+    badge.style.display =
+        tong > 0
+        ? "block"
+        : "none";
 
-    }
+    badge.textContent = tong;
 
 }
 
@@ -10926,7 +11036,7 @@ function addWeeklyAlert(
   if(diff <= 0) return;
 
   const days =
-    Math.floor(diff / 86400000);
+  Math.ceil(diff / 86400000);
 
   // Chỉ nhắc trước 1 ngày
   if(days > 1) return;
@@ -11010,6 +11120,86 @@ function showBaoCaoNotify(){
 
   let chuaXong = "";
   let daXong = "";
+  let hoSoHtml = "";
+
+if(hoSoChoThamMuu.length){
+
+    hoSoHtml = `
+
+<div style="
+    border:1px solid #ffeeba;
+    border-left:5px solid #ff9800;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:15px;
+    background:#fffdf5;
+">
+
+    <div style="
+        font-size:16px;
+        font-weight:700;
+        color:#d35400;
+        margin-bottom:10px;
+    ">
+        📂 Hồ sơ đang chờ bạn tham mưu xử lý
+    </div>
+
+    ${hoSoChoThamMuu.map(c=>`
+
+        <div
+    onclick="openHoSoThamMuu('${c.mahoso}')"
+    style="
+        padding:10px 12px;
+        margin-bottom:8px;
+        border:1px solid #e5e5e5;
+        border-radius:8px;
+        background:#fff;
+        cursor:pointer;
+        transition:all .2s ease;
+    "
+    onmouseover="
+        this.style.background='#f8f9fa';
+        this.style.transform='translateY(-2px)';
+        this.style.boxShadow='0 2px 8px rgba(0,0,0,.08)';
+    "
+    onmouseout="
+        this.style.background='#fff';
+        this.style.transform='translateY(0)';
+        this.style.boxShadow='none';
+    "
+>
+
+    <div
+        style="
+            font-size:17px;
+            font-weight:700;
+            color:#8e44ad;
+            margin-bottom:6px;
+        "
+    >
+        📄 MÃ: ${c.mahoso}
+    </div>
+
+            <div style="
+    font-size:13px;
+    color:#555;
+    margin-top:4px;
+">
+    👤 Người gửi: <b>${c.hoten || "Không rõ người gửi"}</b>
+    &nbsp;&nbsp; | &nbsp;&nbsp;
+    📅 Ngày nhận đơn: <b>${c.ngayden || ""}</b> &nbsp;&nbsp; | &nbsp;&nbsp; 📄 loại đơn:  ${c.loaidon || ""}
+</div>
+
+            
+
+        </div>
+
+    `).join("")}
+
+</div>
+
+`;
+}
 
   baoCaoAlerts.forEach(item => {
 
@@ -11121,93 +11311,104 @@ function showBaoCaoNotify(){
 
   width: 800,
 
-  html: `
+ html: `
+
+<div style="text-align:left;">
 
     <div style="
-      text-align:left;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:20px;
     ">
 
-      <div style="
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        margin-bottom:20px;
-      ">
-
         <div>
-          <div style="
-            font-size:22px;
-            font-weight:700;
-            color:#dc3545;
-          ">
-            🔔 Nhắc hạn báo cáo
-          </div>
 
-          <div style="
-            color:#6c757d;
-            font-size:13px;
-            margin-top:4px;
-          ">
-            Theo dõi các báo cáo sắp đến hạn nộp
-          </div>
+            <div style="
+                font-size:24px;
+                font-weight:700;
+                color:#dc3545;
+            ">
+                🔔 NHẮC VIỆC
+            </div>
+
+            <div style="
+                color:#6c757d;
+                font-size:13px;
+                margin-top:4px;
+            ">
+                Theo dõi công việc cần thực hiện
+            </div>
+
         </div>
 
         <div style="
-          background:#fff3cd;
-          color:#856404;
-          padding:6px 12px;
-          border-radius:20px;
-          font-weight:600;
-          font-size:13px;
+            display:flex;
+            gap:8px;
         ">
-           ${soChuaLam} báo cáo
+
+            <div style="
+                background:#fff3cd;
+                color:#856404;
+                padding:6px 12px;
+                border-radius:20px;
+                font-size:13px;
+                font-weight:600;
+            ">
+                📂 ${hoSoChoThamMuu.length} hồ sơ
+            </div>
+
+            <div style="
+                background:${
+                    soChuaLam > 0
+                    ? '#fff3cd'
+                    : '#d4edda'
+                };
+                color:${
+                    soChuaLam > 0
+                    ? '#856404'
+                    : '#155724'
+                };
+                padding:6px 12px;
+                border-radius:20px;
+                font-size:13px;
+                font-weight:600;
+            ">
+                ${
+                    soChuaLam > 0
+                    ? `📊 ${soChuaLam} báo cáo`
+                    : `✅ 0 báo cáo`
+                }
+            </div>
+
         </div>
-
-      </div>
-
-      <div style="
-  max-height:500px;
-  overflow:auto;
-">
-
-  ${
-    chuaXong ||
-
-    `<div style="
-      text-align:center;
-      padding:50px 20px;
-    ">
-
-      <div style="
-        font-size:60px;
-      ">
-        ✅
-      </div>
-
-      <div style="
-        color:#28a745;
-        font-size:20px;
-        font-weight:700;
-        margin-top:10px;
-      ">
-        Đã hoàn thành tất cả báo cáo
-      </div>
-
-      <div style="
-        color:#6c757d;
-        margin-top:8px;
-      ">
-        Hiện không còn báo cáo nào cần thực hiện.
-      </div>
-
-    </div>`
-  }
-
-</div>
 
     </div>
 
-  `,
+    <div style="
+        max-height:550px;
+        overflow:auto;
+    ">
+
+        ${hoSoHtml}
+
+        ${
+    soChuaLam > 0
+    ? `
+      <div style="
+          margin-top:15px;
+      ">
+          ${chuaXong}
+      </div>
+      `
+    : ``
+}
+
+    </div>
+
+</div>
+
+`,
 
   showConfirmButton:false,
 
