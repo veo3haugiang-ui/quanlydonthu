@@ -4694,7 +4694,7 @@ onclick="viewCase(${i})"
 <td>${i+1}</td>
 <td>${c.mahoso}</td>
 <td>${formatDate(c.ngayden)}</td>
-<td>${c.hoten}</td>
+<td>${rutGonHoTen(c.hoten)}</td>
 <td>${c.loaidon}</td>
 <td>${c.coquan}</td>
 <td>${c.dieukien}</td>
@@ -5456,12 +5456,8 @@ onclick="viewCase(${realIndex})"
 
 <td>
   <div class="clamp-name">
-    ${
-      (c.hoten || "").length > 30
-      ? (c.hoten || "").substring(0,30) + "..."
-      : (c.hoten || "")
-    }
-  </div>
+  ${rutGonHoTen(c.hoten)}
+</div>
 </td>
 
 <td>${c.loaidon || ""}</td>
@@ -12319,6 +12315,28 @@ function updateCongDanThem(){
         `;
 
     }
+
+}
+
+function rutGonHoTen(hoten){
+
+    if(!hoten) return "";
+
+    const text = String(hoten).trim();
+
+    const match = text.match(/NGƯỜI THỨ\s+\d+\s*:/gi);
+
+    if(!match){
+        return text;
+    }
+
+    const soNguoiKhac = match.length;
+
+    const tenDauTien = text
+        .split(/NGƯỜI THỨ\s+\d+\s*:/i)[0]
+        .trim();
+
+    return `${tenDauTien} (và ${soNguoiKhac} người khác)`;
 
 }
 </script>
