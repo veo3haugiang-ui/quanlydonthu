@@ -11059,45 +11059,32 @@ function addWeeklyAlert(
 
 }
 
-function toggleBaoCaoDone(key){
+function toggleBaoCaoDone(key, btn){
 
-  localStorage.setItem(
-    "baocao_" + key,
-    "done"
-  );
-
-  updateBaoCaoCountdown();
-
-  // Đổi màu nút ngay lập tức
-  const btn =
-    document.getElementById(
-      "btn_" + key
+    localStorage.setItem(
+        "baocao_" + key,
+        "done"
     );
 
-  if(btn){
-
-    btn.innerHTML =
-      "✓ Đã hoàn thành";
-
-    btn.style.background =
-      "#28a745";
-
+    // Đổi nút đỏ thành nút xanh
+    btn.innerHTML = "✓ Đã hoàn thành";
+    btn.style.background = "#28a745";
     btn.disabled = true;
+    btn.style.cursor = "default";
 
-    btn.style.cursor =
-      "default";
+    // Đổi trạng thái đếm ngược
+    const status =
+      document.getElementById(
+        "status_" + key
+      );
 
-  }
+    if(status){
+        status.innerHTML =
+          "✓ Đã hoàn thành";
 
-  // Thông báo thành công
-  Swal.fire({
-    toast:true,
-    position:"top-end",
-    icon:"success",
-    title:"Đã đánh dấu hoàn thành",
-    showConfirmButton:false,
-    timer:1500
-  });
+        status.style.color =
+          "#28a745";
+    }
 
 }
 
@@ -11256,23 +11243,25 @@ if(hoSoChoThamMuu.length){
         📅 Hạn làm báo cáo: ${item.deadline}  📊 Số liệu từ ngày ${item.period}
       </div>
 
-      <div style="
-        margin-top:8px;
-        font-weight:600;
-        color:${
-          done ? "#28a745" : "#dc3545"
-        };
-      ">
-        ${
-          done
-? "✓ Đã hoàn thành"
-: item.isDeadlineToday
-  ? `🚨 Hôm nay hạn chót lúc 16:00`
-  : item.days === 0
-      ? `⏳ Còn ${item.hours} giờ`
-      : `⏳ Còn ${item.days} ngày ${item.hours} giờ`
-        }
-      </div>
+      <div
+  id="status_${item.key}"
+  style="
+    margin-top:8px;
+    font-weight:600;
+    color:${
+      done ? "#28a745" : "#dc3545"
+    };
+  ">
+  ${
+    done
+      ? "✓ Đã hoàn thành"
+      : item.isDeadlineToday
+        ? `🚨 Hôm nay hạn chót lúc 16:00`
+        : item.days === 0
+          ? `⏳ Còn ${item.hours} giờ`
+          : `⏳ Còn ${item.days} ngày ${item.hours} giờ`
+  }
+</div>
 
     </div>
 
@@ -11280,7 +11269,7 @@ if(hoSoChoThamMuu.length){
 
      <button
   id="btn_${item.key}"
-  onclick="toggleBaoCaoDone('${item.key}')"
+  onclick="toggleBaoCaoDone('${item.key}', this)"
   style="
     border:none;
     background:${
