@@ -3689,12 +3689,20 @@ setTimeout(()=>{
     );
 
   const baoCaoCon1Ngay =
-    baoCaoAlerts.filter(
-      x =>
-        !isBaoCaoDone(x.key)
-        &&
+  baoCaoAlerts.filter(
+    x =>
+      !isBaoCaoDone(x.key)
+      &&
+      (
         x.days === 1
-    );
+        ||
+        (
+          x.days === 0
+          &&
+          x.hours > 0
+        )
+      )
+  );
 
   // Hạn cuối
   if(baoCaoHanChot.length > 0){
@@ -3708,7 +3716,7 @@ setTimeout(()=>{
   if(baoCaoCon1Ngay.length > 0){
 
     showBaoCaoToast(
-  "⚠ Ngày mai đến hạn: " +
+  "⚠ Sắp đến hạn: " +
   baoCaoCon1Ngay
     .map(x => x.title)
     .join(", ")
@@ -10717,20 +10725,26 @@ function startBaoCaoCountdown(){
   const now = new Date();
 
   const diff =
-    deadline.getTime() - now.getTime();
+  deadline.getTime() - now.getTime();
 
-  if(diff <= 0) return;
+if(diff <= 0) return;
 
-  const days =
-  Math.ceil(diff / 86400000);
+// Tổng số giờ còn lại
+const totalHours =
+  Math.floor(diff / 3600000);
 
-  // Chỉ nhắc trong khoảng cho phép
-  if(days > soNgayNhac) return;
+// Số ngày và giờ còn lại
+const days =
+  Math.floor(totalHours / 24);
 
-  const hours =
-    Math.floor(
-      (diff % 86400000) / 3600000
-    );
+const hours =
+  totalHours % 24;
+
+// Chỉ nhắc trong khoảng cho phép
+if(
+  totalHours >
+  (soNgayNhac * 24)
+) return;
 
   arr.push({
   key:title
