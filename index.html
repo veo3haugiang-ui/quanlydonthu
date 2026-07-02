@@ -3530,30 +3530,10 @@ if(c.ngayxuly){
   }
 
   filteredCases=[...cases];
-currentPage = 1;
-displayFiltered(filteredCases);
-updateStats(cases);
-
-loadHoSoThamMuu();
-startBaoCaoCountdown();
-
-setTimeout(()=>{
-
-    const soBaoCao =
-        baoCaoAlerts.filter(
-            x => !isBaoCaoDone(x.key)
-        ).length;
-
-    const soHoSo =
-        hoSoChoThamMuu.length;
-
-    if(soBaoCao > 0 || soHoSo > 0){
-
-        showBaoCaoNotify();
-
-    }
-
-},500);
+  currentPage = 1;
+  displayFiltered(filteredCases);
+  updateStats(cases);
+  loadHoSoThamMuu();
 if(document.getElementById("pageBaoCao").style.display === "block"){
     renderBaoCao();
   }
@@ -3668,83 +3648,105 @@ function updateThongBaoThamMuu(){
 
 function login(){
 
-let u = document.getElementById("username").value;
-let p = document.getElementById("password").value;
+let u=document.getElementById("username").value;
+let p=document.getElementById("password").value;
 
 fetch(API_URL,{
-  method:"POST",
-  body:JSON.stringify({
-    action:"login",
-    username:u,
-    password:p
-  })
+method:"POST",
+body:JSON.stringify({
+action:"login",
+username:u,
+password:p
+})
 })
 .then(res=>res.json())
 .then(data=>{
 
-  if(data.success){
+if(data.success){
 
-    // ===== XÓA DỮ LIỆU TÀI KHOẢN CŨ =====
-    baoCaoAlerts = [];
-    hoSoChoThamMuu = [];
+currentUser = u;
+currentRole = data.role;
 
-    currentUser = u;
-    currentRole = data.role;
+applyRoleUI();
 
-    applyRoleUI();
+localStorage.setItem("loginFullname", data.fullname);
 
-    localStorage.setItem("loginFullname", data.fullname);
-    localStorage.setItem("loginUser", u);
-    localStorage.setItem("loginTime", Date.now());
+localStorage.setItem("loginUser",u);
+localStorage.setItem("loginTime",Date.now());
 
-    document.getElementById("loginPage").style.display = "none";
-    document.getElementById("mainPage").style.display = "block";
-
-    document.getElementById("welcomeBox").innerHTML =
-      "👤 " + data.fullname + " | Vai trò: " + data.role;
-
-    // ===== TẢI DỮ LIỆU TRƯỚC =====
-    loadData();
+document.getElementById("loginPage").style.display="none";
+document.getElementById("mainPage").style.display="block";
+startBaoCaoCountdown();
 
 setTimeout(()=>{
 
-  // tạo lại danh sách nhắc việc theo user hiện tại
-  startBaoCaoCountdown();
+  const baoCaoHanChot =
+    baoCaoAlerts.filter(
+      x =>
+        !isBaoCaoDone(x.key)
+        &&
+        x.days === 0
+    );
 
-  // nếu có hồ sơ hoặc báo cáo thì hiện popup
-  if(
-      hoSoChoThamMuu.length > 0
-      ||
-      baoCaoAlerts.some(x => !isBaoCaoDone(x.key))
-  ){
-      
+  const baoCaoCon1Ngay =
+  baoCaoAlerts.filter(
+    x =>
+      !isBaoCaoDone(x.key)
+      &&
+      (
+        x.days === 1
+        ||
+        (
+          x.days === 0
+          &&
+          x.hours > 0
+        )
+      )
+  );
+
+  // Hạn cuối
+  if(baoCaoHanChot.length > 0){
+
+    showBaoCaoNotify();
+
+    return;
   }
 
-},3000);
+  // Còn 1 ngày
+  if(baoCaoCon1Ngay.length > 0){
 
-  }else{
-
-    alert("Sai tài khoản hoặc mật khẩu");
+    showBaoCaoToast(
+  "⚠ Sắp đến hạn: " +
+  baoCaoCon1Ngay
+    .map(x => x.title)
+    .join(", ")
+);
 
   }
+
+},1000);
+
+document.getElementById("welcomeBox").innerHTML =
+"👤 "+data.fullname+" | Vai trò: "+data.role;
+
+loadData();
+
+} else {
+
+alert("Sai tài khoản hoặc mật khẩu");
+
+}
 
 });
-
 }
 
 function logout(){
 
-  localStorage.removeItem("loginUser");
-  localStorage.removeItem("loginTime");
+localStorage.removeItem("loginUser");
+localStorage.removeItem("loginTime");
 
-  baoCaoAlerts = [];
-  hoSoChoThamMuu = [];
-
-  currentUser = "";
-  currentRole = "";
-
-  mainPage.style.display = "none";
-  loginPage.style.display = "block";
+mainPage.style.display="none";
+loginPage.style.display="block";
 
 }
 
@@ -11057,32 +11059,45 @@ function addWeeklyAlert(
 
 }
 
-function toggleBaoCaoDone(key, btn){
+function toggleBaoCaoDone(key){
 
-    localStorage.setItem(
-        "baocao_" + key,
-        "done"
+  localStorage.setItem(
+    "baocao_" + key,
+    "done"
+  );
+
+  updateBaoCaoCountdown();
+
+  // Đổi màu nút ngay lập tức
+  const btn =
+    document.getElementById(
+      "btn_" + key
     );
 
-    // Đổi nút đỏ thành nút xanh
-    btn.innerHTML = "✓ Đã hoàn thành";
-    btn.style.background = "#28a745";
+  if(btn){
+
+    btn.innerHTML =
+      "✓ Đã hoàn thành";
+
+    btn.style.background =
+      "#28a745";
+
     btn.disabled = true;
-    btn.style.cursor = "default";
 
-    // Đổi trạng thái đếm ngược
-    const status =
-      document.getElementById(
-        "status_" + key
-      );
+    btn.style.cursor =
+      "default";
 
-    if(status){
-        status.innerHTML =
-          "✓ Đã hoàn thành";
+  }
 
-        status.style.color =
-          "#28a745";
-    }
+  // Thông báo thành công
+  Swal.fire({
+    toast:true,
+    position:"top-end",
+    icon:"success",
+    title:"Đã đánh dấu hoàn thành",
+    showConfirmButton:false,
+    timer:1500
+  });
 
 }
 
@@ -11241,25 +11256,23 @@ if(hoSoChoThamMuu.length){
         📅 Hạn làm báo cáo: ${item.deadline}  📊 Số liệu từ ngày ${item.period}
       </div>
 
-      <div
-  id="status_${item.key}"
-  style="
-    margin-top:8px;
-    font-weight:600;
-    color:${
-      done ? "#28a745" : "#dc3545"
-    };
-  ">
-  ${
-    done
-      ? "✓ Đã hoàn thành"
-      : item.isDeadlineToday
-        ? `🚨 Hôm nay hạn chót lúc 16:00`
-        : item.days === 0
-          ? `⏳ Còn ${item.hours} giờ`
-          : `⏳ Còn ${item.days} ngày ${item.hours} giờ`
-  }
-</div>
+      <div style="
+        margin-top:8px;
+        font-weight:600;
+        color:${
+          done ? "#28a745" : "#dc3545"
+        };
+      ">
+        ${
+          done
+? "✓ Đã hoàn thành"
+: item.isDeadlineToday
+  ? `🚨 Hôm nay hạn chót lúc 16:00`
+  : item.days === 0
+      ? `⏳ Còn ${item.hours} giờ`
+      : `⏳ Còn ${item.days} ngày ${item.hours} giờ`
+        }
+      </div>
 
     </div>
 
@@ -11267,7 +11280,7 @@ if(hoSoChoThamMuu.length){
 
      <button
   id="btn_${item.key}"
-  onclick="toggleBaoCaoDone('${item.key}', this)"
+  onclick="toggleBaoCaoDone('${item.key}')"
   style="
     border:none;
     background:${
