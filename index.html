@@ -3669,58 +3669,28 @@ document.getElementById("mainPage").style.display="block";
 startBaoCaoCountdown();
 showPage("donthu");
 
-setTimeout(()=>{
-
-  const baoCaoHanChot =
-    baoCaoAlerts.filter(
-      x =>
-        !isBaoCaoDone(x.key)
-        &&
-        x.days === 0
-    );
-
-  const baoCaoCon1Ngay =
-  baoCaoAlerts.filter(
-    x =>
-      !isBaoCaoDone(x.key)
-      &&
-      (
-        x.days === 1
-        ||
-        (
-          x.days === 0
-          &&
-          x.hours > 0
-        )
-      )
-  );
-
-  // Hạn cuối
-  if(baoCaoHanChot.length > 0){
-
-    showBaoCaoNotify();
-
-    return;
-  }
-
-  // Còn 1 ngày
-  if(baoCaoCon1Ngay.length > 0){
-
-    showBaoCaoToast(
-  "⚠ Sắp đến hạn: " +
-  baoCaoCon1Ngay
-    .map(x => x.title)
-    .join(", ")
-);
-
-  }
-
-},1000);
-
 document.getElementById("welcomeBox").innerHTML =
 "👤 "+data.fullname+" | Vai trò: "+data.role;
 
 loadData();
+
+setTimeout(()=>{
+
+    let soBaoCao =
+        baoCaoAlerts.filter(
+            x => !isBaoCaoDone(x.key)
+        ).length;
+
+    let soHoSo =
+        hoSoChoThamMuu.length;
+
+    if(soBaoCao + soHoSo > 0){
+
+        showBaoCaoNotify();
+
+    }
+
+},2000);
 
 } else {
 
