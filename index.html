@@ -3648,105 +3648,117 @@ function updateThongBaoThamMuu(){
 
 function login(){
 
-let u=document.getElementById("username").value;
-let p=document.getElementById("password").value;
+let u = document.getElementById("username").value;
+let p = document.getElementById("password").value;
 
 fetch(API_URL,{
-method:"POST",
-body:JSON.stringify({
-action:"login",
-username:u,
-password:p
-})
+  method:"POST",
+  body:JSON.stringify({
+    action:"login",
+    username:u,
+    password:p
+  })
 })
 .then(res=>res.json())
 .then(data=>{
 
-if(data.success){
+  if(data.success){
 
-currentUser = u;
-currentRole = data.role;
+    // ===== XÓA DỮ LIỆU TÀI KHOẢN CŨ =====
+    baoCaoAlerts = [];
+    hoSoChoThamMuu = [];
 
-applyRoleUI();
+    currentUser = u;
+    currentRole = data.role;
 
-localStorage.setItem("loginFullname", data.fullname);
+    applyRoleUI();
 
-localStorage.setItem("loginUser",u);
-localStorage.setItem("loginTime",Date.now());
+    localStorage.setItem("loginFullname", data.fullname);
+    localStorage.setItem("loginUser", u);
+    localStorage.setItem("loginTime", Date.now());
 
-document.getElementById("loginPage").style.display="none";
-document.getElementById("mainPage").style.display="block";
-startBaoCaoCountdown();
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("mainPage").style.display = "block";
 
-setTimeout(()=>{
+    document.getElementById("welcomeBox").innerHTML =
+      "👤 " + data.fullname + " | Vai trò: " + data.role;
 
-  const baoCaoHanChot =
-    baoCaoAlerts.filter(
-      x =>
-        !isBaoCaoDone(x.key)
-        &&
-        x.days === 0
-    );
+    // ===== TẢI DỮ LIỆU TRƯỚC =====
+    loadData();
 
-  const baoCaoCon1Ngay =
-  baoCaoAlerts.filter(
-    x =>
-      !isBaoCaoDone(x.key)
-      &&
-      (
-        x.days === 1
-        ||
-        (
-          x.days === 0
-          &&
-          x.hours > 0
-        )
-      )
-  );
+    // ===== ĐỢI TẢI XONG RỒI MỚI NHẮC VIỆC =====
+    setTimeout(()=>{
 
-  // Hạn cuối
-  if(baoCaoHanChot.length > 0){
+      startBaoCaoCountdown();
 
-    showBaoCaoNotify();
+      const baoCaoHanChot =
+        baoCaoAlerts.filter(
+          x =>
+            !isBaoCaoDone(x.key)
+            &&
+            x.days === 0
+        );
 
-    return;
+      const baoCaoCon1Ngay =
+        baoCaoAlerts.filter(
+          x =>
+            !isBaoCaoDone(x.key)
+            &&
+            (
+              x.days === 1
+              ||
+              (
+                x.days === 0 &&
+                x.hours > 0
+              )
+            )
+        );
+
+      // Hiện popup nếu có báo cáo đến hạn hôm nay
+      if(baoCaoHanChot.length > 0){
+
+        showBaoCaoNotify();
+        return;
+
+      }
+
+      // Hiện toast nếu sắp đến hạn
+      if(baoCaoCon1Ngay.length > 0){
+
+        showBaoCaoToast(
+          "⚠ Sắp đến hạn: " +
+          baoCaoCon1Ngay
+            .map(x => x.title)
+            .join(", ")
+        );
+
+      }
+
+    }, 2000);
+
+  }else{
+
+    alert("Sai tài khoản hoặc mật khẩu");
+
   }
-
-  // Còn 1 ngày
-  if(baoCaoCon1Ngay.length > 0){
-
-    showBaoCaoToast(
-  "⚠ Sắp đến hạn: " +
-  baoCaoCon1Ngay
-    .map(x => x.title)
-    .join(", ")
-);
-
-  }
-
-},1000);
-
-document.getElementById("welcomeBox").innerHTML =
-"👤 "+data.fullname+" | Vai trò: "+data.role;
-
-loadData();
-
-} else {
-
-alert("Sai tài khoản hoặc mật khẩu");
-
-}
 
 });
+
 }
 
 function logout(){
 
-localStorage.removeItem("loginUser");
-localStorage.removeItem("loginTime");
+  localStorage.removeItem("loginUser");
+  localStorage.removeItem("loginTime");
 
-mainPage.style.display="none";
-loginPage.style.display="block";
+  baoCaoAlerts = [];
+  hoSoChoThamMuu = [];
+
+  currentUser = "";
+  currentRole = "";
+
+  mainPage.style.display = "none";
+  loginPage.style.display = "block";
 
 }
 
