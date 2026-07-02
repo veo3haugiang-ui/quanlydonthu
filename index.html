@@ -3609,41 +3609,31 @@ function openHoSoThamMuu(mahoso){
 function updateThongBaoThamMuu(){
 
     let badge =
-        document.getElementById(
-            "baoCaoBadge"
-        );
+        document.getElementById("baoCaoBadge");
 
     let btn =
-        document.getElementById(
-            "baoCaoNotifyBtn"
-        );
+        document.getElementById("baoCaoNotifyBtn");
 
     if(!badge || !btn) return;
 
     let soHoSo =
         hoSoChoThamMuu.length;
 
-    // số nhắc báo cáo hiện có
     let soBaoCao =
-        baoCaoAlerts
-        ? baoCaoAlerts.length
-        : 0;
+        baoCaoAlerts.filter(
+            x => !isBaoCaoDone(x.key)
+        ).length;
 
     let tong =
-        soBaoCao + soHoSo;
+        soHoSo + soBaoCao;
 
     badge.innerText = tong;
 
     badge.style.display =
-        tong > 0
-        ? "inline-block"
-        : "none";
+        tong > 0 ? "inline-block" : "none";
 
     btn.style.display =
-        tong > 0
-        ? "inline-block"
-        : "none";
-
+        tong > 0 ? "inline-block" : "none";
 }
 
 function login(){
@@ -3677,6 +3667,7 @@ localStorage.setItem("loginTime",Date.now());
 document.getElementById("loginPage").style.display="none";
 document.getElementById("mainPage").style.display="block";
 startBaoCaoCountdown();
+showPage("donthu");
 
 setTimeout(()=>{
 
