@@ -3530,10 +3530,30 @@ if(c.ngayxuly){
   }
 
   filteredCases=[...cases];
-  currentPage = 1;
-  displayFiltered(filteredCases);
-  updateStats(cases);
-  loadHoSoThamMuu();
+currentPage = 1;
+displayFiltered(filteredCases);
+updateStats(cases);
+
+loadHoSoThamMuu();
+startBaoCaoCountdown();
+
+setTimeout(()=>{
+
+    const soBaoCao =
+        baoCaoAlerts.filter(
+            x => !isBaoCaoDone(x.key)
+        ).length;
+
+    const soHoSo =
+        hoSoChoThamMuu.length;
+
+    if(soBaoCao > 0 || soHoSo > 0){
+
+        showBaoCaoNotify();
+
+    }
+
+},500);
 if(document.getElementById("pageBaoCao").style.display === "block"){
     renderBaoCao();
   }
@@ -3686,55 +3706,21 @@ fetch(API_URL,{
     // ===== TẢI DỮ LIỆU TRƯỚC =====
     loadData();
 
-    // ===== ĐỢI TẢI XONG RỒI MỚI NHẮC VIỆC =====
-    setTimeout(()=>{
+setTimeout(()=>{
 
-      startBaoCaoCountdown();
+  // tạo lại danh sách nhắc việc theo user hiện tại
+  startBaoCaoCountdown();
 
-      const baoCaoHanChot =
-        baoCaoAlerts.filter(
-          x =>
-            !isBaoCaoDone(x.key)
-            &&
-            x.days === 0
-        );
+  // nếu có hồ sơ hoặc báo cáo thì hiện popup
+  if(
+      hoSoChoThamMuu.length > 0
+      ||
+      baoCaoAlerts.some(x => !isBaoCaoDone(x.key))
+  ){
+      
+  }
 
-      const baoCaoCon1Ngay =
-        baoCaoAlerts.filter(
-          x =>
-            !isBaoCaoDone(x.key)
-            &&
-            (
-              x.days === 1
-              ||
-              (
-                x.days === 0 &&
-                x.hours > 0
-              )
-            )
-        );
-
-      // Hiện popup nếu có báo cáo đến hạn hôm nay
-      if(baoCaoHanChot.length > 0){
-
-        showBaoCaoNotify();
-        return;
-
-      }
-
-      // Hiện toast nếu sắp đến hạn
-      if(baoCaoCon1Ngay.length > 0){
-
-        showBaoCaoToast(
-          "⚠ Sắp đến hạn: " +
-          baoCaoCon1Ngay
-            .map(x => x.title)
-            .join(", ")
-        );
-
-      }
-
-    }, 2000);
+},3000);
 
   }else{
 
