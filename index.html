@@ -11022,43 +11022,48 @@ function addWeeklyAlert(
 
 function toggleBaoCaoDone(key){
 
-  localStorage.setItem(
-    "baocao_" + key,
-    "done"
-  );
-
-  updateBaoCaoCountdown();
-
-  // Đổi màu nút ngay lập tức
-  const btn =
-    document.getElementById(
-      "btn_" + key
+    localStorage.setItem(
+        "baocao_" + key,
+        "done"
     );
 
-  if(btn){
+    // Đổi nút đỏ thành nút xanh
+    const btn =
+      document.getElementById(
+        "btn_" + key
+      );
 
-    btn.innerHTML =
-      "✓ Đã hoàn thành";
+    if(btn){
 
-    btn.style.background =
-      "#28a745";
+        btn.innerHTML =
+          "✅ Đã hoàn thành";
 
-    btn.disabled = true;
+        btn.style.background =
+          "#28a745";
 
-    btn.style.cursor =
-      "default";
+        btn.disabled = true;
 
-  }
+        btn.style.cursor =
+          "default";
+    }
 
-  // Thông báo thành công
-  Swal.fire({
-    toast:true,
-    position:"top-end",
-    icon:"success",
-    title:"Đã đánh dấu hoàn thành",
-    showConfirmButton:false,
-    timer:1500
-  });
+    // Đổi dòng đếm ngược
+    const status =
+      document.getElementById(
+        "status_" + key
+      );
+
+    if(status){
+
+        status.innerHTML =
+          "✅ Đã hoàn thành";
+
+        status.style.color =
+          "#28a745";
+    }
+
+    updateBaoCaoCountdown();
+    updateThongBaoThamMuu();
 
 }
 
@@ -11217,7 +11222,9 @@ if(hoSoChoThamMuu.length){
         📅 Hạn làm báo cáo: ${item.deadline}  📊 Số liệu từ ngày ${item.period}
       </div>
 
-      <div style="
+      <div
+      id="status_${item.key}"
+      style="
         margin-top:8px;
         font-weight:600;
         color:${
