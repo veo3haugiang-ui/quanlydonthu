@@ -3663,6 +3663,9 @@ password:p
 .then(data=>{
 
 if(data.success){
+// Xóa dữ liệu người dùng trước
+hoSoChoThamMuu = [];
+baoCaoAlerts = [];
 
 currentUser = u;
 currentRole = data.role;
@@ -3676,55 +3679,31 @@ localStorage.setItem("loginTime",Date.now());
 
 document.getElementById("loginPage").style.display="none";
 document.getElementById("mainPage").style.display="block";
-startBaoCaoCountdown();
+
+loadData();
 
 setTimeout(()=>{
 
-  const baoCaoHanChot =
-    baoCaoAlerts.filter(
-      x =>
-        !isBaoCaoDone(x.key)
-        &&
-        x.days === 0
-    );
+    loadHoSoThamMuu();
 
-  const baoCaoCon1Ngay =
-  baoCaoAlerts.filter(
-    x =>
-      !isBaoCaoDone(x.key)
-      &&
-      (
-        x.days === 1
-        ||
-        (
-          x.days === 0
-          &&
-          x.hours > 0
-        )
-      )
-  );
+    startBaoCaoCountdown();
 
-  // Hạn cuối
-  if(baoCaoHanChot.length > 0){
+    const soHoSo =
+        hoSoChoThamMuu.length;
 
-    showBaoCaoNotify();
+    const soBaoCao =
+        baoCaoAlerts.filter(
+            x => !isBaoCaoDone(x.key)
+        ).length;
 
-    return;
-  }
+    // Có hồ sơ hoặc có báo cáo => mở popup giống bấm chuông
+    if(soHoSo > 0 || soBaoCao > 0){
 
-  // Còn 1 ngày
-  if(baoCaoCon1Ngay.length > 0){
+        showBaoCaoNotify();
 
-    showBaoCaoToast(
-  "⚠ Sắp đến hạn: " +
-  baoCaoCon1Ngay
-    .map(x => x.title)
-    .join(", ")
-);
+    }
 
-  }
-
-},1000);
+},2500);
 
 document.getElementById("welcomeBox").innerHTML =
 "👤 "+data.fullname+" | Vai trò: "+data.role;
@@ -3742,11 +3721,19 @@ alert("Sai tài khoản hoặc mật khẩu");
 
 function logout(){
 
-localStorage.removeItem("loginUser");
-localStorage.removeItem("loginTime");
+  localStorage.removeItem("loginUser");
+  localStorage.removeItem("loginTime");
+  localStorage.removeItem("loginFullname");
 
-mainPage.style.display="none";
-loginPage.style.display="block";
+  // reset dữ liệu nhắc việc
+  hoSoChoThamMuu = [];
+  baoCaoAlerts = [];
+
+  currentUser = null;
+  currentRole = null;
+
+  mainPage.style.display="none";
+  loginPage.style.display="block";
 
 }
 
