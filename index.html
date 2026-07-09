@@ -4024,6 +4024,10 @@ let loaiDonValue = document.getElementById("loaidon").value;
 //==============================
 
 let hotenValue = hoten.value.trim();
+
+if(!hotenValue){
+    hotenValue = "Đơn nặc danh";
+}
 let diachiValue = diachi.value.trim();
 let dienthoaiValue = dienthoai.value.trim();
 
