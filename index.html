@@ -2573,9 +2573,9 @@ select:disabled{
 /* ===== THƯ VIỆN VĂN BẢN ĐẸP HƠN ===== */
 
 #pageVanBan table{
-    min-width:1100px;
-    width:1100px;
-    table-layout:auto;
+    width:100%;
+    min-width:1300px;
+    table-layout:fixed;
 }
 
 #pageVanBan th,
@@ -2601,7 +2601,7 @@ select:disabled{
 /* Tên văn bản */
 #pageVanBan th:nth-child(3),
 #pageVanBan td:nth-child(3){
-     width:auto;
+     width:35%;
 }
 
 /* Loại VB */
@@ -2762,10 +2762,11 @@ select:disabled{
 
   /* ===== TABLE ===== */
 
-  .table-scroll{
+.table-scroll{
     overflow-x:auto;
+    width:100%;
     -webkit-overflow-scrolling:touch;
-  }
+}
 
   table{
     min-width:1200px;
