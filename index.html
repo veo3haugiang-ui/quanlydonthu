@@ -1111,13 +1111,18 @@ display:flex;
 }
 
 .sidebar{
-width:220px;
-background:#2c3e50;
-color:white;
-padding-top:10px;
-position:sticky;
-top:0;
-height:100vh;
+    width:220px;
+    background:#2c3e50;
+    color:white;
+    padding-top:10px;
+    position:sticky;
+    top:0;
+    height:100vh;
+
+    transition:all .3s ease;
+}
+.sidebar.collapsed{
+    width:70px;
 }
 
 .sidebar-title{
@@ -1171,6 +1176,83 @@ height:100vh;
     transform:scale(1.05);
 }
 
+/* ===== SIDEBAR COLLAPSE ===== */
+
+.sidebar{
+    transition:all .3s ease;
+}
+
+.main-content{
+    transition:all .3s ease;
+}
+
+.sidebar.collapsed{
+    width:70px;
+}
+
+.sidebar.collapsed + .main-content{
+    margin-left:0;
+}
+
+.sidebar.collapsed .sidebar-title{
+    display:none;
+}
+
+.sidebar.collapsed .menu-text{
+    display:none;
+}
+
+.sidebar.collapsed .sidebar-logo img{
+    width:45px;
+}
+
+.sidebar.collapsed a{
+    text-align:center;
+    padding:14px 5px;
+}
+.sidebar-title-wrap{
+    position:relative;
+    margin-bottom:15px;
+}
+.sidebar.collapsed .menu-text{
+    display:none;
+}
+
+/* Nút menu */
+
+#toggleSidebarBtn{
+    position:absolute;
+    right:-14px;
+    top:50%;
+    transform:translateY(-50%);
+
+    width:30px;
+    height:50px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#34495e;
+
+    color:white;
+
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.25);
+
+    transition:.2s;
+}
+
+#toggleSidebarBtn:hover{
+    background:#3f5873;
+}
+
 .modal{
 position:fixed;
 left:0;
@@ -1209,6 +1291,13 @@ text-decoration:none;
 font-size:14px;
 border-left:4px solid transparent;
 }
+.sidebar.collapsed .sidebar-title{
+    display:none;
+}
+
+.sidebar.collapsed .menu-text{
+    display:none;
+}
 
 .sidebar a:hover{
 background:#34495e;
@@ -1219,6 +1308,19 @@ border-left:4px solid #ffc107;
 .sidebar a.active{
 background:#1a252f;
 border-left:4px solid #ffc107;
+}
+
+.menu-icon{
+    width:28px;
+    min-width:28px;
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    font-size:18px;
+}
+
+.menu-text{
+    margin-left:8px;
 }
 
 
@@ -10688,6 +10790,32 @@ document.getElementById("vanBanModal")
 
 }
 
+function toggleSidebar(){
+
+    const sidebar =
+        document.querySelector(".sidebar");
+
+    sidebar.classList.toggle("collapsed");
+
+    const btn =
+        document.getElementById(
+            "toggleSidebarBtn"
+        );
+
+    if(collapsed){
+
+    btn.innerHTML =
+    '<i class="fas fa-chevron-right"></i>';
+
+}else{
+
+    btn.innerHTML =
+    '<i class="fas fa-chevron-left"></i>';
+
+}
+
+}
+
 function closeVanBanForm(){
 
 document.getElementById("vanBanModal")
@@ -11465,9 +11593,37 @@ if(hoSoChoThamMuu.length){
     color:#555;
     margin-top:4px;
 ">
-    👤 Người gửi: <b>${c.hoten || "Không rõ người gửi"}</b>
+    👤 Người gửi:
+    <b>${
+        (() => {
+
+            let ten = c.hoten || "";
+
+            let soNguoiKhac =
+                (ten.match(/NGƯỜI THỨ \d+:/g) || []).length;
+
+            if(soNguoiKhac > 0){
+
+                ten =
+                    ten.split("NGƯỜI THỨ")[0].trim()
+                    + ` (và ${soNguoiKhac} người khác)`;
+
+            }
+
+            return ten || "Không có họ tên người gửi";
+
+        })()
+    }</b>
+
     &nbsp;&nbsp; | &nbsp;&nbsp;
-    📅 Ngày nhận đơn: <b>${c.ngayden || ""}</b> &nbsp;&nbsp; | &nbsp;&nbsp; 📄 loại đơn:  ${c.loaidon || ""}
+
+    📅 Ngày nhận đơn:
+    <b>${c.ngayden || ""}</b>
+
+    &nbsp;&nbsp; | &nbsp;&nbsp;
+
+    📄 Loại đơn:
+    <b>${c.loaidon || ""}</b>
 </div>
 
             
@@ -12617,6 +12773,47 @@ function toggleMobileMenu(){
     .classList.toggle("show");
 
 }
+
+function toggleSidebar(){
+
+    const sidebar =
+        document.querySelector('.sidebar');
+
+    const btn =
+        document.getElementById('toggleSidebarBtn');
+
+    sidebar.classList.toggle('collapsed');
+
+    if(sidebar.classList.contains('collapsed')){
+
+        btn.innerHTML =
+        '<i class="fas fa-angle-right"></i>';
+
+    }else{
+
+        btn.innerHTML =
+        '<i class="fas fa-angle-left"></i>';
+
+    }
+
+}
+
+window.addEventListener("load",()=>{
+
+    const collapsed =
+        localStorage.getItem(
+            "sidebarCollapsed"
+        );
+
+    if(collapsed === "true"){
+
+        document
+            .querySelector(".sidebar")
+            .classList.add("collapsed");
+
+    }
+
+});
 </script>
 </head>
 <body>
@@ -12651,28 +12848,45 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
 <div class="sidebar-logo">
     <img src="https://quanlydonthu.io.vn/iconcantho.png" alt="Cần Thơ">
 </div>
-<div class="sidebar-title">
-    MENU HỆ THỐNG
+<div class="sidebar-title-wrap">
+
+    <div class="sidebar-title">
+        MENU HỆ THỐNG
+    </div>
+
+    <button
+    id="toggleSidebarBtn"
+    onclick="toggleSidebar()">
+
+    <i class="fas fa-chevron-left"></i>
+
+</button>
+
 </div>
 
 <a href="#" class="active" onclick="reloadDonThuPage()">
-📚 Quản lý đơn thư
+    <span class="menu-icon">📚</span>
+    <span class="menu-text">Quản lý đơn thư</span>
 </a>
 
 <a href="#" onclick="showPage('tiepdancu')">
-📖 Sổ tiếp công dân
+    <span class="menu-icon">📖</span>
+    <span class="menu-text">Sổ tiếp công dân</span>
 </a>
 
 <a href="#" onclick="showPage('baocao')">
-📊 Báo cáo
+    <span class="menu-icon">📊</span>
+    <span class="menu-text">Báo cáo</span>
 </a>
 
 <a href="#" onclick="showPage('vanban')">
-📂 Thư viện văn bản
+    <span class="menu-icon">📂</span>
+    <span class="menu-text">Thư viện văn bản</span>
 </a>
 
 <a href="#" id="menuUsers" onclick="showPage('users')">
-👤 Quản lý tài khoản
+    <span class="menu-icon">👤</span>
+    <span class="menu-text">Quản lý tài khoản</span>
 </a>
 
 
@@ -12686,6 +12900,7 @@ class="mobile-menu-btn"
 onclick="toggleMobileMenu()">
 ☰
 </button>
+
 <div class="header-left">
    <div class="org-name">
         🏛️ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
@@ -12741,6 +12956,8 @@ onclick="toggleMobileMenu()">
 </div>
 
 </div>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </header>
 
 <!-- ================= QUẢN LÝ ĐƠN THƯ ================= -->
