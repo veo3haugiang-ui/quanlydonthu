@@ -2324,8 +2324,16 @@ opacity:0.85;
 }
 
 .popup-actions{
-text-align:center;
-margin-top:25px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:25px;
+}
+
+@media print{
+    .popup-actions{
+        display:none !important;
+    }
 }
 
 .form-grid{
@@ -4060,6 +4068,13 @@ localStorage.setItem("loginTime",Date.now());
 
 document.getElementById("loginPage").style.display="none";
 document.getElementById("mainPage").style.display="block";
+const sidebar =
+document.querySelector(".sidebar");
+
+sidebar.classList.remove("collapsed");
+
+document.getElementById("toggleSidebarBtn").innerHTML =
+'<i class="fas fa-chevron-left"></i>';
 
 loadData();
 
@@ -4090,6 +4105,7 @@ document.getElementById("welcomeBox").innerHTML =
 "👤 "+data.fullname+" | Vai trò: "+data.role;
 
 loadData();
+
 
 } else {
 
@@ -5167,6 +5183,8 @@ if(c.tinhtrang==="Chuyển cơ quan khác") statusClass="status-transfer";
 modalBody.innerHTML = `
 <div class="view-container">
 
+<div id="printArea">
+
 <div class="view-title">
 📄 Hồ sơ: ${c.mahoso}
 </div>
@@ -5384,9 +5402,15 @@ background:#fff;
 </div>
 </div>
 
+</div> <!-- đóng printArea -->
+
 <div class="popup-actions">
-<button class="print-btn" onclick="window.print()">🖨 In</button>
-<button class="pdf-btn" onclick="window.print()">📑 Xuất PDF</button>
+<button class="print-btn" onclick="printHoSo()">
+🖨 In
+</button>
+<button class="pdf-btn" onclick="exportPDF()">
+📑 Xuất PDF
+</button>
 <button
     class="btn btn-secondary"
     onclick="closeModal()">
@@ -5926,7 +5950,68 @@ displayFiltered(filteredCases);
 
 function printList(){
 
-window.print();
+    let table =
+        document.getElementById("tableHoSo");
+
+    if(!table){
+        alert("Không tìm thấy bảng");
+        return;
+    }
+
+    let win =
+        window.open("", "_blank");
+
+    win.document.write(`
+    <html>
+    <head>
+        <title>Danh sách hồ sơ</title>
+
+        <style>
+
+        body{
+            font-family:Arial;
+            padding:20px;
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:20px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            font-size:12px;
+        }
+
+        th,td{
+            border:1px solid #000;
+            padding:5px;
+        }
+
+        th{
+            background:#eee;
+        }
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <h2>SỔ THEO DÕI ĐƠN THƯ</h2>
+
+        ${table.outerHTML}
+
+    </body>
+    </html>
+    `);
+
+    win.document.close();
+
+    setTimeout(()=>{
+        win.print();
+    },500);
 
 }
 
@@ -6760,7 +6845,80 @@ displayTiepDan();
 }
 
 function printTiepDanList(){
-window.print();
+
+    const table =
+    document.getElementById("tableTiepDan");
+
+    if(!table){
+        alert("Không tìm thấy bảng");
+        return;
+    }
+
+    const win = window.open("","_blank");
+
+    win.document.open();
+
+    win.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="utf-8">
+
+    <title>Sổ tiếp công dân</title>
+
+    <style>
+
+    @page{
+        size: landscape;
+        margin:10mm;
+    }
+
+    body{
+        font-family:Arial;
+    }
+
+    h1{
+        text-align:center;
+        margin-bottom:15px;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+        font-size:12px;
+    }
+
+    th,td{
+        border:1px solid #000;
+        padding:4px;
+        vertical-align:top;
+    }
+
+    th:last-child,
+    td:last-child{
+        display:none;
+    }
+
+    </style>
+    </head>
+
+    <body>
+
+    <h1>SỔ TIẾP CÔNG DÂN</h1>
+
+    ${table.outerHTML}
+
+    </body>
+    </html>
+    `);
+
+    win.document.close();
+
+    win.onload = function(){
+        win.focus();
+        win.print();
+    };
+
 }
 
 function exportExcelTiepDan(){
@@ -7640,7 +7798,51 @@ win.print();
 
 function savePdfTiepDan(){
 
-printTiepDan();
+let content =
+    document.querySelector(".view-container").innerHTML;
+
+    let win =
+    window.open("", "_blank");
+
+    win.document.write(`
+    <html>
+    <head>
+
+    <title>Sổ tiếp công dân</title>
+
+    <style>
+
+    body{
+        font-family:Arial;
+        padding:20px;
+    }
+
+    .popup-actions{
+        display:none;
+    }
+
+    button{
+        display:none;
+    }
+
+    </style>
+
+    </head>
+
+    <body>
+
+        ${content}
+
+    </body>
+
+    </html>
+    `);
+
+    win.document.close();
+
+    setTimeout(()=>{
+        win.print();
+    },500);
 
 }
 
@@ -10798,21 +11000,22 @@ function toggleSidebar(){
     sidebar.classList.toggle("collapsed");
 
     const btn =
-        document.getElementById(
-            "toggleSidebarBtn"
-        );
+        document.getElementById("toggleSidebarBtn");
+
+    const collapsed =
+        sidebar.classList.contains("collapsed");
 
     if(collapsed){
 
-    btn.innerHTML =
-    '<i class="fas fa-chevron-right"></i>';
+        btn.innerHTML =
+        '<i class="fas fa-chevron-right"></i>';
 
-}else{
+    }else{
 
-    btn.innerHTML =
-    '<i class="fas fa-chevron-left"></i>';
+        btn.innerHTML =
+        '<i class="fas fa-chevron-left"></i>';
 
-}
+    }
 
 }
 
@@ -12814,6 +13017,188 @@ window.addEventListener("load",()=>{
     }
 
 });
+
+function printHoSo(){
+
+    const printArea =
+        document.getElementById("printArea");
+
+    if(!printArea) return;
+
+    const win =
+        window.open("", "_blank");
+
+    win.document.write(`
+    <html>
+    <head>
+        <title>Hồ sơ đơn thư</title>
+
+        <style>
+
+        body{
+            font-family:Arial,sans-serif;
+            padding:20px;
+            color:#000;
+            line-height:1.5;
+        }
+
+        .popup-actions,
+        #taiLieuViewer{
+            display:none !important;
+        }
+
+        .view-title{
+            font-size:22px;
+            font-weight:bold;
+            color:#b22222;
+            margin-bottom:20px;
+        }
+
+        .section-title{
+            font-size:18px;
+            font-weight:bold;
+            color:#b22222;
+            margin:20px 0 10px;
+            border-bottom:1px solid #ccc;
+            padding-bottom:5px;
+        }
+
+        .view-grid{
+            display:block;
+        }
+
+        .view-item{
+            border:1px solid #ddd;
+            padding:10px;
+            margin-bottom:10px;
+            border-radius:6px;
+        }
+
+        .view-label{
+            font-weight:bold;
+            margin-bottom:4px;
+        }
+
+        .nguoi-card{
+            border:1px solid #ddd;
+            padding:8px;
+            margin-bottom:8px;
+            border-radius:6px;
+        }
+
+        </style>
+    </head>
+
+    <body>
+
+        ${printArea.innerHTML}
+
+    </body>
+    </html>
+    `);
+
+    win.document.close();
+
+    setTimeout(()=>{
+        win.focus();
+        win.print();
+        win.close();
+    },500);
+}
+
+function exportPDF(){
+
+    const element =
+    document.getElementById("printArea").cloneNode(true);
+    element.querySelectorAll(".popup-actions")
+       .forEach(x => x.remove());
+
+    const maHoSo =
+        document.querySelector(".view-title")
+        ?.innerText
+        ?.replace(/[^\w\-]/g,"_")
+        || "HoSoDonThu";
+
+    const opt = {
+
+        margin: 8,
+
+        filename:
+            maHoSo + ".pdf",
+
+        image: {
+            type: "jpeg",
+            quality: 1
+        },
+
+        html2canvas: {
+            scale: 2,
+            useCORS: true
+        },
+
+        jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait"
+        },
+
+        pagebreak: {
+            mode: ["css","legacy"]
+        }
+    };
+
+    html2pdf()
+        .set(opt)
+        .from(element)
+        .save();
+}
+
+function exportPDFTiepDan(){
+
+    const element =
+        document.getElementById("printAreaTiepDan")
+        .cloneNode(true);
+
+    const actions =
+        element.querySelector(".popup-actions");
+
+    if(actions) actions.remove();
+
+    const opt = {
+
+        margin: 8,
+
+        filename:
+            "SoTiepCongDan_" +
+            Date.now() +
+            ".pdf",
+
+        image:{
+            type:"jpeg",
+            quality:1
+        },
+
+        html2canvas:{
+            scale:2,
+            useCORS:true
+        },
+
+        jsPDF:{
+            unit:"mm",
+            format:"a4",
+            orientation:"portrait"
+        },
+
+        pagebreak:{
+            mode:["css","legacy"]
+        }
+    };
+
+    html2pdf()
+        .set(opt)
+        .from(element)
+        .save();
+}
 </script>
 </head>
 <body>
@@ -13106,8 +13491,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
 </div>
     </div>
-
+<div id="printListArea">
     <div class="table-toolbar">
+
       <h3>Danh sách hồ sơ</h3>
       <button class="btn-add" onclick="newCase()">➕ Thêm hồ sơ</button>
     </div>
@@ -13132,6 +13518,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         <tbody id="tbody"></tbody>
       </table>
     </div>
+      </div>
 
     <div id="pagination"></div>
 
@@ -13149,7 +13536,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         <span>hồ sơ / trang</span>
 
         <button onclick="printList()" class="icon-btn">🖨</button>
-        <button onclick="exportExcel()" class="icon-btn">📥</button>
+        <button onclick="exportExcel()" class="icon-btn">📄</button>
       </div>
     </div>
 
@@ -13437,7 +13824,7 @@ margin-top:10px;
 
 
     <div class="table-scroll">
-      <table>
+      <table id="tableTiepDan">
         <thead>
           <tr>
             <th>STT</th>
@@ -13470,7 +13857,7 @@ margin-top:10px;
           <span>hồ sơ / trang</span>
 
           <button onclick="printTiepDanList()" class="icon-btn">🖨</button>
-          <button onclick="exportExcelTiepDan()" class="icon-btn">📥</button>
+          <button onclick="exportExcelTiepDan()" class="icon-btn">📄</button>
         </div>
       </div>
 
@@ -14018,7 +14405,7 @@ style="display:none;margin-top:5px;"
 
 
 <div class="view-container">
-
+<div id="printAreaTiepDan">
 <div class="view-title">
 📖 CHI TIẾT TIẾP CÔNG DÂN
 </div>
@@ -14107,7 +14494,7 @@ III. NỘI DUNG VÀ XỬ LÝ
 <div class="view-value" id="v_ghichu"></div>
 </div>
 </div>
-
+</div>
 
 <!-- NÚT -->
 <div style="text-align:center;margin-top:25px">
@@ -14117,7 +14504,7 @@ style="background:#0d6efd;color:white;border:none;padding:7px 16px;border-radius
 🖨 In
 </button>
 
-<button onclick="savePdfTiepDan()" 
+<button onclick="exportPDFTiepDan()" 
 style="background:#198754;color:white;border:none;padding:7px 16px;border-radius:6px">
 📄 Xuất PDF
 </button>
@@ -14596,6 +14983,6 @@ onclick="saveBaoCaoLuuTru()">
 </div>
 
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 </html>
