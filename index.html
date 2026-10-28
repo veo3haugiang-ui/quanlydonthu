@@ -9,6 +9,26 @@
 <link rel="icon" type="image/png" href="web.png">
 
 <style>
+  .login-logo{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.login-logo img{
+
+    width:90px;
+    height:90px;
+
+    object-fit:contain;
+
+    border-radius:50%;
+    background:#fff;
+
+    padding:6px;
+
+    box-shadow:
+      0 6px 18px rgba(0,0,0,.20);
+}
 .baocao-sheet{
 
   font-family:"Times New Roman",serif;
@@ -927,6 +947,406 @@ margin:0;
 font-size:16px;
 }
 
+/* NÚT AI */
+#aiChatPanel{
+
+    position:fixed;
+
+    right:25px;
+    bottom:40px;
+
+    width:430px;
+    height:680px;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    display:none;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+    z-index:99999;
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.25);
+
+}
+
+.ai-header{
+
+    height:62px;
+
+    background:#b22222;
+
+    color:#fff;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 18px;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    flex-shrink:0;
+
+}
+
+.ai-title{
+
+    display:flex;
+    flex-direction:column;
+
+}
+
+.ai-title-main{
+
+    font-size:20px;
+    font-weight:700;
+
+}
+
+.ai-title-sub{
+
+    font-size:12px;
+    opacity:.9;
+    margin-top:2px;
+
+}
+
+.ai-close{
+
+    font-size:22px;
+    cursor:pointer;
+    transition:.2s;
+
+}
+
+.ai-close:hover{
+
+    transform:scale(1.15);
+
+}
+
+#aiMessages{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    background:#f7f8fa;
+
+    padding:14px;
+
+}
+
+.ai-input{
+
+    position:relative;
+
+     padding:12px 14px 16px;
+
+    border-top:1px solid #eee;
+
+    background:#fff;
+
+}
+.ai-input input{
+    flex:1;
+    height:44px;
+
+    border:1px solid #d9d9d9;
+    border-radius:24px;
+
+    padding:0 18px;
+    font-size:15px;
+
+    outline:none;
+    box-sizing:border-box;
+}
+
+#aiQuestion{
+
+    width:100%;
+
+     min-height:46px;
+    max-height:120px;
+
+    padding:12px 60px 12px 16px;
+
+    resize:none;
+
+    border:1px solid #ddd;
+
+    border-radius:28px;
+
+    padding:
+
+        14px
+        60px
+        14px
+        18px;
+
+    font-size:15px;
+
+    line-height:1.5;
+
+    outline:none;
+
+    box-sizing:border-box;
+
+    transition:.25s;
+
+    overflow-y:auto;
+
+}
+
+#aiQuestion:focus{
+
+    border-color:#b22222;
+
+    box-shadow:
+        0 0 0 3px rgba(178,34,34,.12);
+
+}
+#aiSendBtn{
+
+    position:absolute;
+
+    right:22px;
+
+     top:40%;
+
+    transform:translateY(-50%);
+
+    width:35px;
+    height:35px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#c62828;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-size:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    transition:.25s;
+
+}
+#aiSendBtn:hover{
+
+    background:#a81f1f;
+
+    transform:translateY(-50%) scale(1.08);
+
+}
+
+.ai-input button{
+
+    width:52px;
+
+    height:52px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#b22222;
+
+    color:#fff;
+
+    font-size:22px;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    flex-shrink:0;
+
+    transition:.25s;
+
+}
+
+.ai-input button:hover{
+
+    background:#991b1b;
+
+    transform:scale(1.05);
+
+}
+
+
+.ai-user{
+
+    margin:18px 0;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+}
+
+.ai-user .bubble{
+
+    max-width:78%;
+
+    background:#dbeafe;
+
+    color:#222;
+
+    padding:12px 16px;
+
+    border-radius:
+
+        18px
+        18px
+        4px
+        18px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.08);
+
+    word-break:break-word;
+
+}
+
+.ai-bot{
+
+    margin:18px 0;
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:10px;
+
+}
+
+.ai-avatar{
+
+    width:38px;
+    height:38px;
+
+    border-radius:50%;
+
+    background:#b22222;
+
+    color:#fff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:20px;
+
+    flex-shrink:0;
+
+}
+
+.ai-bot .bubble{
+
+    max-width:78%;
+
+    background:#fff;
+
+    padding:12px 16px;
+
+    border-radius:
+
+        18px
+        18px
+        18px
+        4px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.08);
+
+    word-break:break-word;
+
+}
+#aiFloatBtn{
+    position:fixed;
+    bottom:25px;
+    right:25px;
+    width:65px;
+    height:65px;
+    border:none;
+    border-radius:50%;
+    background:linear-gradient(
+        135deg,
+        #198754,
+        #20c997
+    );
+    color:#fff;
+    font-size:30px;
+    cursor:pointer;
+    z-index:9999;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,.25);
+
+    transition:.3s;
+}
+
+#aiFloatBtn:hover{
+
+    transform:
+        translateY(-3px)
+        scale(1.08);
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.3);
+
+}
+#aiFloatBtn{
+
+    animation:
+        aiPulse 2s infinite;
+
+}
+
+@keyframes aiPulse{
+
+    0%{
+        box-shadow:
+        0 0 0 0 rgba(25,135,84,.5);
+    }
+
+    70%{
+        box-shadow:
+        0 0 0 15px rgba(25,135,84,0);
+    }
+
+    100%{
+        box-shadow:
+        0 0 0 0 rgba(25,135,84,0);
+    }
+
+}
+
 /* THANH TÌM KIẾM GỌN */
 
 
@@ -1346,10 +1766,11 @@ height:100vh;
 display:flex;
 flex-direction:column;
 align-items:center;
-justify-content:center;
+justify-content:flex-start;
+padding-top:120px;
 background:
 linear-gradient(rgba(120,0,0,0.85),rgba(120,0,0,0.85)),
-url("https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=1600&auto=format&fit=crop") center/cover no-repeat;
+url("https://quanlydonthu.io.vn/bg.jpg") center/cover no-repeat;
 }
 
 /* ===== WRAPPER ===== */
@@ -1387,7 +1808,7 @@ margin-bottom:6px;
 .system-subtitle{
 font-size:14px;
 opacity:0.9;
-margin-bottom:35px;
+margin-bottom:20px;
 }
 
 /* ===== LOGIN CARD ===== */
@@ -2889,6 +3310,115 @@ select:disabled{
   }
 
 }
+
+/* ===== NHÂN VẬT TRỢ LÝ AI ===== */
+#aiGirlAssistant {
+    position: fixed;
+    right: 410px;
+    bottom: 35px;
+    height: min(490px, 68vh);
+    width: auto;
+    display: none;
+    z-index: 100001;
+    pointer-events: none;
+    transform-origin: 50% 100%;
+}
+
+#aiGirlAssistant.is-visible {
+    display: block;
+    animation: aiGirlSway 4.2s ease-in-out infinite;
+}
+
+#aiGirlAssistant img {
+    display: block;
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    object-position: bottom center;
+    filter: drop-shadow(0 8px 12px rgba(0,0,0,.12));
+}
+
+@keyframes aiGirlSway {
+    0%, 100% {
+        transform: rotate(-1.5deg) translateX(-2px);
+    }
+    50% {
+        transform: rotate(1.5deg) translateX(3px);
+    }
+}
+
+@media (max-width: 1100px) {
+    #aiGirlAssistant {
+        height: 390px;
+        right: min(380px, 35vw);
+        bottom: 100px;
+    }
+}
+
+@media (max-width: 760px) {
+    #aiGirlAssistant {
+        display: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #aiGirlAssistant.is-visible {
+        animation: none;
+    }
+}
+
+/* ===== ICON CÔ GÁI TRONG KHUNG CHAT ===== */
+.ai-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #b22222;
+}
+
+.ai-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+    border-radius: 50%;
+}
+
+/* ===== NÚT CHAT CÓ ẢNH CÔ GÁI ===== */
+#aiFloatBtn {
+    width: 65px;
+    height: 65px;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #b22222;
+}
+
+#aiFloatBtn img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+}
+
+/* ===================================
+   TẠM THỜI ẨN TRỢ LÝ AI
+   =================================== */
+
+#aiFloatBtn,
+#aiChatPanel,
+#aiGirlAssistant {
+    display: none !important;
+}
 </style>
 
 
@@ -2974,6 +3504,7 @@ let baoCaoPage = 1;
 let baoCaoRowsPerPage = 10;
 let baoCaoTuanPage = 1;
 let baoCaoTuanRowsPerPage = 10;
+let aiWelcomeShown = false;
 
 
 /* ===== THƯ VIỆN VĂN BẢN ===== */
@@ -3254,43 +3785,6 @@ document.querySelectorAll(".bcLinkItem")
 .filter(item => item !== "");
 
 
-// =========================
-// FILE UPLOAD
-// =========================
-
-const fileInput =
-document.getElementById("bcFile");
-
-let uploadedLink = "";
-
-if(
-fileInput &&
-fileInput.files &&
-fileInput.files.length > 0
-){
-
-try{
-
-uploadedLink =
-await uploadVanBanFile();
-
-if(uploadedLink){
-
-dsLink.unshift(uploadedLink);
-
-}
-
-}catch(err){
-
-console.error(err);
-
-alert("Upload file thất bại");
-
-return;
-
-}
-
-}
 
 
 // =========================
@@ -3613,6 +4107,7 @@ function showPage(page){
 document.getElementById("pageDonThu").style.display="none";
 document.getElementById("pageTiepDan").style.display="none";
 document.getElementById("pageVanBan").style.display="none";
+document.getElementById("pageDanhMuc").style.display="none"; // ⬅ THÊM DÒNG NÀY
 /* ĐÓNG TRÌNH XEM VĂN BẢN */
 
 if(document.getElementById("viewerBox")){
@@ -3752,6 +4247,21 @@ if(page==="users"){
   setTimeout(loadUsers, 50);
 
 }
+
+if(page==="danhMuc"){
+
+  if(currentRole !== "Admin"){
+    alert("⚠ Bạn không có quyền truy cập");
+    return;
+  }
+
+  document.getElementById("pageDanhMuc").style.display="block";
+  document.querySelectorAll(".sidebar a")[6].classList.add("active");
+  document.getElementById("pageTitle").innerText="QUẢN TRỊ DANH MỤC";
+
+  setTimeout(loadDanhMucAdmin, 50);
+
+}
 // Cập nhật lại chuông thông báo
 loadHoSoThamMuu();
 
@@ -3835,7 +4345,7 @@ let baoCaoAlerts = [];
 let filteredBaoCaoDonThu = [];
 let hoSoChoThamMuu = [];
 
-const API_URL="https://script.google.com/macros/s/AKfycbxRJ333k81zTjbmn6V9B3GjkZml0GcH3AFoQ1j81TxeVZvp0vES0fpwX6VjwvClZjkL/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbwzyNlkejLTlXkUSJZDmLkguopjuMzJmFFkEtesawhzTtw4CCAQW5tD3WnLaZSye9C0/exec";
 
 function parseLocalDate(str){
   if(!str) return null;
@@ -4058,6 +4568,16 @@ baoCaoAlerts = [];
 
 currentUser = u;
 currentRole = data.role;
+// Chỉ Admin mới được thấy menu Quản trị hệ thống
+if(data.role === "Admin"){
+
+    document.getElementById("adminMenu").style.display = "block";
+
+}else{
+
+    document.getElementById("adminMenu").style.display = "none";
+
+}
 
 applyRoleUI();
 
@@ -4068,6 +4588,7 @@ localStorage.setItem("loginTime",Date.now());
 
 document.getElementById("loginPage").style.display="none";
 document.getElementById("mainPage").style.display="block";
+document.getElementById("aiFloatBtn").style.display="block";
 const sidebar =
 document.querySelector(".sidebar");
 
@@ -4131,6 +4652,7 @@ function logout(){
 
   mainPage.style.display="none";
   loginPage.style.display="block";
+  document.getElementById("aiFloatBtn").style.display="none";
 
 }
 
@@ -4139,29 +4661,59 @@ function newCase(){
   document.getElementById("form").reset();
   editIndex = -1;
 
-  // 🔥 THÊM ĐOẠN NÀY
+  // ==========================================
+  // LÃNH ĐẠO KÝ DUYỆT MẶC ĐỊNH
+  // ==========================================
+  const kyduyetSelect =
+      document.getElementById("kyduyet");
+
+  if (kyduyetSelect) {
+
+      const defaultLanhDao =
+          "Phó Giám đốc Lục Bích Phúc";
+
+      // Chỉ chọn nếu người này đang có trong
+      // danh sách lãnh đạo lấy từ Sheet
+      const option = Array.from(
+          kyduyetSelect.options
+      ).find(
+          o => o.value.trim() === defaultLanhDao
+      );
+
+      if (option) {
+          kyduyetSelect.value =
+              defaultLanhDao;
+      }
+  }
+
   let today = new Date();
   let dd = String(today.getDate()).padStart(2,'0');
   let mm = String(today.getMonth()+1).padStart(2,'0');
   let yyyy = today.getFullYear();
 
-  document.getElementById("ngayden").value = `${dd}/${mm}/${yyyy}`;
+  document.getElementById("ngayden").value =
+      `${dd}/${mm}/${yyyy}`;
+
   // ===== RESET NGƯỜI GỬI =====
-document.getElementById("soluong").value = 1;
+  document.getElementById("soluong").value = 1;
 
-document.getElementById("nguoiGuiThemContainer").innerHTML = "";
-
-// cập nhật lại giao diện
-updateNguoiGuiThem();
-
-  document.getElementById("formModal").style.display="block";
   document.getElementById(
-"hosoFileContainer"
-).innerHTML="";
+      "nguoiGuiThemContainer"
+  ).innerHTML = "";
 
-document.getElementById(
-"hosoLink"
-).value="";
+  // cập nhật lại giao diện
+  updateNguoiGuiThem();
+
+  document.getElementById("formModal")
+      .style.display="block";
+
+  document.getElementById(
+      "hosoFileContainer"
+  ).innerHTML="";
+
+  document.getElementById(
+      "hosoLink"
+  ).value="";
 }
 
 function generateCode(type){
@@ -4203,7 +4755,7 @@ function generateCode(type){
   return code;
 }
 
-function addCase(){
+async function addCase(){
 /* ===== KIỂM TRA THÔNG TIN HỒ SƠ ===== */
 
 if(!ngayden.value){
@@ -4219,7 +4771,7 @@ return;
 }
 
 if(!nguondon.value.trim()){
-alert("⚠ Vui lòng nhập nguồn đơn");
+alert("⚠ Vui lòng chọn nguồn đơn");
 nguondon.focus();
 return;
 }
@@ -4269,21 +4821,28 @@ if(!tinhtrang.value.trim()){
 
 // 🔥 KHÔNG CHO NHẬP KẾT QUẢ KHI ĐANG XỬ LÝ
 
+// ==========================================
+// KHÔNG CHO NHẬP THÔNG TIN KẾT QUẢ
+// KHI HỒ SƠ ĐANG XỬ LÝ
+//
+// LƯU Ý:
+// Lãnh đạo ký duyệt có giá trị mặc định
+// nên KHÔNG kiểm tra kyduyet ở đây.
+// ==========================================
+
 if(tinhtrang.value === "Đang xử lý"){
 
   if(
     ketqua.value.trim() !== "" ||
     ngayxuly.value.trim() !== "" ||
-    sokyhieu.value.trim() !== "" ||
-    kyduyet.value.trim() !== ""
+    sokyhieu.value.trim() !== ""
   ){
 
     alert(
-      "⚠ Chỉ được nhập Kết quả xử lý, Ngày hoàn thành, Số ký hiệu, Lãnh đạo ký duyệt khi chọn trạng thái 'Đã xử lý'"
+      "⚠ Chỉ được nhập Kết quả xử lý, Ngày hoàn thành và Số ký hiệu khi chọn trạng thái 'Đã xử lý'"
     );
 
     return;
-
   }
 
 }
@@ -4403,6 +4962,40 @@ return;
 }
 
 let loaiDonValue = document.getElementById("loaidon").value;
+// ==============================
+// NGUỒN ĐƠN - XỬ LÝ "NƠI KHÁC CHUYỂN ĐẾN"
+// ==============================
+
+let nguonDonValue = nguondon.value.trim();
+
+if (
+    nguonDonValue === "Nơi khác chuyển đến" ||
+    nguonDonValue === "Từ nơi khác chuyển đến"
+) {
+
+    const nguonDonKhacEl =
+        document.getElementById("nguonDonKhac");
+
+    if (
+        !nguonDonKhacEl ||
+        !nguonDonKhacEl.value.trim()
+    ) {
+
+        alert(
+            "⚠ Vui lòng nhập thông tin nơi khác chuyển đến"
+        );
+
+        if (nguonDonKhacEl) {
+            nguonDonKhacEl.focus();
+        }
+
+        return;
+    }
+
+    nguonDonValue +=
+        " - " +
+        nguonDonKhacEl.value.trim();
+}
 //==============================
 // GHÉP THÔNG TIN NHIỀU NGƯỜI GỬI
 //==============================
@@ -4457,7 +5050,17 @@ let day2="", m2="", y2="";
 if(ngayxuly.value){
   [day2, m2, y2] = ngayxuly.value.split("/");
 }
+
+// =====================================
+// TÀI LIỆU ĐÍNH KÈM
+// =====================================
+
 let dsFile = [];
+
+
+// -------------------------------------
+// 1. LẤY CÁC LINK ĐÃ CÓ
+// -------------------------------------
 
 document
 .querySelectorAll(".hosoFileItem")
@@ -4478,11 +5081,73 @@ document
 
 });
 
+
+// -------------------------------------
+// 2. UPLOAD FILE TỪ MÁY TÍNH
+// -------------------------------------
+
+const fileInput =
+  document.getElementById("hosoFiles");
+
+
+if(
+  fileInput &&
+  fileInput.files &&
+  fileInput.files.length > 0
+){
+
+  try{
+
+    for(
+      const file
+      of Array.from(fileInput.files)
+    ){
+
+      console.log(
+        "Đang upload:",
+        file.name
+      );
+
+
+      const link =
+        await uploadHoSoFileFromComputer(
+          file
+        );
+
+
+      if(link){
+
+        dsFile.push(
+          `${link}@@${currentUser}`
+        );
+
+      }
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "UPLOAD HỒ SƠ:",
+      error
+    );
+
+    alert(
+      "❌ Upload tài liệu thất bại:\n"
+      + error.message
+    );
+
+    return;
+
+  }
+
+}
+
 let newData={
 action:(editIndex===-1)?"add":"update",
 mahoso,
 ngayden:`${day1}/${m1}/${y1}`,
-nguondon:nguondon.value,
+nguondon:nguonDonValue,
 linhvuc:linhvuc.value,
 soluong:soluong.value,
 
@@ -5047,6 +5712,46 @@ function updateNguoiGuiThem(){
 </div>
 
 `;
+
+    }
+
+}
+
+function toggleDonNacDanh(){
+
+    const chk = document.getElementById('donNacDanh');
+    const hoten = document.getElementById('hoten');
+    const soluong = document.getElementById('soluong');
+
+    if(chk.checked){
+
+        // Mặc định số người = 1
+        soluong.value = 1;
+        soluong.readOnly = true;
+        soluong.style.background = '#f5f5f5';
+
+        // Mặc định họ tên
+        hoten.value = 'Không có họ tên người gửi';
+        hoten.readOnly = true;
+        hoten.style.background = '#f5f5f5';
+        hoten.style.color = '#666';
+
+        // Cập nhật lại người gửi đi kèm nếu có
+        if(typeof updateNguoiGuiThem === 'function'){
+            updateNguoiGuiThem();
+        }
+
+    }else{
+
+        // Mở lại số người
+        soluong.readOnly = false;
+        soluong.style.background = '';
+
+        // Mở lại họ tên
+        hoten.value = '';
+        hoten.readOnly = false;
+        hoten.style.background = '';
+        hoten.style.color = '';
 
     }
 
@@ -5896,38 +6601,70 @@ renderPagination(list.length);
 }
 
 
-function renderPagination(totalRows){
+function renderPagination(totalRows) {
 
-let totalPages = Math.ceil(totalRows / rowsPerPage);
+    let totalPages = Math.ceil(totalRows / rowsPerPage);
 
-let html="";
+    let html = "";
 
-/* Trang đầu */
+    if (totalPages <= 0) {
+        document.getElementById("pagination").innerHTML = "";
+        return;
+    }
 
-html += `<button class="page-btn" onclick="goPage(1)" ${currentPage==1?'disabled':''}>«</button>`;
+    // Đảm bảo trang hiện tại nằm trong giới hạn
+    currentPage = Math.max(1, Math.min(currentPage, totalPages));
 
-/* Trang trước */
+    // Nút về trang đầu
+    html += `
+        <button class="page-btn"
+            onclick="goPage(1)"
+            ${currentPage === 1 ? "disabled" : ""}>
+            «
+        </button>
+    `;
 
-html += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage==1?'disabled':''}>‹</button>`;
+    // Nút trang trước
+    html += `
+        <button class="page-btn"
+            onclick="goPage(${currentPage - 1})"
+            ${currentPage === 1 ? "disabled" : ""}>
+            ‹
+        </button>
+    `;
 
-/* Các số trang */
+    // Chỉ hiển thị tối đa 3 số trang
+    let startPage = Math.max(1, Math.min(currentPage, totalPages - 2));
+    let endPage = Math.min(totalPages, startPage + 2);
 
-for(let i=1;i<=totalPages;i++){
+    for (let i = startPage; i <= endPage; i++) {
+        html += `
+            <button class="page-btn ${i === currentPage ? "active" : ""}"
+                onclick="goPage(${i})">
+                ${i}
+            </button>
+        `;
+    }
 
-html += `<button class="page-btn ${i==currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    // Nút sang trang tiếp theo
+    html += `
+        <button class="page-btn"
+            onclick="goPage(${currentPage + 1})"
+            ${currentPage === totalPages ? "disabled" : ""}>
+            ›
+        </button>
+    `;
 
-}
+    // Nút đến trang cuối
+    html += `
+        <button class="page-btn"
+            onclick="goPage(${totalPages})"
+            ${currentPage === totalPages ? "disabled" : ""}>
+            »
+        </button>
+    `;
 
-/* Trang sau */
-
-html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage==totalPages?'disabled':''}>›</button>`;
-
-/* Trang cuối */
-
-html += `<button class="page-btn" onclick="goPage(${totalPages})" ${currentPage==totalPages?'disabled':''}>»</button>`;
-
-document.getElementById("pagination").innerHTML=html;
-
+    document.getElementById("pagination").innerHTML = html;
 }
 
 function goPage(page){
@@ -6072,6 +6809,7 @@ flatpickr("#toNgayXuLy", {
 });
 
 loadUsers();
+loadTatCaDanhMuc();
 
 setTimeout(()=>{
 
@@ -6319,36 +7057,106 @@ document.getElementById("soanthaoKhac").style.display = "none";
 
 function toggleXuLyFields(){
 
-  let tinhtrang = document.getElementById("tinhtrang").value;
+  let tinhtrang =
+    document.getElementById("tinhtrang").value;
 
-  let ketqua = document.getElementById("ketqua");
-  let ngayxuly = document.getElementById("ngayxuly");
-  let sokyhieu = document.getElementById("sokyhieu");
-  let kyduyet = document.getElementById("kyduyet");
+  let ketqua =
+    document.getElementById("ketqua");
 
-  // Nếu đang xử lý
+  let ngayxuly =
+    document.getElementById("ngayxuly");
+
+  let sokyhieu =
+    document.getElementById("sokyhieu");
+
+  let kyduyet =
+    document.getElementById("kyduyet");
+
+
+  // ==========================================
+  // LÃNH ĐẠO KÝ DUYỆT MẶC ĐỊNH
+  // ==========================================
+
+  const defaultLanhDao =
+    "Phó Giám đốc Lục Bích Phúc";
+
+
+  // ==========================================
+  // NẾU ĐANG XỬ LÝ
+  // ==========================================
+
   if(tinhtrang === "Đang xử lý"){
 
     ketqua.disabled = true;
     ngayxuly.disabled = true;
     sokyhieu.disabled = true;
+
+    // Lãnh đạo ký duyệt vẫn giữ mặc định
     kyduyet.disabled = true;
 
-    // xóa dữ liệu
+
+    // Xóa các thông tin chưa được phép nhập
     ketqua.value = "";
     ngayxuly.value = "";
     sokyhieu.value = "";
-    kyduyet.value = "";
+
+
+    // ==========================================
+    // KHÔNG ĐƯỢC XÓA kyduyet.value
+    // GÁN LẠI LÃNH ĐẠO MẶC ĐỊNH
+    // ==========================================
+
+    const option = Array.from(
+      kyduyet.options
+    ).find(
+      o => o.value.trim() === defaultLanhDao
+    );
+
+
+    if(option){
+
+      kyduyet.value =
+        defaultLanhDao;
+
+    }
 
   }
 
-  // Nếu đã xử lý
+
+  // ==========================================
+  // NẾU ĐÃ XỬ LÝ
+  // ==========================================
+
   else if(tinhtrang === "Đã xử lý"){
 
     ketqua.disabled = false;
     ngayxuly.disabled = false;
     sokyhieu.disabled = false;
     kyduyet.disabled = false;
+
+
+    // ==========================================
+    // LUÔN ĐẶT LÃNH ĐẠO MẶC ĐỊNH
+    // NẾU CHƯA CÓ GIÁ TRỊ
+    // ==========================================
+
+    if(!kyduyet.value.trim()){
+
+      const option = Array.from(
+        kyduyet.options
+      ).find(
+        o => o.value.trim() === defaultLanhDao
+      );
+
+
+      if(option){
+
+        kyduyet.value =
+          defaultLanhDao;
+
+      }
+
+    }
 
   }
 
@@ -7396,41 +8204,105 @@ function displayBaoCaoTuan(){
 
 function renderBaoCaoTuanPagination(){
 
-  let totalPage =
-  Math.ceil(
-    baoCaoTuanList.length /
-    baoCaoTuanRowsPerPage
-  );
+  let totalPages =
+    Math.ceil(
+      baoCaoTuanList.length /
+      baoCaoTuanRowsPerPage
+    );
 
   let div =
-  document.getElementById(
-    "baoCaoTuanPagination"
-  );
+    document.getElementById(
+      "baoCaoTuanPagination"
+    );
 
   if(!div) return;
 
   let html = "";
 
-  for(let i=1;i<=totalPage;i++){
+  /* Không có dữ liệu hoặc chỉ có 1 trang */
+  if(totalPages <= 1){
+    div.innerHTML = "";
+    return;
+  }
+
+  /* Trang đầu */
+  html += `
+    <button
+      class="page-btn"
+      onclick="goBaoCaoTuanPage(1)"
+      ${baoCaoTuanPage == 1 ? "disabled" : ""}
+    >
+      «
+    </button>
+  `;
+
+  /* Trang trước */
+  html += `
+    <button
+      class="page-btn"
+      onclick="goBaoCaoTuanPage(${baoCaoTuanPage - 1})"
+      ${baoCaoTuanPage == 1 ? "disabled" : ""}
+    >
+      ‹
+    </button>
+  `;
+
+  /* Các số trang */
+  for(let i = 1; i <= totalPages; i++){
 
     html += `
       <button
-        class="${
-          i===baoCaoTuanPage
-          ? 'active-page'
-          : ''
-        }"
-        onclick="
-          baoCaoTuanPage=${i};
-          displayBaoCaoTuan();
-        ">
+        class="page-btn ${i == baoCaoTuanPage ? "active" : ""}"
+        onclick="goBaoCaoTuanPage(${i})"
+      >
         ${i}
       </button>
     `;
 
   }
 
+  /* Trang sau */
+  html += `
+    <button
+      class="page-btn"
+      onclick="goBaoCaoTuanPage(${baoCaoTuanPage + 1})"
+      ${baoCaoTuanPage == totalPages ? "disabled" : ""}
+    >
+      ›
+    </button>
+  `;
+
+  /* Trang cuối */
+  html += `
+    <button
+      class="page-btn"
+      onclick="goBaoCaoTuanPage(${totalPages})"
+      ${baoCaoTuanPage == totalPages ? "disabled" : ""}
+    >
+      »
+    </button>
+  `;
+
   div.innerHTML = html;
+}
+
+function goBaoCaoTuanPage(page){
+
+  let totalPages =
+    Math.ceil(
+      baoCaoTuanList.length /
+      baoCaoTuanRowsPerPage
+    );
+
+  if(page < 1) page = 1;
+
+  if(page > totalPages){
+    page = totalPages;
+  }
+
+  baoCaoTuanPage = page;
+
+  displayBaoCaoTuan();
 
 }
 
@@ -8167,18 +9039,47 @@ function loadNguoiXuLyFilter() {
 
   const select = document.getElementById("filterNguoiXuLy");
 
-  select.innerHTML = '<option value="">Người xử lý</option>';
+  if (!select) {
+    console.warn("Không tìm thấy #filterNguoiXuLy");
+    return;
+  }
 
-  for (let u in users) {
+  // Xóa danh sách cũ
+  select.innerHTML = "";
 
-    const fullname = users[u].fullname;
+  // Option mặc định
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "Người xử lý";
+  select.appendChild(defaultOption);
 
+  // Chỉ lấy:
+  // 1. Lãnh đạo phòng
+  // 2. Chuyên viên
+  for (let username in users) {
+
+    const user = users[username];
+
+    if (!user) continue;
+
+    const fullname = String(user.fullname || "").trim();
+    const role = String(user.role || "").trim();
+
+    // Không có họ tên thì bỏ qua
     if (!fullname) continue;
+
+    // ⭐ CHỈ CHO PHÉP 2 VAI TRÒ NÀY
+    if (
+      role !== "Lãnh đạo phòng" &&
+      role !== "Chuyên viên"
+    ) {
+      continue;
+    }
 
     const option = document.createElement("option");
 
-    option.value = fullname;       // 👈 value là họ tên
-    option.textContent = fullname; // 👈 hiển thị họ tên
+    option.value = fullname;
+    option.textContent = fullname;
 
     select.appendChild(option);
   }
@@ -8443,80 +9344,235 @@ function applyRoleUI(){
 
 function loadUsers(){
 
-fetch(API_URL,{
-  method:"POST",
-  body:JSON.stringify({
-    action:"getUsers"
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"getUsers"
+    })
   })
-})
-.then(res=>res.json())
-.then(data=>{
 
-  let tbody =
-    document.getElementById("userTable");
+  .then(res=>res.json())
 
-  tbody.innerHTML = "";
+  .then(data=>{
 
-  users = {};
+    let tbody =
+      document.getElementById("userTable");
 
-  data.forEach((u,i)=>{
+    if(tbody){
+      tbody.innerHTML = "";
+    }
 
-    users[
-      u.username.trim().toLowerCase()
-    ] = u;
+    users = {};
 
-   tbody.innerHTML += `
-<tr>
+    data.forEach((u,i)=>{
 
-  <td>${u.username}</td>
+      const username =
+        String(u.username || "")
+        .trim()
+        .toLowerCase();
 
-  <td>${u.fullname}</td>
+      if(!username) return;
 
-  <td>${u.role}</td>
+      users[username] = u;
 
-  <td>
 
-<span id="pass_${u.username.trim().toLowerCase()}">
-******
-</span>
+      // ==============================
+      // HIỂN THỊ BẢNG TÀI KHOẢN
+      // ==============================
 
-<button
-class="btn-eye"
-onclick="togglePass('${u.username.trim().toLowerCase()}')"
-style="
-margin-left:5px;
-border:none;
-background:none;
-cursor:pointer;
-font-size:16px;
-">
-👁
-</button>
+      if(tbody){
 
-</td>
+        tbody.innerHTML += `
+          <tr>
 
-  <td>
+            <td>${u.username || ""}</td>
 
-    <button
-      class="btn-edit"
-      onclick="editUser('${u.username}')">
-      Sửa
-    </button>
+            <td>${u.fullname || ""}</td>
 
-    <button
-      class="btn-delete"
-      onclick="deleteUser('${u.username}')">
-      Xóa
-    </button>
+            <td>${u.role || ""}</td>
 
-  </td>
+            <td>
+              <span id="pass_${username}">
+                ******
+              </span>
 
-</tr>
-`;
+              <button
+                class="btn-eye"
+                onclick="togglePass('${username}')"
+                style="
+                  margin-left:5px;
+                  border:none;
+                  background:none;
+                  cursor:pointer;
+                  font-size:16px;
+                "
+              >
+                👁
+              </button>
+            </td>
+
+            <td>
+              ${
+                currentRole === "Admin"
+                ?
+                `
+                <button
+                  class="btn-edit"
+                  onclick="editUser('${u.username}')"
+                >
+                  Sửa
+                </button>
+
+                <button
+                  onclick="deleteUser('${u.username}')"
+                >
+                  Xóa
+                </button>
+                `
+                :
+                ""
+              }
+            </td>
+
+          </tr>
+        `;
+
+      }
+
+    });
+
+
+
+
+    // =================================================
+    // Các hàm khác nếu hệ thống đang sử dụng
+    // =================================================
+
+    loadNguoiXuLyFilter();
+
+  })
+
+  .catch(err=>{
+
+    console.error(
+      "❌ Lỗi tải danh sách tài khoản:",
+      err
+    );
 
   });
 
-});
+}
+
+// =====================================================
+// LOAD DANH SÁCH NGƯỜI THAM MƯU TỪ TÀI KHOẢN
+// =====================================================
+function loadNguoiThamMuu(){
+
+  const select = document.getElementById("soanthaoSelect");
+
+  if(!select){
+    console.warn("Không tìm thấy #soanthaoSelect");
+    return;
+  }
+
+  // Lưu lại người đang chọn nếu đang sửa hồ sơ
+  const oldValue = select.value;
+
+  // Xóa toàn bộ danh sách cũ
+  select.innerHTML = "";
+
+  // Option mặc định
+  const defaultOption = document.createElement("option");
+
+  defaultOption.value = "";
+  defaultOption.textContent = "-- Chọn người tham mưu --";
+
+  select.appendChild(defaultOption);
+
+
+  // =================================================
+  // LẤY HỌ TÊN TỪ DANH SÁCH USERS
+  // =================================================
+
+  const danhSach = [];
+
+  for(let username in users){
+
+    const user = users[username];
+
+    if(!user) continue;
+
+    const fullname = String(
+      user.fullname || ""
+    ).trim();
+
+    if(!fullname) continue;
+
+    // Tránh trùng họ tên
+    if(!danhSach.includes(fullname)){
+      danhSach.push(fullname);
+    }
+  }
+
+
+  // =================================================
+  // SẮP XẾP THEO HỌ TÊN
+  // =================================================
+
+  danhSach.sort((a,b) =>
+    a.localeCompare(b, "vi")
+  );
+
+
+  // =================================================
+  // TẠO OPTION
+  // =================================================
+
+  danhSach.forEach(fullname => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = fullname;
+    option.textContent = fullname;
+
+    select.appendChild(option);
+
+  });
+
+
+  // =================================================
+  // GIỮ OPTION "KHÁC"
+  // Cho dữ liệu hồ sơ cũ không bị mất
+  // =================================================
+
+  const optionKhac =
+    document.createElement("option");
+
+  optionKhac.value = "Khác";
+  optionKhac.textContent = "Khác";
+
+  select.appendChild(optionKhac);
+
+
+  // =================================================
+  // KHÔI PHỤC GIÁ TRỊ CŨ NẾU CÓ
+  // =================================================
+
+  if(oldValue){
+
+    const exists =
+      Array.from(select.options)
+      .some(option =>
+        option.value === oldValue
+      );
+
+    if(exists){
+      select.value = oldValue;
+    }
+
+  }
+
 }
 
 function output(data){
@@ -8564,300 +9620,800 @@ function loadCongChucDropdown(){
 
 }
 
-function renderBaoCao(isClick = false){
+// =====================================================
+// HỖ TRỢ BÁO CÁO - LẤY DANH MỤC TỪ SHEET
+// =====================================================
 
-  let from = document.getElementById("fromDateBaoCao").value;
-  let to = document.getElementById("toDateBaoCao").value;
+function chuanHoaGiaTriBaoCao(value){
+  return String(value ?? "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
 
-  let list = [];
 
-  // 👉 Nếu bấm nút mà chưa chọn ngày → chặn
-  if(isClick && (!from || !to)){
-    alert("Vui lòng chọn khoảng thời gian");
-    return;
-  }
+// =====================================================
+// ĐẾM SỐ HỒ SƠ THEO GIÁ TRỊ DANH MỤC
+// =====================================================
 
-  // 🔥 HÀM PARSE NGÀY CHUẨN (FIX LỖI GỐC)
-  function parseDate(str){
-    if(!str) return null;
+function demTheoDanhMucBaoCao(list, field, value){
 
-    // dd/MM/yyyy
-    if(str.includes("/")){
-      let [d,m,y] = str.split("/");
-      return new Date(y, m-1, d);
-    }
+  const target =
+    chuanHoaGiaTriBaoCao(value);
 
-    // yyyy-MM-dd hoặc ISO
-    if(str.includes("-")){
-      let [y,m,d] = str.split("T")[0].split("-");
-      return new Date(y, m-1, d);
-    }
+  return list.filter(c => {
 
-    return null;
-  }
+    const current =
+      chuanHoaGiaTriBaoCao(c[field]);
 
-  // 👉 Nếu có chọn ngày → lọc
-  if(from && to){
-
-    let f = parseDate(from);
-    let t = parseDate(to);
-
-    f.setHours(0,0,0,0);
-    t.setHours(23,59,59,999);
-
-    list = cases.filter(c=>{
-
-      let d = parseDate(c.ngayden);
-      if(!d) return false;
-
-      d.setHours(0,0,0,0);
-
-      return d >= f && d <= t;
-    });
-
-  }else{
-    // 👉 chưa chọn ngày → lấy toàn bộ
-    list = [...cases];
-  }
-
-  // 🔥 TÍNH TOÁN
-  let total = list.length;
-
-  let done = list.filter(c => c.tinhtrang === "Đã xử lý").length;
-
-  let tongDaXuLyTheoNgayHoanThanh = 0;
-
-if(from && to){
-
-  let f = parseDate(from);
-  let t = parseDate(to);
-
-  f.setHours(0,0,0,0);
-  t.setHours(23,59,59,999);
-
-  tongDaXuLyTheoNgayHoanThanh =
-  cases.filter(c => {
-
-    if((c.tinhtrang || "").trim() !== "Đã xử lý")
-      return false;
-
-    if(!c.ngayxuly)
-      return false;
-
-    let d = parseDate(c.ngayxuly);
-
-    if(!d)
-      return false;
-
-    d.setHours(0,0,0,0);
-
-    return d >= f && d <= t;
+    return current === target;
 
   }).length;
 
 }
 
-  let dangXuLy = list.filter(c => c.tinhtrang === "Đang xử lý").length;
 
-  let tongDangXuLyHeThong = cases.filter(c => (c.tinhtrang || "").trim() === "Đang xử lý").length;
+// =====================================================
+// TẠO DANH SÁCH BÁO CÁO TỪ DANH MỤC SHEET
+// =====================================================
 
-  let duDieuKien = list.filter(c => c.dieukien === "Đủ điều kiện xử lý").length;
+function taoDanhSachBaoCaoTheoDanhMuc(
+  list,
+  nhom,
+  field
+){
 
-  let khongDu = list.filter(c => c.dieukien === "Không đủ điều kiện xử lý").length;
+  let ds =
+    Array.isArray(danhMuc[nhom])
+      ? danhMuc[nhom]
+      : [];
 
-  let thuoc = list.filter(c => c.coquan === "Thuộc thẩm quyền giải quyết").length;
 
-  let khongThuoc = list.filter(c => c.coquan === "Không thuộc thẩm quyền giải quyết").length;
+  // Chuẩn hóa + loại giá trị trùng
+  ds = [
+    ...new Set(
+      ds
+        .map(v =>
+          String(v ?? "").trim()
+        )
+        .filter(v => v !== "")
+    )
+  ];
 
-  let khieuNai = list.filter(c => c.loaidon === "Khiếu nại").length;
 
-  let toCao = list.filter(c => c.loaidon === "Tố cáo").length;
+  if(ds.length === 0){
 
-  let kienNghi = list.filter(c => c.loaidon === "Phản ánh - Kiến nghị").length;
+    return `
+      <div style="
+        color:#888;
+        font-style:italic;
+      ">
+        Chưa có danh mục
+      </div>
+    `;
 
-  let hoaGiai = list.filter(c => c.loaidon === "Hòa giải").length;
+  }
 
-  let khac = list.filter(c => c.loaidon === "Khác").length;
 
-  // 🔥 FIX HIỂN THỊ NGÀY (TRÁNH undefined)
-  let titleDate = (from && to)
-    ? `📊 Báo cáo từ ngày ${formatDateVN(from)} đến ngày ${formatDateVN(to)}`
-    : "📊 Báo cáo toàn bộ hồ sơ";
+  return ds.map(value => {
 
-  // 🔥 RENDER
-  document.getElementById("baoCaoContent").innerHTML = `
+    const soLuong =
+      demTheoDanhMucBaoCao(
+        list,
+        field,
+        value
+      );
+
+
+    return `
+      <div style="margin-bottom:5px;">
+        - ${escapeHtmlBaoCao(value)}:
+        <b>${soLuong}</b>
+      </div>
+    `;
+
+  }).join("");
+
+}
+
+
+// =====================================================
+// CHỐNG HTML INJECTION KHI HIỂN THỊ DANH MỤC
+// =====================================================
+
+function escapeHtmlBaoCao(value){
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+// =====================================================
+// ĐẢM BẢO BÁO CÁO LUÔN LẤY DANH MỤC MỚI NHẤT
+// TỪ SHEET
+// =====================================================
+
+function taiDanhMucChoBaoCao(){
+
+  return Promise.all([
+
+    loadDanhMuc("LOAIDON"),
+
+    loadDanhMuc("LINHVUC"),
+
+    loadDanhMuc("THAMQUYENGIAIQUYET"),
+
+    loadDanhMuc("DIEUKIENXULY"),
+
+    loadDanhMuc("TINHTRANGXULYDON"),
+
+    loadDanhMuc("KETQUAXULYDON")
+
+  ]);
+
+}
+
+// =====================================================
+// BÁO CÁO TIẾP NHẬN VÀ XỬ LÝ ĐƠN
+// TỰ ĐỘNG LẤY DANH MỤC TỪ SHEET DANHMUC
+// =====================================================
+
+async function renderBaoCao(isClick = false){
+
+  // =====================================================
+  // 1. LẤY KHOẢNG THỜI GIAN
+  // =====================================================
+
+  let from =
+    document.getElementById(
+      "fromDateBaoCao"
+    ).value;
+
+  let to =
+    document.getElementById(
+      "toDateBaoCao"
+    ).value;
+
+
+  // =====================================================
+  // 2. KIỂM TRA KHI BẤM XEM BÁO CÁO
+  // =====================================================
+
+  if(
+    isClick &&
+    (!from || !to)
+  ){
+
+    alert(
+      "Vui lòng chọn khoảng thời gian"
+    );
+
+    return;
+
+  }
+
+
+  // =====================================================
+  // 3. LUÔN TẢI DANH MỤC MỚI NHẤT TỪ SHEET
+  // =====================================================
+
+  try{
+
+    await taiDanhMucChoBaoCao();
+
+    console.log(
+      "✅ DANH MỤC DÙNG CHO BÁO CÁO:",
+      danhMuc
+    );
+
+  }
+  catch(error){
+
+    console.error(
+      "❌ LỖI TẢI DANH MỤC BÁO CÁO:",
+      error
+    );
+
+    alert(
+      "Không thể tải danh mục từ Sheet."
+    );
+
+    return;
+
+  }
+
+
+  // =====================================================
+  // 4. HÀM PARSE NGÀY
+  // =====================================================
+
+  function parseDate(str){
+
+    if(!str)
+      return null;
+
+
+    // dd/MM/yyyy
+
+    if(str.includes("/")){
+
+      let [
+        d,
+        m,
+        y
+      ] =
+        str.split("/");
+
+      return new Date(
+        Number(y),
+        Number(m) - 1,
+        Number(d)
+      );
+
+    }
+
+
+    // yyyy-MM-dd hoặc ISO
+
+    if(str.includes("-")){
+
+      let [
+        y,
+        m,
+        d
+      ] =
+        str
+          .split("T")[0]
+          .split("-");
+
+      return new Date(
+        Number(y),
+        Number(m) - 1,
+        Number(d)
+      );
+
+    }
+
+
+    return null;
+
+  }
+
+
+  // =====================================================
+  // 5. LỌC HỒ SƠ THEO NGÀY
+  // =====================================================
+
+  let list = [];
+
+
+  if(from && to){
+
+    let f =
+      parseDate(from);
+
+    let t =
+      parseDate(to);
+
+
+    if(!f || !t){
+
+      alert(
+        "Khoảng thời gian không hợp lệ."
+      );
+
+      return;
+
+    }
+
+
+    f.setHours(
+      0,0,0,0
+    );
+
+    t.setHours(
+      23,59,59,999
+    );
+
+
+    list =
+      cases.filter(c => {
+
+        let d =
+          parseDate(
+            c.ngayden
+          );
+
+
+        if(!d)
+          return false;
+
+
+        d.setHours(
+          0,0,0,0
+        );
+
+
+        return (
+          d >= f &&
+          d <= t
+        );
+
+      });
+
+  }
+  else{
+
+    // Không chọn ngày → toàn bộ hồ sơ
+
+    list = [
+      ...cases
+    ];
+
+  }
+
+
+  // =====================================================
+  // 6. TỔNG SỐ
+  // =====================================================
+
+  let total =
+    list.length;
+
+
+  // =====================================================
+  // 7. TÌNH TRẠNG XỬ LÝ
+  // =====================================================
+
+  let done =
+    demTheoDanhMucBaoCao(
+      list,
+      "tinhtrang",
+      "Đã xử lý"
+    );
+
+
+  let dangXuLy =
+    demTheoDanhMucBaoCao(
+      list,
+      "tinhtrang",
+      "Đang xử lý"
+    );
+
+
+  // =====================================================
+  // 8. ĐÃ XỬ LÝ THEO NGÀY HOÀN THÀNH
+  // =====================================================
+
+  let tongDaXuLyTheoNgayHoanThanh = 0;
+
+
+  if(from && to){
+
+    let f =
+      parseDate(from);
+
+    let t =
+      parseDate(to);
+
+
+    f.setHours(
+      0,0,0,0
+    );
+
+    t.setHours(
+      23,59,59,999
+    );
+
+
+    tongDaXuLyTheoNgayHoanThanh =
+
+      cases.filter(c => {
+
+        if(
+          chuanHoaGiaTriBaoCao(
+            c.tinhtrang
+          )
+          !==
+          chuanHoaGiaTriBaoCao(
+            "Đã xử lý"
+          )
+        ){
+
+          return false;
+
+        }
+
+
+        if(!c.ngayxuly)
+          return false;
+
+
+        let d =
+          parseDate(
+            c.ngayxuly
+          );
+
+
+        if(!d)
+          return false;
+
+
+        d.setHours(
+          0,0,0,0
+        );
+
+
+        return (
+          d >= f &&
+          d <= t
+        );
+
+      }).length;
+
+  }
+
+
+  // =====================================================
+  // 9. TỔNG ĐANG XỬ LÝ TOÀN HỆ THỐNG
+  // =====================================================
+
+  let tongDangXuLyHeThong =
+
+    demTheoDanhMucBaoCao(
+      cases,
+      "tinhtrang",
+      "Đang xử lý"
+    );
+
+
+  // =====================================================
+  // 10. TẠO DANH SÁCH ĐỘNG TỪ SHEET
+  // =====================================================
+
+  const baoCaoThamQuyen =
+
+    taoDanhSachBaoCaoTheoDanhMuc(
+      list,
+      "THAMQUYENGIAIQUYET",
+      "coquan"
+    );
+
+
+  const baoCaoLoaiDon =
+
+    taoDanhSachBaoCaoTheoDanhMuc(
+      list,
+      "LOAIDON",
+      "loaidon"
+    );
+
+
+  const baoCaoDieuKien =
+
+    taoDanhSachBaoCaoTheoDanhMuc(
+      list,
+      "DIEUKIENXULY",
+      "dieukien"
+    );
+
+
+  const baoCaoKetQua =
+
+    taoDanhSachBaoCaoTheoDanhMuc(
+      list,
+      "KETQUAXULYDON",
+      "ketqua"
+    );
+
+
+  const baoCaoLinhVuc =
+
+    taoDanhSachBaoCaoTheoDanhMuc(
+      list,
+      "LINHVUC",
+      "linhvuc"
+    );
+
+
+  // =====================================================
+  // 11. TIÊU ĐỀ
+  // =====================================================
+
+  let titleDate =
+
+    (from && to)
+
+      ?
+
+    `📊 Báo cáo từ ngày
+     ${formatDateVN(from)}
+     đến ngày
+     ${formatDateVN(to)}`
+
+      :
+
+    "📊 Báo cáo toàn bộ hồ sơ";
+
+
+  // =====================================================
+  // 12. HIỂN THỊ BÁO CÁO
+  // =====================================================
+
+  document.getElementById(
+    "baoCaoContent"
+  ).innerHTML = `
+
     <div class="report-box">
 
-  <div id="countdownBaoCao"></div>
 
-  <div class="report-title">
-    ${titleDate}
-  </div>
+      <div id="countdownBaoCao"></div>
+
+
+      <div class="report-title">
+        ${titleDate}
+      </div>
+
+
+      <!-- ========================================= -->
+      <!-- TỔNG QUAN -->
+      <!-- ========================================= -->
 
       <div class="report-grid">
-        <div class="report-card">
-          <h4>Tổng số đơn</h4>
-          <span>${total}</span>
-        </div>
+
 
         <div class="report-card">
-          <h4>Đã xử lý</h4>
-          <span>${done}
-         ${
-  from && to &&
-  done !== tongDaXuLyTheoNgayHoanThanh
-  ?
-  `
-  <div style="
-    font-size:13px;
-    color:#d32f2f;
-    margin-top:4px;">
-    Trong tổng số đơn Đã xử lý trong kỳ
-  </div>
-  ${tongDaXuLyTheoNgayHoanThanh}
-  `
-  :
-  ""
-}
-          
-            </span>
+
+          <h4>
+            Tổng số đơn
+          </h4>
+
+          <span>
+            ${total}
+          </span>
+
         </div>
+
+
 
         <div class="report-card">
-          <h4>Đang xử lý</h4>
-          <span>${dangXuLy}
-          ${
-    dangXuLy !== tongDangXuLyHeThong
-    ?
-    ` 
-          <div style="
-        font-size:13px;
-        color:#d32f2f;
-        margin-top:4px;">Trong tổng số đơn Đang xử lý </div> ${tongDangXuLyHeThong} 
-         `
-    :
-    ""
-}
-        </span>
+
+          <h4>
+            Đã xử lý
+          </h4>
+
+          <span>
+
+            ${done}
+
+            ${
+              from &&
+              to &&
+              done !==
+              tongDaXuLyTheoNgayHoanThanh
+
+              ?
+
+              `
+
+              <div style="
+                font-size:13px;
+                color:#d32f2f;
+                margin-top:4px;
+              ">
+
+                Trong tổng số đơn
+                Đã xử lý trong kỳ
+
+              </div>
+
+              ${tongDaXuLyTheoNgayHoanThanh}
+
+              `
+
+              :
+
+              ""
+            }
+
+          </span>
+
         </div>
-         
+
+
+
+        <div class="report-card">
+
+          <h4>
+            Đang xử lý
+          </h4>
+
+          <span>
+
+            ${dangXuLy}
+
+            ${
+              dangXuLy !==
+              tongDangXuLyHeThong
+
+              ?
+
+              `
+
+              <div style="
+                font-size:13px;
+                color:#d32f2f;
+                margin-top:4px;
+              ">
+
+                Trong tổng số đơn
+                Đang xử lý
+
+              </div>
+
+              ${tongDangXuLyHeThong}
+
+              `
+
+              :
+
+              ""
+            }
+
+          </span>
+
+        </div>
+
+
       </div>
 
-     <div class="report-layout">
 
-  <!-- CỘT 1 -->
-  <div class="report-col">
 
-    <div class="report-section">
-      <h3>1. Phân loại thẩm quyền</h3>
+      <!-- ========================================= -->
+      <!-- CHI TIẾT -->
+      <!-- ========================================= -->
 
-      <div class="report-list">
-        - Thuộc thẩm quyền: <b>${thuoc}</b><br>
-        - Không thuộc thẩm quyền: <b>${khongThuoc}</b>
+      <div class="report-layout">
+
+
+        <!-- ===================================== -->
+        <!-- CỘT 1 -->
+        <!-- ===================================== -->
+
+        <div class="report-col">
+
+
+          <!-- THẨM QUYỀN -->
+
+          <div class="report-section">
+
+            <h3>
+              1. Phân loại thẩm quyền
+            </h3>
+
+            <div class="report-list">
+
+              ${baoCaoThamQuyen}
+
+            </div>
+
+          </div>
+
+
+
+          <!-- LOẠI ĐƠN -->
+
+          <div class="report-section">
+
+            <h3>
+              2. Phân loại đơn
+            </h3>
+
+            <div class="report-list">
+
+              ${baoCaoLoaiDon}
+
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- ===================================== -->
+        <!-- CỘT 2 -->
+        <!-- ===================================== -->
+
+        <div class="report-col">
+
+
+          <!-- ĐIỀU KIỆN -->
+
+          <div class="report-section">
+
+            <h3>
+              3. Phân theo điều kiện
+            </h3>
+
+            <div class="report-list">
+
+              ${baoCaoDieuKien}
+
+            </div>
+
+          </div>
+
+
+
+          <!-- KẾT QUẢ -->
+
+          <div class="report-section">
+
+            <h3>
+              4. Phân loại kết quả xử lý
+            </h3>
+
+            <div class="report-list">
+
+              ${baoCaoKetQua}
+
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- ===================================== -->
+        <!-- CỘT 3 -->
+        <!-- ===================================== -->
+
+        <div class="report-col">
+
+
+          <!-- LĨNH VỰC -->
+
+          <div class="report-section">
+
+            <h3>
+              5. Phân loại lĩnh vực
+            </h3>
+
+            <div class="report-list">
+
+              ${baoCaoLinhVuc}
+
+            </div>
+
+          </div>
+
+
+        </div>
+
+
       </div>
+
     </div>
 
-    <div class="report-section">
-      <h3>2. Phân loại đơn</h3>
-
-      <div class="report-list">
-        - Khiếu nại: <b>${khieuNai}</b><br>
-        - Tố cáo: <b>${toCao}</b><br>
-        - Kiến nghị, phản ánh: <b>${kienNghi}</b><br>
-        - Hòa giải: <b>${hoaGiai}</b><br>
-        - Khác: <b>${khac}</b>
-      </div>
-    </div>
-
-  </div>
-
-
-  <!-- CỘT 2 -->
-  <div class="report-col">
-
-    <div class="report-section">
-      <h3>3. Phân theo điều kiện</h3>
-
-      <div class="report-list">
-        - Đủ điều kiện xử lý: <b>${duDieuKien}</b><br>
-        - Không đủ điều kiện xử lý: <b>${khongDu}</b>
-      </div>
-    </div>
-
-    <div class="report-section">
-      <h3>4. Phân loại kết quả xử lý</h3>
-
-      <div class="report-list">
-        - Phúc đáp:
-        <b>${list.filter(c => c.ketqua === "Phúc đáp").length}</b><br>
-
-        - Hướng dẫn:
-        <b>${list.filter(c => c.ketqua === "Hướng dẫn").length}</b><br>
-
-        - Chuyển đơn:
-        <b>${list.filter(c => c.ketqua === "Chuyển đơn").length}</b><br>
-
-        - Báo cáo:
-        <b>${list.filter(c => c.ketqua === "Báo cáo").length}</b><br>
-
-        - Lưu đơn:
-        <b>${list.filter(c => c.ketqua === "Lưu đơn").length}</b><br>
-
-        - Thụ lý giải quyết:
-        <b>${list.filter(c => c.ketqua === "Thụ lý giải quyết").length}</b><br>
-
-        - Khác:
-        <b>${list.filter(c => c.ketqua === "Khác").length}</b>
-      </div>
-    </div>
-
-  </div>
-
-
-  <!-- CỘT 3 -->
-  <div class="report-col">
-
-    <div class="report-section">
-      <h3>5. Phân loại lĩnh vực</h3>
-
-      <div class="report-list">
-
-        - Lao động - Việc làm:
-        <b>${list.filter(c => c.linhvuc === "Lao động - Việc làm").length}</b><br>
-
-        - Công chức - Viên chức:
-        <b>${list.filter(c => c.linhvuc === "Công chức - Viên chức").length}</b><br>
-
-        - Người có công:
-        <b>${list.filter(c => c.linhvuc === "Người có công").length}</b><br>
-
-        - Cải cách hành chính và chính quyền địa phương:
-        <b>${list.filter(c => c.linhvuc === "CCHC&CQĐP").length}</b><br>
-
-        - Tổ chức - Biên chế:
-        <b>${list.filter(c => c.linhvuc === "Tổ chức - Biên chế").length}</b><br>
-        - Thi đua - Khen thưởng:
-        <b>${list.filter(c => c.linhvuc === "Thi đua - Khen thưởng").length}</b><br>
-
-
-        - Đất đai:
-        <b>${list.filter(c => c.linhvuc === "Đất đai").length}</b><br>
-
-        - Khác:
-        <b>${list.filter(c => c.linhvuc === "Khác").length}</b>
-
-      </div>
-    </div>
-
-  </div>
-
-</div>
   `;
- 
-  // THÊM DÒNG NÀY
-  startBaoCaoCountdown(); 
-}
 
+
+  // =====================================================
+  // 13. KHỞI ĐỘNG NHẮC BÁO CÁO
+  // =====================================================
+
+  startBaoCaoCountdown();
+
+}
 function handleBaoCao(){
 
   let btn = document.getElementById("btnBaoCao");
@@ -8942,40 +10498,136 @@ function closeBaoCaoTuan(){
 
 function searchBaoCaoTuan(){
 
-  let key = document.getElementById("searchBaoCaoTuan").value.toLowerCase();
+  let key =
+    document
+      .getElementById("searchBaoCaoTuan")
+      .value
+      .toLowerCase()
+      .trim();
 
-  let tbody = document.getElementById("tbodyBaoCaoTuan");
+  let list =
+    baoCaoTuanList.filter(c =>
+
+      (c.tuan || "")
+        .toLowerCase()
+        .includes(key)
+
+      ||
+
+      (c.hoanthanh || "")
+        .toLowerCase()
+        .includes(key)
+
+      ||
+
+      (c.chuahoanthanh || "")
+        .toLowerCase()
+        .includes(key)
+
+      ||
+
+      (c.kehoach || "")
+        .toLowerCase()
+        .includes(key)
+
+    );
+
+  /*
+   * Nếu chưa nhập từ khóa
+   * thì dùng lại danh sách gốc
+   */
+  if(!key){
+
+    baoCaoTuanPage = 1;
+
+    displayBaoCaoTuan();
+
+    return;
+  }
+
+  /*
+   * Hiển thị kết quả tìm kiếm
+   * tạm thời không phân trang
+   */
+  let tbody =
+    document.getElementById(
+      "tbodyBaoCaoTuan"
+    );
+
   tbody.innerHTML = "";
-
-  let list = baoCaoTuanList.filter(c =>
-
-    (c.tuan || "").toLowerCase().includes(key) ||
-    (c.hoanthanh || "").toLowerCase().includes(key) ||
-    (c.chuahoanthanh || "").toLowerCase().includes(key) ||
-    (c.kehoach || "").toLowerCase().includes(key)
-
-  );
 
   list.forEach((c,i)=>{
 
-    let buttons = `<button onclick="viewBaoCaoTuan(${i})">Xem</button>`;
+    let realIndex =
+      baoCaoTuanList.indexOf(c);
 
-    if(currentRole==="Admin" || c.username===currentUser){
-      buttons += `<button onclick="editBaoCaoTuan(${i})">Sửa</button>`;
-      buttons += `<button onclick="deleteBaoCaoTuan('${c.id}')">Xóa</button>`;
+    let buttons =
+      `<button
+        onclick="viewBaoCaoTuan(${realIndex})"
+      >
+        Xem
+      </button>`;
+
+    if(
+      currentRole === "Admin" ||
+      c.username === currentUser
+    ){
+
+      buttons += `
+        <button
+          onclick="editBaoCaoTuan(${realIndex})"
+        >
+          Sửa
+        </button>
+      `;
+
+      buttons += `
+        <button
+          onclick="deleteBaoCaoTuan('${c.id}')"
+        >
+          Xóa
+        </button>
+      `;
+
     }
+
+    buttons += `
+      <button
+        class="btn-excel"
+        onclick="exportBaoCaoTuanExcel(${realIndex})"
+      >
+        📗 Excel
+      </button>
+    `;
 
     tbody.innerHTML += `
       <tr>
-        <td>${i+1}</td>
-        <td>${c.tuan||""}</td>
-        <td>${c.hoanthanh||""}</td>
-        <td>${c.chuahoanthanh||""}</td>
-        <td>${c.kehoach||""}</td>
+
+        <td>${i + 1}</td>
+
+        <td>${c.tuan || ""}</td>
+
+        <td>${c.hoanthanh || ""}</td>
+
+        <td>${c.chuahoanthanh || ""}</td>
+
+        <td>${c.kehoach || ""}</td>
+
         <td>${buttons}</td>
+
       </tr>
     `;
+
   });
+
+  /*
+   * Khi đang tìm kiếm thì ẩn phân trang
+   */
+  document
+    .getElementById(
+      "baoCaoTuanPagination"
+    )
+    .innerHTML = "";
 
 }
 
@@ -11304,6 +12956,87 @@ async function fileToBase64(file){
 
 }
 
+function showSelectedHoSoFiles(){
+
+  const input =
+    document.getElementById("hosoFiles");
+
+  const box =
+    document.getElementById("hosoSelectedFiles");
+
+  if(!input || !box) return;
+
+  if(!input.files.length){
+
+    box.innerText =
+      "Chưa chọn file";
+
+    return;
+
+  }
+
+  box.innerText =
+    Array.from(input.files)
+      .map(file =>
+        file.name
+      )
+      .join(", ");
+
+}
+
+async function uploadHoSoFileFromComputer(file){
+
+  if(!file){
+    throw new Error("Không có file");
+  }
+
+  const base64 =
+    await fileToBase64(file);
+
+  const res =
+    await fetch(API_URL, {
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"uploadHoSoFile",
+
+        fileName:file.name,
+
+        mimeType:
+          file.type ||
+          "application/octet-stream",
+
+        base64:base64
+
+      })
+
+    });
+
+  if(!res.ok){
+
+    throw new Error(
+      "Không kết nối được máy chủ"
+    );
+
+  }
+
+  const data =
+    await res.json();
+
+  if(!data.success || !data.url){
+
+    throw new Error(
+      "Upload file thất bại"
+    );
+
+  }
+
+  return data.url;
+
+}
+
 function startBaoCaoCountdown(){
 
   const box =
@@ -12811,56 +14544,6 @@ function deleteVanBan(id){
 }
 
 
-function renderBaoCaoTuanPagination(totalRows){
-
-  let totalPage =
-    Math.ceil(
-      totalRows /
-      baoCaoTuanRowsPerPage
-    );
-
-  let html = "";
-
-  if(totalPage <= 1){
-
-    document.getElementById(
-      "baoCaoTuanPagination"
-    ).innerHTML = "";
-
-    return;
-
-  }
-
-  for(
-    let i=1;
-    i<=totalPage;
-    i++
-  ){
-
-    html += `
-      <button
-        class="
-        page-btn
-        ${i===baoCaoTuanPage
-          ? "active"
-          : ""
-        }
-        "
-        onclick="
-        baoCaoTuanPage=${i};
-        renderBaoCaoTuan();
-        ">
-        ${i}
-      </button>
-    `;
-
-  }
-
-  document.getElementById(
-    "baoCaoTuanPagination"
-  ).innerHTML = html;
-
-}
 
 function updateCongDanThem(){
 
@@ -13199,6 +14882,1210 @@ function exportPDFTiepDan(){
         .from(element)
         .save();
 }
+
+function openAIChat(){
+
+    // Mở khung chat
+    document.getElementById("aiChatPanel").style.display = "flex";
+
+    // Ẩn icon mặt cô gái ở góc màn hình
+    const aiFloatBtn = document.getElementById("aiFloatBtn");
+    if (aiFloatBtn) aiFloatBtn.style.display = "none";
+
+    // Hiện nhân vật cô gái đứng cạnh khung chat
+    const aiGirl = document.getElementById("aiGirlAssistant");
+    if (aiGirl) aiGirl.classList.add("is-visible");
+
+    if(!aiWelcomeShown){
+
+        addBotMessage(
+            "👋 Xin chào!<br><br>" +
+            "Tôi là <b>Trợ lý AI của Hệ thống Quản lý đơn thư</b>.<br><br>" +
+            "Tôi có thể giúp gì cho bạn hôm nay?"
+        );
+
+        aiWelcomeShown = true;
+    }
+
+}
+function addBotMessage(text){
+
+    const messages = document.getElementById("aiMessages");
+
+    messages.innerHTML += `
+        <div class="ai-row bot">
+
+            <div class="ai-avatar">
+    <img
+        src="https://quanlydonthu.io.vn/ai-girl-icon.png"
+        alt="AI">
+</div>
+
+            <div class="ai-bubble bot">
+                ${text}
+            </div>
+
+        </div>
+    `;
+
+    messages.scrollTop = messages.scrollHeight;
+
+}
+
+function closeAIChat(){
+
+    // Đóng khung chat
+    document.getElementById("aiChatPanel").style.display = "none";
+
+    // Hiện lại icon mặt cô gái ở góc màn hình
+    const aiFloatBtn = document.getElementById("aiFloatBtn");
+    if (aiFloatBtn) aiFloatBtn.style.display = "flex";
+
+    // Ẩn nhân vật cô gái đứng cạnh khung chat
+    const aiGirl = document.getElementById("aiGirlAssistant");
+    if (aiGirl) aiGirl.classList.remove("is-visible");
+
+}
+window.addEventListener("load", function () {
+
+    const input = document.getElementById("aiQuestion");
+
+    if(!input) return;
+
+    input.addEventListener("keydown", function(e){
+
+        if(e.key==="Enter" && !e.shiftKey){
+
+            e.preventDefault();
+
+            sendAI();
+
+        }
+
+    });
+
+});
+
+async function sendAI(){
+
+    let q =
+    document
+    .getElementById(
+      "aiQuestion"
+    )
+    .value.trim();
+
+    if(!q) return;
+
+    const box =
+    document
+    .getElementById(
+      "aiMessages"
+    );
+
+    box.innerHTML += `
+<div class="ai-user">
+
+    <div class="bubble">
+        ${q}
+    </div>
+
+</div>
+`;
+
+    document
+    .getElementById(
+      "aiQuestion"
+    )
+    .value = "";
+
+    box.innerHTML += `
+<div id="aiLoading"
+class="ai-bot">
+
+    <div class="ai-avatar">
+    <img
+        src="https://quanlydonthu.io.vn/ai-girl-icon.png"
+        alt="AI">
+</div>
+
+    <div class="bubble">
+        Đang phân tích...
+    </div>
+
+</div>
+`;
+
+    box.scrollTop =
+    box.scrollHeight;
+
+    try{
+
+      const res =
+      await fetch(
+        API_URL +
+        "?action=callAI&question=" +
+        encodeURIComponent(q)
+      );
+
+      const answer =
+      await res.text();
+
+      document
+      .getElementById(
+        "aiLoading"
+      )
+      .remove();
+
+     box.innerHTML += `
+<div class="ai-bot">
+
+    <div class="ai-avatar">
+    <img
+        src="https://quanlydonthu.io.vn/ai-girl-icon.png"
+        alt="AI">
+</div>
+
+    <div class="bubble">
+        ${answer}
+    </div>
+
+</div>
+`;
+
+    }catch(err){
+
+      document
+      .getElementById(
+        "aiLoading"
+      )
+      .innerHTML =
+      "❌ Không kết nối được AI";
+
+    }
+
+    box.scrollTop =
+    box.scrollHeight;
+
+}
+
+function aiAnalyzeCase(){
+
+  let q = `
+  Phân tích hồ sơ:
+
+  Họ tên:
+  ${currentCase.hoten}
+
+  Loại đơn:
+  ${currentCase.loaidon}
+
+  Nội dung:
+  ${currentCase.noidung}
+
+  Cho biết:
+
+  1. Đây là loại đơn gì
+  2. Có thuộc thẩm quyền giải quyết không
+  3. Hướng xử lý đề xuất
+  `;
+
+  askAI(q);
+
+}
+
+// ================= QUẢN TRỊ DANH MỤC =================
+
+function loadDanhMucAdmin(){
+
+  const nhom =
+    document.getElementById("dmNhom").value;
+
+  const dmList =
+    document.getElementById("dmList");
+
+  // Hiển thị trạng thái đang tải
+  dmList.innerHTML = `
+    <div style="
+      padding:15px;
+      color:#666;
+      text-align:center;
+    ">
+      ⏳ Đang tải danh mục...
+    </div>
+  `;
+
+
+  // =========================
+  // DÙNG GET ĐỂ LẤY DANH MỤC
+  // =========================
+
+  const url =
+    API_URL +
+    "?action=getDanhMuc&nhom=" +
+    encodeURIComponent(nhom);
+
+
+  fetch(url)
+
+    .then(response => {
+
+      if(!response.ok){
+
+        throw new Error(
+          "HTTP " + response.status
+        );
+
+      }
+
+      return response.json();
+
+    })
+
+
+    .then(data => {
+
+      console.log(
+        "DANH MỤC TRẢ VỀ:",
+        data
+      );
+
+
+      if(!Array.isArray(data)){
+
+        throw new Error(
+          "Dữ liệu trả về không phải mảng"
+        );
+
+      }
+
+
+      // =========================
+      // CHUYỂN DỮ LIỆU VỀ CHUỖI
+      // =========================
+
+      const danhSach =
+        data.map(v => {
+
+          if(typeof v === "string"){
+
+            return v.trim();
+
+          }
+
+
+          if(
+            typeof v === "object" &&
+            v !== null
+          ){
+
+            if(v.ten !== undefined){
+
+              return String(v.ten).trim();
+
+            }
+
+            if(v.value !== undefined){
+
+              return String(v.value).trim();
+
+            }
+
+            if(v.gia_tri !== undefined){
+
+              return String(v.gia_tri).trim();
+
+            }
+
+          }
+
+
+          return "";
+
+        })
+        .filter(v => v !== "");
+
+
+      // =========================
+      // KHÔNG CÓ DỮ LIỆU
+      // =========================
+
+      if(danhSach.length === 0){
+
+        dmList.innerHTML = `
+          <div style="
+            padding:15px;
+            color:#666;
+          ">
+            Chưa có dữ liệu
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      // =========================
+      // HIỂN THỊ BẢNG
+      // =========================
+
+      let html = `
+
+        <table class="table">
+
+          <thead>
+
+            <tr>
+
+              <th style="width:60px">
+                STT
+              </th>
+
+              <th>
+                Giá trị
+              </th>
+
+              <th style="width:160px">
+                Thao tác
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+      `;
+
+
+      danhSach.forEach((v,i) => {
+
+        const safeValue =
+          String(v)
+            .replace(/\\/g,"\\\\")
+            .replace(/'/g,"\\'")
+            .replace(/"/g,'&quot;');
+
+
+        html += `
+
+          <tr>
+
+            <td style="text-align:center">
+              ${i + 1}
+            </td>
+
+            <td>
+              ${v}
+            </td>
+
+            <td style="text-align:center">
+
+              <button
+                class="btn-edit"
+                onclick="suaDanhMuc('${safeValue}')"
+              >
+                ✏️ Sửa
+              </button>
+
+              <button
+                class="btn-delete"
+                onclick="xoaDanhMuc('${safeValue}')"
+              >
+                🗑️ Xóa
+              </button>
+
+            </td>
+
+          </tr>
+
+        `;
+
+      });
+
+
+      html += `
+
+          </tbody>
+
+        </table>
+
+      `;
+
+
+      dmList.innerHTML = html;
+
+
+    })
+
+
+    .catch(error => {
+
+      console.error(
+        "Lỗi loadDanhMucAdmin:",
+        error
+      );
+
+
+      dmList.innerHTML = `
+
+        <div style="
+          padding:15px;
+          background:#f8d7da;
+          color:#b30000;
+          border:1px solid #f5c2c7;
+          border-radius:6px;
+        ">
+
+          ❌ Không thể tải danh mục.
+
+          <br>
+
+          <small>
+            ${error.message}
+          </small>
+
+        </div>
+
+      `;
+
+    });
+
+}
+
+
+
+// ================= THÊM DANH MỤC =================
+
+function themDanhMuc(){
+
+  const nhom =
+    document.getElementById("dmNhom").value;
+
+  const value =
+    document.getElementById("dmMoi").value.trim();
+
+
+  if(!value){
+
+    alert("Nhập giá trị");
+
+    return;
+
+  }
+
+
+  fetch(API_URL,{
+
+    method:"POST",
+
+    body:JSON.stringify({
+
+      action:"themDanhMuc",
+
+      nhom:nhom,
+
+      value:value
+
+    })
+
+  })
+
+  .then(r => r.json())
+
+  .then(res => {
+
+    if(res.success){
+
+      document.getElementById("dmMoi").value = "";
+
+      loadDanhMucAdmin();
+
+      // Tải lại dropdown toàn hệ thống
+      loadDanhMuc(nhom);
+
+    }else{
+
+      alert(
+        res.message ||
+        "Lỗi thêm dữ liệu"
+      );
+
+    }
+
+  });
+
+}
+
+
+// ================= SỬA DANH MỤC =================
+
+function suaDanhMuc(oldValue){
+
+  const nhom =
+    document.getElementById("dmNhom").value;
+
+
+  const newValue =
+    prompt(
+      "Nhập giá trị mới:",
+      oldValue
+    );
+
+
+  if(
+    !newValue ||
+    newValue === oldValue
+  ){
+
+    return;
+
+  }
+
+
+  fetch(API_URL,{
+
+    method:"POST",
+
+    body:JSON.stringify({
+
+      action:"suaDanhMuc",
+
+      nhom:nhom,
+
+      oldValue:oldValue,
+
+      newValue:newValue
+
+    })
+
+  })
+
+  .then(r => r.json())
+
+  .then(res => {
+
+    if(res.success){
+
+      loadDanhMucAdmin();
+
+      loadDanhMuc(nhom);
+
+    }else{
+
+      alert(
+        res.message ||
+        "Lỗi sửa dữ liệu"
+      );
+
+    }
+
+  });
+
+}
+
+
+// ================= XÓA DANH MỤC =================
+
+function xoaDanhMuc(value){
+
+  if(
+    !confirm(
+      "Xóa giá trị này?"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const nhom =
+    document.getElementById("dmNhom").value;
+
+
+  fetch(API_URL,{
+
+    method:"POST",
+
+    body:JSON.stringify({
+
+      action:"xoaDanhMuc",
+
+      nhom:nhom,
+
+      value:value
+
+    })
+
+  })
+
+  .then(r => r.json())
+
+  .then(res => {
+
+    if(res.success){
+
+      loadDanhMucAdmin();
+
+      loadDanhMuc(nhom);
+
+    }else{
+
+      alert(
+        res.message ||
+        "Lỗi xóa dữ liệu"
+      );
+
+    }
+
+  });
+
+}
+
+
+function napDanhMucVaoSelect(
+    id,
+    nhom,
+    placeholder
+){
+
+    const select =
+        document.getElementById(id);
+
+    if(!select){
+        console.warn(
+            "Không tìm thấy select:",
+            id
+        );
+        return;
+    }
+
+    const ds =
+        danhMuc[nhom] || [];
+
+    select.innerHTML =
+        `<option value="">${placeholder}</option>`;
+
+    ds.forEach(value => {
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            String(value).trim();
+
+        option.textContent =
+            String(value).trim();
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+function loadTatCaDanhMuc(){
+
+    Promise.all([
+
+        // =========================
+        // THÔNG TIN HỒ SƠ
+        // =========================
+
+        loadDanhMuc("LOAIDON"),
+        loadDanhMuc("LINHVUC"),
+
+        // =========================
+        // XỬ LÝ HỒ SƠ
+        // =========================
+
+        loadDanhMuc("THAMQUYENGIAIQUYET"),
+        loadDanhMuc("DIEUKIENXULY"),
+        loadDanhMuc("TINHTRANGXULYDON"),
+        loadDanhMuc("KETQUAXULYDON"),
+        loadDanhMuc("NGUONDON"),
+
+        // =========================
+        // NGƯỜI THAM MƯU
+        // =========================
+
+        loadDanhMuc("NGUOITHAMMUU"),
+
+        // =========================
+        // LÃNH ĐẠO KÝ DUYỆT
+        // =========================
+
+        loadDanhMuc("LANHDAOKYDUYET")
+
+    ])
+
+    .then(() => {
+
+        console.log(
+            "✅ ĐÃ TẢI TOÀN BỘ DANH MỤC:",
+            danhMuc
+        );
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "❌ LỖI TẢI TOÀN BỘ DANH MỤC:",
+            error
+        );
+
+    });
+
+}
+
+
+// =====================================================
+// TẢI DANH MỤC TỪ SHEET DANHMUC
+// DÙNG CHUNG CHO:
+// 1. FORM NHẬP / SỬA HỒ SƠ
+// 2. BỘ LỌC TÌM KIẾM
+// =====================================================
+
+var danhMuc = {};
+
+function loadDanhMuc(nhom){
+
+  nhom = String(nhom || "").trim();
+
+  if(!nhom){
+    return Promise.resolve([]);
+  }
+
+
+  // =====================================================
+  // 1. GỌI API LẤY DỮ LIỆU TỪ SHEET DANHMUC
+  // =====================================================
+
+  const url =
+    API_URL +
+    "?action=getDanhMuc&nhom=" +
+    encodeURIComponent(nhom);
+
+
+  return fetch(url)
+
+    .then(response => {
+
+      if(!response.ok){
+
+        throw new Error(
+          "HTTP " + response.status
+        );
+
+      }
+
+      return response.json();
+
+    })
+
+
+    .then(data => {
+
+      console.log(
+        "DANH MỤC:",
+        nhom,
+        data
+      );
+
+
+      if(!Array.isArray(data)){
+
+        throw new Error(
+          "Dữ liệu danh mục không phải mảng"
+        );
+
+      }
+
+
+      // =====================================================
+      // 2. CHUẨN HÓA DỮ LIỆU
+      // =====================================================
+
+      danhMuc[nhom] =
+        data
+          .map(v => {
+
+            // Nếu API trả chuỗi
+            if(typeof v === "string"){
+              return v.trim();
+            }
+
+            // Nếu API trả object
+            if(
+              typeof v === "object" &&
+              v !== null
+            ){
+
+              if(v.ten !== undefined){
+                return String(v.ten).trim();
+              }
+
+              if(v.value !== undefined){
+                return String(v.value).trim();
+              }
+
+              if(v.gia_tri !== undefined){
+                return String(v.gia_tri).trim();
+              }
+
+            }
+
+            return "";
+
+          })
+          .filter(v => v !== "");
+
+
+      // =====================================================
+      // 3. MỖI NHÓM DANH MỤC DÙNG CHO 2 SELECT
+      //
+      // SELECT FORM NHẬP/SỬA
+      // +
+      // SELECT BỘ LỌC TÌM KIẾM
+      // =====================================================
+
+      const selectMap = {
+
+  // =========================
+  // LOẠI ĐƠN
+  // =========================
+
+  "LOAIDON": [
+    "loaidon",
+    "typeFilter"
+  ],
+
+  // =========================
+  // LĨNH VỰC
+  // =========================
+
+  "LINHVUC": [
+    "linhvuc",
+    "linhvucFilter"
+  ],
+
+  // =========================
+  // THẨM QUYỀN
+  // =========================
+
+  "THAMQUYENGIAIQUYET": [
+    "coquan",
+    "authorityFilter"
+  ],
+
+  // =========================
+  // ĐIỀU KIỆN
+  // =========================
+
+  "DIEUKIENXULY": [
+    "dieukien",
+    "conditionFilter"
+  ],
+
+  // =========================
+  // TÌNH TRẠNG
+  // =========================
+
+  "TINHTRANGXULYDON": [
+    "tinhtrang",
+    "statusFilter"
+  ],
+
+  // =========================
+  // KẾT QUẢ
+  // =========================
+
+  "KETQUAXULYDON": [
+    "ketqua",
+    "ketquaFilter"
+  ],
+  // =========================
+  // KẾT QUẢ
+  // =========================
+
+  "NGUONDON": [
+    "nguondon",
+    "nguondonFilter"
+],
+
+  // =========================
+  // NGƯỜI THAM MƯU
+  // =========================
+
+  "NGUOITHAMMUU": [
+    "soanthaoSelect"
+  ],
+
+  // =========================
+  // LÃNH ĐẠO KÝ DUYỆT
+  // =========================
+
+  "LANHDAOKYDUYET": [
+  "kyduyet"
+  ]
+
+};
+
+
+      const selectIds =
+        selectMap[nhom];
+
+
+      // Không có mapping
+      if(!selectIds){
+
+        console.warn(
+          "Chưa có select tương ứng cho nhóm:",
+          nhom
+        );
+
+        return danhMuc[nhom];
+
+      }
+
+
+      // =====================================================
+      // 4. XÁC ĐỊNH PLACEHOLDER
+      // =====================================================
+
+      let placeholder =
+        "-- Chọn người tham mưu --";
+
+
+
+      if(nhom === "LOAIDON"){
+
+        placeholder =
+          "-- Chọn loại đơn --";
+
+      }
+
+
+if(nhom === "NGUONDON"){
+    placeholder =
+        "-- Chọn nguồn đơn --";
+}
+
+      if(nhom === "LINHVUC"){
+
+        placeholder =
+          "-- Chọn lĩnh vực --";
+
+      }
+
+
+      if(nhom === "THAMQUYENGIAIQUYET"){
+
+        placeholder =
+          "-- Chọn thẩm quyền giải quyết --";
+
+      }
+
+
+      if(nhom === "DIEUKIENXULY"){
+
+        placeholder =
+          "-- Chọn điều kiện --";
+
+      }
+
+
+      if(nhom === "TINHTRANGXULYDON"){
+
+        placeholder =
+          "-- Chọn tình trạng --";
+
+      }
+
+
+      if(nhom === "KETQUAXULYDON"){
+
+        placeholder =
+          "-- Chọn kết quả --";
+
+      }
+
+      if(nhom === "LANHDAOKYDUYET"){
+
+    placeholder =
+        "-- Chọn lãnh đạo ký duyệt --";
+
+}
+
+
+
+      // =====================================================
+      // 5. ĐỔ DỮ LIỆU VÀO TẤT CẢ SELECT LIÊN QUAN
+      // =====================================================
+
+      selectIds.forEach(selectId => {
+
+        const select =
+          document.getElementById(selectId);
+
+
+        // Nếu select không tồn tại thì bỏ qua
+        if(!select){
+
+          console.warn(
+            "Không tìm thấy select:",
+            selectId,
+            "của nhóm:",
+            nhom
+          );
+
+          return;
+
+        }
+
+
+        // ===================================================
+        // LƯU GIÁ TRỊ ĐANG CHỌN
+        // ===================================================
+
+        const oldValue =
+          String(
+            select.value || ""
+          ).trim();
+
+
+        // ===================================================
+        // XÓA OPTION CŨ
+        // ===================================================
+
+        select.innerHTML = "";
+
+
+        // ===================================================
+        // OPTION MẶC ĐỊNH
+        // ===================================================
+
+        const firstOption =
+          document.createElement("option");
+
+        firstOption.value = "";
+
+        firstOption.textContent =
+          placeholder;
+
+        select.appendChild(
+          firstOption
+        );
+
+
+        // ===================================================
+        // ĐƯA DỮ LIỆU TỪ SHEET VÀO SELECT
+        // ===================================================
+
+        danhMuc[nhom].forEach(value => {
+
+          const option =
+            document.createElement("option");
+
+
+          option.value =
+            String(value).trim();
+
+
+          option.textContent =
+            String(value).trim();
+
+
+          select.appendChild(
+            option
+          );
+
+        });
+
+
+        // ===================================================
+        // KHÔI PHỤC GIÁ TRỊ CŨ
+        // ===================================================
+
+        if(oldValue){
+
+          const exists =
+            danhMuc[nhom].some(
+              value =>
+                String(value).trim()
+                === oldValue
+            );
+
+
+          if(exists){
+
+            select.value =
+              oldValue;
+
+          }
+
+        }
+
+      });
+
+
+      console.log(
+        "✅ ĐÃ NẠP DANH MỤC:",
+        nhom,
+        danhMuc[nhom]
+      );
+
+
+      return danhMuc[nhom];
+
+    })
+
+
+    .catch(error => {
+
+      console.error(
+        "❌ LỖI TẢI DANH MỤC:",
+        nhom,
+        error
+      );
+
+
+      return [];
+
+    });
+
+}
+
+function xuLyNguonDon() {
+
+    const select = document.getElementById("nguondon");
+    const group = document.getElementById("nguonDonKhacGroup");
+    const input = document.getElementById("nguonDonKhac");
+
+    if (!select || !group || !input) return;
+
+    // Lấy tên đang hiển thị của option
+    const text = select.options[select.selectedIndex]
+        ? select.options[select.selectedIndex].text.trim()
+        : "";
+
+    // Chỉ hiện khi chọn "Nơi khác chuyển đến"
+    if (text === "Nơi khác chuyển đến" ||
+        text === "Từ nơi khác chuyển đến") {
+
+        group.style.display = "block";
+        input.focus();
+
+    } else {
+
+        group.style.display = "none";
+        input.value = "";
+    }
+}
+
 </script>
 </head>
 <body>
@@ -13206,7 +16093,9 @@ function exportPDFTiepDan(){
 
 
 <div id="loginPage" class="login-wrapper">
-
+<div class="login-logo">
+    <img src="https://quanlydonthu.io.vn/iconcantho.png" alt="Logo">
+</div>
 <div class="system-title">
 HỆ THỐNG QUẢN LÝ ĐƠN THƯ
 </div>
@@ -13269,11 +16158,33 @@ SỞ NỘI VỤ THÀNH PHỐ CẦN THƠ
     <span class="menu-text">Thư viện văn bản</span>
 </a>
 
-<a href="#" id="menuUsers" onclick="showPage('users')">
-    <span class="menu-icon">👤</span>
-    <span class="menu-text">Quản lý tài khoản</span>
+<!-- Chỉ Admin -->
+<div id="adminMenu" style="display:none;">
+
+    <hr style="margin:10px 0;border:none;border-top:1px solid rgba(255,255,255,.2);">
+
+    <div style="
+        padding:8px 18px;
+        color:#ffc107;
+        font-weight:bold;
+        font-size:13px;
+        letter-spacing:.5px;
+    ">
+        ⚙ QUẢN TRỊ HỆ THỐNG
+    </div>
+
+    <a href="#" id="menuUsers" onclick="showPage('users')">
+        <span class="menu-icon">👤</span>
+        <span class="menu-text">Quản lý tài khoản</span>
+    </a>
+
+    
+    <a href="#" onclick="showPage('danhMuc')">
+    <span class="menu-icon">📋</span>
+    <span class="menu-text">Quản trị danh mục</span>
 </a>
 
+</div>
 
 
 </div>
@@ -13460,7 +16371,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
           <option>Nguyễn Thị Nhi</option>
           <option>Lâm Tố Trinh</option>
           <option>Trịnh Thị Bích Phượng</option>
-          <option>Nguyễn Thế Long</option>
+          <option>Nguyễn Thế Long 2</option>
         </select>
 
   <!-- Người tham mưu -->
@@ -13731,32 +16642,37 @@ onclick="closeBaoCaoTuanxx()">
     <tbody id="tbodyBaoCaoTuan"></tbody>
   </table>
 
-  <div id="paginationBaoCaoTuan"></div>
-  <div
-style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-top:10px;
-">
+  <!-- PHÂN TRANG BÁO CÁO TUẦN -->
+<div id="baoCaoTuanPagination"
+     style="
+       display:flex;
+       justify-content:center;
+       align-items:center;
+       width:100%;
+       gap:4px;
+     ">
+</div>
 
-  <div>
-    Hiển thị
+<!-- THANH CHỌN SỐ DÒNG -->
+<div class="table-footer">
+
+  <div class="rows-control">
+
+    <span>Hiển thị</span>
 
     <select
       id="baoCaoTuanRows"
-      onchange="changeBaoCaoTuanRows()">
-
+      onchange="changeBaoCaoTuanRows()"
+    >
       <option value="10">10</option>
       <option value="20">20</option>
       <option value="50">50</option>
-
+      <option value="100">100</option>
     </select>
 
-    báo cáo/trang
-  </div>
+    <span>báo cáo/trang</span>
 
-  <div id="baoCaoTuanPagination"></div>
+  </div>
 
 </div>
 
@@ -13884,6 +16800,71 @@ margin-top:10px;
       <tbody id="userTable"></tbody>
     </table>
   </div>
+</div>
+
+<!-- ================= QUẢN TRỊ DANH MỤC ================= -->
+<div id="pageDanhMuc" style="display:none">
+
+  <div class="card">
+
+    <h3 style="color:#b30000;margin-bottom:15px">
+      📋 Quản trị danh mục
+    </h3>
+
+    <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap">
+
+      <select id="dmNhom" onchange="loadDanhMucAdmin()">
+
+  <option value="NGUOITHAMMUU">
+    Người tham mưu
+  </option>
+
+  <option value="LOAIDON">
+    Loại đơn
+  </option>
+
+ <option value="NGUONDON">
+    Nguồn đơn
+</option>
+
+  <option value="LINHVUC">
+    Lĩnh vực
+  </option>
+
+  <option value="THAMQUYENGIAIQUYET">
+    Thẩm quyền giải quyết
+  </option>
+
+  <option value="DIEUKIENXULY">
+    Điều kiện xử lý
+  </option>
+
+  <option value="TINHTRANGXULYDON">
+    Tình trạng xử lý đơn
+  </option>
+
+  <option value="KETQUAXULYDON">
+    Kết quả xử lý đơn
+  </option>
+
+  <option value="LANHDAOKYDUYET">
+  Lãnh đạo ký duyệt
+</option>
+
+</select>
+
+      <input id="dmMoi" placeholder="Nhập giá trị mới">
+
+      <button class="btn-add" onclick="themDanhMuc()">
+        ➕ Thêm
+      </button>
+
+    </div>
+
+    <div id="dmList"></div>
+
+  </div>
+
 </div>
 
 <!-- ================= THƯ VIỆN VĂN BẢN ================= -->
@@ -14025,31 +17006,32 @@ background:#fff;
 <label>Loại đơn <span style="color:red">*</span></label>
 <select id="loaidon">
 <option value="">-- Chọn loại đơn --</option>
-<option>Khiếu nại</option>
-<option>Tố cáo</option>
-<option>Phản ánh - Kiến nghị</option>
-<option>Hòa giải</option>
-<option>Khác</option>
+
 </select>
 </div>
 
 <div class="form-group">
 <label>Nguồn đơn <span style="color:red">*</span></label>
-<input id="nguondon">
+<select id="nguondon" onchange="xuLyNguonDon()">
+<option value="">-- Chọn nguồn đơn --</option>
+</select>
+ <div class="form-group" id="nguonDonKhacGroup"
+         style="display:none; margin-top:10px;">
+
+        <label>Thông tin nơi chuyển đến <span style="color:red">*</span></label>
+
+        <input
+            type="text"
+            id="nguonDonKhac"
+            placeholder="Nhập tên cơ quan/đơn vị/nơi chuyển đến..."
+        >
+    </div>
 </div>
 
 <div class="form-group">
 <label>Lĩnh vực <span style="color:red">*</span></label>
 <select id="linhvuc">
 <option value="">-- Chọn lĩnh vực --</option>
-<option>Lao động - Việc làm</option>
-<option>Công chức - Viên chức</option>
-<option>Người có công</option>
-<option>Cải cách hành chính và chính quyền địa phương</option>
-<option>Tổ chức - Biên chế</option>
-<option>Thi đua - Khen thưởng</option>
-<option>Đất đai</option>
-<option>Khác</option>
 </select>
 </div>
 
@@ -14058,7 +17040,31 @@ background:#fff;
 
 
 <div class="section">
-<div class="section-title">Thông tin người gửi</div>
+<div class="section-title" style="display:flex;align-items:center;gap:14px;">
+
+  <span>THÔNG TIN NGƯỜI GỬI</span>
+
+  <label style="
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-size:13px;
+      color:#666;
+      font-weight:normal;
+      margin:0;
+      white-space:nowrap;
+  ">
+
+      <input type="checkbox"
+             id="donNacDanh"
+             onchange="toggleDonNacDanh()"
+             style="margin:0;">
+
+      Đơn nặc danh
+
+  </label>
+
+</div>
 <div class="form-group">
 <label>Số người <span style="color:red">*</span></label>
 <input
@@ -14071,9 +17077,8 @@ background:#fff;
 
 
 <div class="form-group">
-<label>Họ tên</label>
-<input id="hoten">
-</div>
+<label>Họ tên</label> 
+<input id="hoten"> </div>
 
 <div class="form-group">
 <label>Điện thoại</label>
@@ -14104,8 +17109,6 @@ background:#fff;
 <label>Thẩm quyền giải quyết <span style="color:red">*</span></label>
 <select id="coquan">
 <option value="">-- Chọn thẩm quyền giải quyết --</option>
-<option>Thuộc thẩm quyền giải quyết</option>
-<option>Không thuộc thẩm quyền giải quyết</option>
 </select>
 </div>
 
@@ -14113,8 +17116,6 @@ background:#fff;
 <label>Điều kiện xử lý <span style="color:red">*</span></label>
 <select id="dieukien">
 <option value="">-- Chọn điều kiện --</option>
-<option>Đủ điều kiện xử lý</option>
-<option>Không đủ điều kiện xử lý</option>
 </select>
 </div>
 
@@ -14122,8 +17123,6 @@ background:#fff;
 <label>Tình trạng xử lý đơn <span style="color:red">*</span></label>
 <select id="tinhtrang">
 <option value="">-- Chọn tình trạng --</option>
-<option>Đang xử lý</option>
-<option>Đã xử lý</option>
 </select>
 </div>
 
@@ -14131,13 +17130,6 @@ background:#fff;
 <label>Kết quả xử lý đơn</label>
 <select id="ketqua">
 <option value="">-- Chọn kết quả --</option>
-<option>Phúc đáp</option>
-<option>Hướng dẫn</option>
-<option>Chuyển đơn</option>
-<option>Báo cáo</option>
-<option>Lưu đơn</option>
-<option>Thụ lý giải quyết</option>
-<option>Khác</option>
 </select>
 </div>
 
@@ -14152,46 +17144,35 @@ background:#fff;
 </div>
 
 <div class="form-group">
-<label>Lãnh đạo ký duyệt</label>
-<input id="kyduyet">
+  <label>Lãnh đạo ký duyệt</label>
+
+  <select id="kyduyet">
+    <option value="">
+      -- Chọn lãnh đạo ký duyệt --
+    </option>
+  </select>
 </div>
 
 <div class="form-group">
 <label>Người tham mưu soạn thảo<span style="color:red">*</span></label>
-<select id="soanthaoSelect" onchange="toggleSoanThaoKhac()">
+<select
+  id="soanthaoSelect"
+  onchange="toggleSoanThaoKhac()"
+>
 
-<option value="">-- Chọn người tham mưu --</option>
-
-<option value="Nguyễn Thị Nhi">
-Nguyễn Thị Nhi
-</option>
-
-<option value="Lâm Tố Trinh">
-Lâm Tố Trinh
-</option>
-
-<option value="Trịnh Thị Bích Phượng">
-Trịnh Thị Bích Phượng
-</option>
-
-<option value="Nguyễn Thế Long">
-Nguyễn Thế Long
-</option>
-
-<option value="Khác">
-Khác
-</option>
+  <option value="">
+    -- Chọn người tham mưu --
+  </option>
 
 </select>
 
-<!-- ô nhập khi chọn Khác -->
-
 <input
-type="text"
-id="soanthaoKhac"
-placeholder="Nhập họ tên người tham mưu"
-style="display:none;margin-top:5px;"
+  type="text"
+  id="soanthaoKhac"
+  placeholder="Nhập họ tên người tham mưu"
+  style="display:none;margin-top:5px;"
 >
+
 </div>
 
 
@@ -14205,23 +17186,72 @@ style="display:none;margin-top:5px;"
 
 <div class="card-section">
 
-<div class="section-title">
-📎 TÀI LIỆU ĐÍNH KÈM
-</div>
+  <div class="section-title">
+    📎 TÀI LIỆU ĐÍNH KÈM
+  </div>
 
-<input
-  id="hosoLink"
-  placeholder="Dán link Google Drive hoặc PDF">
+  <!-- DÁN LINK GOOGLE DRIVE -->
+  <div style="display:flex; gap:8px; margin-bottom:8px;">
 
-<button
-  type="button"
-  onclick="addHoSoFile()">
+    <input
+      id="hosoLink"
+      placeholder="Dán link Google Drive hoặc PDF"
+      style="flex:1;">
 
-➕ Thêm tài liệu
+    <button
+      type="button"
+      onclick="addHoSoFile()">
 
-</button>
+      ➕ Thêm link
 
-<div id="hosoFileContainer"></div>
+    </button>
+
+  </div>
+
+
+  <!-- CHỌN FILE TRỰC TIẾP TỪ MÁY -->
+  <div style="
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:8px;
+    padding:10px;
+    background:#f8f9fa;
+    border:1px dashed #bbb;
+    border-radius:6px;
+  ">
+
+    <label
+      for="hosoFiles"
+      style="
+        cursor:pointer;
+        background:#198754;
+        color:white;
+        padding:8px 14px;
+        border-radius:5px;
+        margin:0;
+      ">
+
+      📁 Chọn file từ máy
+
+    </label>
+
+    <input
+      type="file"
+      id="hosoFiles"
+      multiple
+      style="display:none;"
+      onchange="showSelectedHoSoFiles()">
+
+    <span id="hosoSelectedFiles">
+      Chưa chọn file
+    </span>
+
+  </div>
+
+
+  <!-- DANH SÁCH FILE/LINK ĐÃ CÓ -->
+  <div id="hosoFileContainer"></div>
 
 </div>
 <button class="btn-save">💾 Lưu hồ sơ</button>
@@ -14909,7 +17939,6 @@ document.getElementById('baoCaoModal').style.display='none'
 <option value="Tháng">Tháng</option>
 <option value="Quý">Quý</option>
 <option value="6 tháng">6 tháng đầu năm</option>
-<option value="9 tháng">9 tháng đầu năm</option>
 <option value="Năm">Năm</option>
 <option value="Khác">Khác</option>
 </select>
@@ -14985,5 +18014,73 @@ onclick="saveBaoCaoLuuTru()">
 
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- NHÂN VẬT TRỢ LÝ AI -->
+<div id="aiGirlAssistant" aria-hidden="true">
+    <img
+        src="https://quanlydonthu.io.vn/tro-ly-nu.png"
+        alt="Nhân vật nữ trợ lý AI">
+</div>
+<!-- CHAT AI -->
+
+<div id="aiChatPanel">
+
+    <div class="ai-header">
+
+    <div class="ai-title">
+
+        <div class="ai-title-main">
+    <img
+        src="https://quanlydonthu.io.vn/ai-girl-icon.png"
+        alt="Trợ lý AI"
+        style="width:28px;height:28px;object-fit:cover;border-radius:50%;vertical-align:middle;margin-right:5px;">
+    Trợ lý AI
+</div>
+
+        <div class="ai-title-sub">
+            AI hỗ trợ nghiệp vụ xử lý đơn thư Sở Nội vụ
+        </div>
+
+    </div>
+
+    <span class="ai-close"
+          onclick="closeAIChat()">
+        ✕
+    </span>
+
+</div>
+
+    <div id="aiMessages"></div>
+
+    <div class="ai-input">
+
+    <textarea
+        id="aiQuestion"
+        placeholder="Nhập câu hỏi..."
+    ></textarea>
+
+    <button
+        id="aiSendBtn"
+        onclick="sendAI()"
+        title="Gửi">
+
+        ➤
+
+    </button>
+
+</div>
+
+</div>
+<button
+    id="aiFloatBtn"
+    onclick="openAIChat()"
+    title="Trợ lý AI"
+    aria-label="Mở Trợ lý AI">
+
+    <img
+        src="https://quanlydonthu.io.vn/ai-girl-icon.png"
+        alt="Cô gái trợ lý AI">
+
+</button>
 </body>
 </html>
