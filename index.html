@@ -9575,6 +9575,8 @@ function loadNguoiThamMuu(){
 
 }
 
+ 
+
 function output(data){
 
   return ContentService
@@ -15820,9 +15822,11 @@ function loadDanhMuc(nhom){
   // NGƯỜI THAM MƯU
   // =========================
 
-  "NGUOITHAMMUU": [
-    "soanthaoSelect"
-  ],
+"NGUOITHAMMUU": [
+    "soanthaoSelect",
+    "td_congchuc",
+    "staffFilterTiepDan"
+],
 
   // =========================
   // LÃNH ĐẠO KÝ DUYỆT
@@ -15974,7 +15978,11 @@ if(nhom === "NGUONDON"){
         firstOption.value = "";
 
         firstOption.textContent =
-          placeholder;
+    selectId === "td_congchuc"
+        ? "-- Chọn công chức tiếp --"
+        : selectId === "staffFilterTiepDan"
+            ? "Công chức tiếp"
+            : placeholder;
 
         select.appendChild(
           firstOption
@@ -16004,6 +16012,18 @@ if(nhom === "NGUONDON"){
           );
 
         });
+        // Bảo đảm Công chức tiếp có lựa chọn Khác
+        if (
+    ["td_congchuc", "staffFilterTiepDan"].includes(selectId) &&
+    !Array.from(select.options).some(
+        option => option.value.trim() === "Khác"
+    )
+) {
+    const optionKhac = document.createElement("option");
+    optionKhac.value = "Khác";
+    optionKhac.textContent = "Khác";
+    select.appendChild(optionKhac);
+}
 
 
         // ===================================================
@@ -16688,13 +16708,8 @@ onclick="closeBaoCaoTuanxx()">
         <input id="searchTiepDan" placeholder="🔍 Tìm công dân..." oninput="applyFilterTiepDan()">
 
         <select id="staffFilterTiepDan" onchange="applyFilterTiepDan()">
-          <option value="">Công chức tiếp</option>
-          <option>Nguyễn Thị Nhi</option>
-          <option>Lâm Tố Trinh</option>
-          <option>Trịnh Thị Bích Phượng</option>
-          <option>Nguyễn Thế Long</option>
-          <option>Khác</option>
-        </select>
+    <option value="">Công chức tiếp</option>
+</select>
 
         <select id="monthFilterTiepDan" onchange="applyFilterTiepDan()">
           <option value="">Tháng</option>
